@@ -1,0 +1,13 @@
+{
+  "@import": "1place/js-repository#^0.1.0",
+  "possiblyAsync": {
+    "@include": "./packages/possibly-async"
+  },
+  "link": {
+    "@type": "method",
+    "@run": [
+      "(@import shell/bash) run \"npm-link ./packages/possibly-async\"",
+      "(@import shell/bash) run \"npm-link ./packages/possibly-async/tests\""
+    ]
+  }
+}
