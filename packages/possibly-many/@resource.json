@@ -1,0 +1,13 @@
+{
+  "@import": "1place/npm-package#^0.2.0",
+  "name": "possibly-many",
+  "version": "0.1.3",
+  "description": "Helps handling values that are one (scalar) or many (array) indifferently",
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/possibly-many",
+  "dependencies": {},
+  "tests": {
+    "@include": "./tests"
+  }
+}
