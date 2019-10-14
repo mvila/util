@@ -66,3 +66,16 @@ possiblyAsync.mapObject = function (object, mapper) {
     }
   );
 };
+
+possiblyAsync.all = function (iterable) {
+  return possiblyAsync.map(iterable, function (value) {
+    return value;
+  });
+};
+
+possiblyAsync.possiblyMany = function (valueOrPromise) {
+  if (Array.isArray(valueOrPromise)) {
+    return possiblyAsync.all(valueOrPromise);
+  }
+  return valueOrPromise;
+};

@@ -88,6 +88,28 @@ describe('possibly-async', () => {
     });
     expect(results).toEqual({a: 2, b: 4, c: 6});
   });
+
+  test('possiblyAsync.all()', async () => {
+    let results = possiblyAsync.all([1, 2, 3]);
+    expect(results).toEqual([1, 2, 3]);
+
+    results = await possiblyAsync.all([1, makePromise(2), 3]);
+    expect(results).toEqual([1, 2, 3]);
+  });
+
+  test('possiblyAsync.possiblyMany()', async () => {
+    let results = possiblyAsync.possiblyMany(1);
+    expect(results).toBe(1);
+
+    results = possiblyAsync.possiblyMany([1, 2, 3]);
+    expect(results).toEqual([1, 2, 3]);
+
+    results = await possiblyAsync.possiblyMany(makePromise(1));
+    expect(results).toEqual(1);
+
+    results = await possiblyAsync.possiblyMany([1, makePromise(2), 3]);
+    expect(results).toEqual([1, 2, 3]);
+  });
 });
 
 function makePromise(value) {
