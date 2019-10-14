@@ -1,20 +1,6 @@
 import {possiblyMany} from '../../..';
 
 describe('One or many', () => {
-  test('possiblyMany()', () => {
-    let results = [];
-    for (const value of possiblyMany('aaa')) {
-      results.push(value.toUpperCase());
-    }
-    expect(results).toEqual(['AAA']);
-
-    results = [];
-    for (const value of possiblyMany(['aaa', 'bbb', 'ccc'])) {
-      results.push(value.toUpperCase());
-    }
-    expect(results).toEqual(['AAA', 'BBB', 'CCC']);
-  });
-
   test('possiblyMany.get()', () => {
     expect(possiblyMany.get('aaa')).toBe('aaa');
     expect(() => possiblyMany.get('aaa', 1)).toThrow(/Expected an array/);

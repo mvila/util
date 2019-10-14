@@ -1,6 +1,4 @@
-export function possiblyMany(value) {
-  return Array.isArray(value) ? value : [value];
-}
+export const possiblyMany = {};
 
 possiblyMany.get = function (value, index) {
   if (index !== undefined) {
