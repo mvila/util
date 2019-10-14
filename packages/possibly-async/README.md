@@ -1,6 +1,6 @@
 # possibly-async
 
-Help merging synchronous and asynchronous code execution.
+Helps implementing functions that are synchronous or asynchronous depending of their parameters.
 
 ## Installation
 
