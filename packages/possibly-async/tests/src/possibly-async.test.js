@@ -1,7 +1,7 @@
 import {possiblyAsync} from '../../..';
 
 describe('possibly-async', () => {
-  test('possiblyAsync()', async () => {
+  test('possiblyAsync() with one callback', async () => {
     const syncFunc = () => 'a';
     let result = possiblyAsync(syncFunc(), result => result + 'b');
     expect(result).toBe('ab');
@@ -21,6 +21,14 @@ describe('possibly-async', () => {
       );
     result = await possiblyAsync(asyncFunc3(), result => result + 'd');
     expect(result).toBe('abcd');
+  });
+
+  test('possiblyAsync() with multiple callbacks', async () => {
+    const asyncFunc1 = () => new Promise(resolve => setTimeout(() => resolve('a'), 5));
+    const asyncFunc2 = result => new Promise(resolve => setTimeout(() => resolve(result + 'b'), 5));
+    const asyncFunc3 = result => new Promise(resolve => setTimeout(() => resolve(result + 'c'), 5));
+
+    expect(await possiblyAsync(asyncFunc1(), asyncFunc2, asyncFunc3)).toBe('abc');
   });
 
   test('possiblyAsync.forEach()', async () => {

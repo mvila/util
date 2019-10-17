@@ -2,13 +2,30 @@ import isPromise from 'is-promise';
 
 /* eslint-disable prefer-arrow-callback */
 
-export function possiblyAsync(valueOrPromise, func) {
+export function possiblyAsync(valueOrPromise, callback, ...remainingCallbacks) {
+  function runCallback(value) {
+    const result = callback(value);
+
+    const remainingCallback = remainingCallbacks.shift();
+
+    if (remainingCallback !== undefined) {
+      return possiblyAsync(result, remainingCallback, ...remainingCallbacks);
+    }
+
+    return result;
+  }
+
   if (isPromise(valueOrPromise)) {
-    return valueOrPromise.then(function (value) {
-      return func(value);
+    const promise = valueOrPromise;
+
+    return promise.then(function (value) {
+      return runCallback(value);
     });
   }
-  return func(valueOrPromise);
+
+  const value = valueOrPromise;
+
+  return runCallback(value);
 }
 
 possiblyAsync.forEach = function (iterable, func) {
