@@ -1,34 +1,212 @@
 import {possiblyAsync} from '../../..';
 
 describe('possibly-async', () => {
-  test('possiblyAsync() with one callback', async () => {
+  test('possiblyAsync() with one then callback', async () => {
     const syncFunc = () => 'a';
-    let result = possiblyAsync(syncFunc(), result => result + 'b');
+    let result = possiblyAsync(syncFunc(), {then: result => result + 'b'});
     expect(result).toBe('ab');
 
     const asyncFunc = () => new Promise(resolve => setTimeout(() => resolve('a'), 5));
-    result = await possiblyAsync(asyncFunc(), result => result + 'b');
+    result = await possiblyAsync(asyncFunc(), {then: result => result + 'b'});
     expect(result).toBe('ab');
 
-    const asyncFunc2 = () => possiblyAsync(asyncFunc(), result => result + 'b');
-    result = await possiblyAsync(asyncFunc2(), result => result + 'c');
+    const asyncFunc2 = () => possiblyAsync(asyncFunc(), {then: result => result + 'b'});
+    result = await possiblyAsync(asyncFunc2(), {then: result => result + 'c'});
     expect(result).toBe('abc');
 
     const asyncFunc3 = () =>
-      possiblyAsync(
-        asyncFunc2(),
-        result => new Promise(resolve => setTimeout(() => resolve(result + 'c'), 5))
-      );
-    result = await possiblyAsync(asyncFunc3(), result => result + 'd');
+      possiblyAsync(asyncFunc2(), {
+        then: result => new Promise(resolve => setTimeout(() => resolve(result + 'c'), 5))
+      });
+    result = await possiblyAsync(asyncFunc3(), {then: result => result + 'd'});
     expect(result).toBe('abcd');
   });
 
-  test('possiblyAsync() with multiple callbacks', async () => {
+  test('possiblyAsync() with multiple then callbacks', async () => {
     const asyncFunc1 = () => new Promise(resolve => setTimeout(() => resolve('a'), 5));
     const asyncFunc2 = result => new Promise(resolve => setTimeout(() => resolve(result + 'b'), 5));
     const asyncFunc3 = result => new Promise(resolve => setTimeout(() => resolve(result + 'c'), 5));
 
-    expect(await possiblyAsync(asyncFunc1(), asyncFunc2, asyncFunc3)).toBe('abc');
+    expect(await possiblyAsync(asyncFunc1(), {then: [asyncFunc2, asyncFunc3]})).toBe('abc');
+  });
+
+  test('possiblyAsync() with a catch callback', async () => {
+    const error1 = new Error('Error 1');
+    const error2 = new Error('Error 2');
+
+    const catchCallback = jest.fn(error => {
+      expect(error).toBe(error1);
+      throw error2;
+    });
+
+    let result;
+    expect(() => {
+      result = possiblyAsync('a', {
+        then() {
+          throw error1;
+        },
+        catch: catchCallback
+      });
+    }).toThrow(error2);
+    expect(result).toBeUndefined();
+    expect(catchCallback).toHaveBeenCalledTimes(1);
+
+    await expect(
+      (async () => {
+        result = await possiblyAsync(Promise.reject(error1), {catch: catchCallback});
+      })()
+    ).rejects.toThrow(error2);
+    expect(result).toBeUndefined();
+    expect(catchCallback).toHaveBeenCalledTimes(2);
+
+    await expect(
+      (async () => {
+        result = await possiblyAsync('a', {
+          async then() {
+            throw error1;
+          },
+          catch: catchCallback
+        });
+      })()
+    ).rejects.toThrow(error2);
+    expect(result).toBeUndefined();
+    expect(catchCallback).toHaveBeenCalledTimes(3);
+
+    expect(() => {
+      result = possiblyAsync('a', {
+        then: [
+          result => result + 'b',
+          () => {
+            throw error1;
+          }
+        ],
+        catch: catchCallback
+      });
+    }).toThrow(error2);
+    expect(result).toBeUndefined();
+    expect(catchCallback).toHaveBeenCalledTimes(4);
+  });
+
+  test('possiblyAsync() with a finally callback', async () => {
+    const finallyCallback = jest.fn();
+
+    let result = possiblyAsync('a', {then: result => result + 'b', finally: finallyCallback});
+    expect(result).toBe('ab');
+    expect(finallyCallback).toHaveBeenCalledTimes(1);
+
+    result = await possiblyAsync(Promise.resolve('a'), {
+      then: result => result + 'b',
+      finally: finallyCallback
+    });
+    expect(result).toBe('ab');
+    expect(finallyCallback).toHaveBeenCalledTimes(2);
+
+    result = await possiblyAsync(Promise.resolve('a'), {
+      then: async result => result + 'b',
+      finally: finallyCallback
+    });
+    expect(result).toBe('ab');
+    expect(finallyCallback).toHaveBeenCalledTimes(3);
+
+    result = possiblyAsync('a', {
+      then: [result => result + 'b', result => result + 'c'],
+      finally: finallyCallback
+    });
+    expect(result).toBe('abc');
+    expect(finallyCallback).toHaveBeenCalledTimes(4);
+
+    const error = new Error('Error');
+
+    result = undefined;
+    expect(() => {
+      result = possiblyAsync('a', {
+        then: [
+          result => result + 'b',
+          result => result + 'c',
+          () => {
+            throw error;
+          }
+        ],
+        finally: finallyCallback
+      });
+    }).toThrow(error);
+    expect(result).toBeUndefined();
+    expect(finallyCallback).toHaveBeenCalledTimes(5);
+
+    result = undefined;
+    await expect(
+      (async () => {
+        result = await possiblyAsync(Promise.resolve('a'), {
+          then: [
+            async result => result + 'b',
+            result => result + 'c',
+            async () => {
+              throw error;
+            }
+          ],
+          finally: finallyCallback
+        });
+      })()
+    ).rejects.toThrow(error);
+    expect(result).toBeUndefined();
+    expect(finallyCallback).toHaveBeenCalledTimes(6);
+  });
+
+  test('possiblyAsync() with both a catch and a finally callback', async () => {
+    const error1 = new Error('Error 1');
+    const error2 = new Error('Error 2');
+
+    const catchCallback = jest.fn(error => {
+      expect(error).toBe(error1);
+      return error2;
+    });
+
+    const finallyCallback = jest.fn();
+
+    let result = possiblyAsync('a', {
+      then: () => {
+        throw error1;
+      },
+      catch: catchCallback,
+      finally: finallyCallback
+    });
+    expect(result).toBe(error2);
+    expect(catchCallback).toHaveBeenCalledTimes(1);
+    expect(finallyCallback).toHaveBeenCalledTimes(1);
+
+    result = await possiblyAsync(Promise.reject(error1), {
+      catch: catchCallback,
+      finally: finallyCallback
+    });
+    expect(result).toBe(error2);
+    expect(catchCallback).toHaveBeenCalledTimes(2);
+    expect(finallyCallback).toHaveBeenCalledTimes(2);
+
+    result = await possiblyAsync('a', {
+      then: async () => {
+        throw error1;
+      },
+      catch: catchCallback,
+      finally: finallyCallback
+    });
+    expect(result).toBe(error2);
+    expect(catchCallback).toHaveBeenCalledTimes(3);
+    expect(finallyCallback).toHaveBeenCalledTimes(3);
+
+    const catchCallback2 = jest.fn(error => {
+      expect(error).toBe(error1);
+      throw error2;
+    });
+    result = possiblyAsync(Promise.resolve('a'), {
+      then: async () => {
+        throw error1;
+      },
+      catch: catchCallback2,
+      finally: finallyCallback
+    });
+    await expect(result).rejects.toThrow(error2);
+    expect(catchCallback2).toHaveBeenCalledTimes(1);
+    expect(finallyCallback).toHaveBeenCalledTimes(4);
   });
 
   test('possiblyAsync.forEach()', async () => {
@@ -48,6 +226,51 @@ describe('possibly-async', () => {
       results.push(value * 2);
     });
     expect(results).toEqual([2, 4, 6]);
+  });
+
+  test('possiblyAsync.forEach() with a catch callback', async () => {
+    const error1 = new Error('Error 1');
+    const error2 = new Error('Error 2');
+
+    const catchCallback = jest.fn(error => {
+      expect(error).toBe(error1);
+      return error2;
+    });
+
+    let accumulator = [];
+    let result = possiblyAsync.forEach(
+      [1, 2, 3, 4, 5],
+      value => {
+        if (value === 3) {
+          throw error1;
+        }
+        accumulator.push(value * 2);
+      },
+      {catch: catchCallback}
+    );
+    expect(result).toBe(error2);
+    expect(catchCallback).toHaveBeenCalledTimes(1);
+    expect(accumulator).toEqual([2, 4]);
+
+    accumulator = [];
+    result = await possiblyAsync.forEach(
+      [1, 2, 3, 4, 5],
+      value => {
+        if (value === 2) {
+          return makePromise(() => {
+            accumulator.push(value * 2);
+          });
+        }
+        if (value === 3) {
+          throw error1;
+        }
+        accumulator.push(value * 2);
+      },
+      {catch: catchCallback}
+    );
+    expect(result).toBe(error2);
+    expect(catchCallback).toHaveBeenCalledTimes(2);
+    expect(accumulator).toEqual([2, 4]);
   });
 
   test('possiblyAsync.map()', async () => {

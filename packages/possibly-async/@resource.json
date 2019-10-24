@@ -1,7 +1,7 @@
 {
   "@import": "1place/npm-package#^0.2.0",
   "name": "possibly-async",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Helps implementing functions that are synchronous or asynchronous depending of their parameters",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
