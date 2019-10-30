@@ -307,6 +307,30 @@ describe('possibly-async', () => {
     expect(results).toEqual([2, 4, 6]);
   });
 
+  test('possiblyAsync.some()', async () => {
+    const callback = jest.fn(value => value === 2);
+
+    let result = possiblyAsync.some([1, 2, 3], callback);
+    expect(result).toBe(true);
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    result = possiblyAsync.some([1, -2, 3], callback);
+    expect(result).toBe(false);
+    expect(callback).toHaveBeenCalledTimes(5);
+
+    result = await possiblyAsync.some([1, 2, 3], async value => {
+      return callback(value);
+    });
+    expect(result).toBe(true);
+    expect(callback).toHaveBeenCalledTimes(7);
+
+    result = await possiblyAsync.some([1, -2, 3], async value => {
+      return callback(value);
+    });
+    expect(result).toBe(false);
+    expect(callback).toHaveBeenCalledTimes(10);
+  });
+
   test('possiblyAsync.mapObject()', async () => {
     let results = possiblyAsync.mapObject({a: 1, b: 2, c: 3}, value => value * 2);
     expect(results).toEqual({a: 2, b: 4, c: 6});

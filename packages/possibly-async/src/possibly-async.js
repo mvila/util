@@ -2,6 +2,8 @@ import isPromise from 'is-promise';
 
 /* eslint-disable prefer-arrow-callback */
 
+const BREAK = Symbol('BREAK');
+
 export function possiblyAsync(
   valueOrPromise,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
@@ -109,8 +111,10 @@ possiblyAsync.forEach = function (
         function () {
           return callback(value);
         },
-        function () {
-          return iterate();
+        function (callbackResult) {
+          if (callbackResult !== BREAK) {
+            return iterate();
+          }
         }
       ]);
     }
@@ -175,6 +179,41 @@ possiblyAsync.reduce = function (
       then: [
         function () {
           return accumulator;
+        },
+        ...thenCallbacks
+      ],
+      catch: catchCallback,
+      finally: finallyCallback
+    }
+  );
+};
+
+possiblyAsync.some = function (
+  iterable,
+  callback,
+  {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
+) {
+  if (!Array.isArray(thenCallbacks)) {
+    thenCallbacks = [thenCallbacks];
+  }
+
+  let result = false;
+
+  return possiblyAsync(
+    possiblyAsync.forEach(iterable, function (value) {
+      return possiblyAsync(callback(value), {
+        then(callbackResult) {
+          if (callbackResult) {
+            result = true;
+            return BREAK;
+          }
+        }
+      });
+    }),
+    {
+      then: [
+        function () {
+          return result;
         },
         ...thenCallbacks
       ],
