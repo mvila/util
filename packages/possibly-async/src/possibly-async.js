@@ -1,7 +1,5 @@
 import isPromise from 'is-promise';
 
-/* eslint-disable prefer-arrow-callback */
-
 const BREAK = Symbol('BREAK');
 
 export function possiblyAsync(
@@ -13,7 +11,7 @@ export function possiblyAsync(
   }
 
   if (finallyCallback) {
-    const finallyAndReturnCallback = function (value) {
+    const finallyAndReturnCallback = function(value) {
       return possiblyAsync(finallyCallback(), {
         then() {
           return value;
@@ -21,8 +19,8 @@ export function possiblyAsync(
       });
     };
 
-    const catchAndFinallyCallback = function (error) {
-      const finallyAndThrowCallback = function (error) {
+    const catchAndFinallyCallback = function(error) {
+      const finallyAndThrowCallback = function(error) {
         const finallyCallbackResult = finallyCallback();
         return possiblyAsync(finallyCallbackResult, {
           then() {
@@ -85,7 +83,7 @@ function _possiblyAsync(valueOrPromise, thenCallbacks) {
   return callThenCallbacks(valueOrPromise);
 }
 
-possiblyAsync.call = function (callbacks, {catch: catchCallback, finally: finallyCallback} = {}) {
+possiblyAsync.call = function(callbacks, {catch: catchCallback, finally: finallyCallback} = {}) {
   return possiblyAsync(undefined, {
     then: callbacks,
     catch: catchCallback,
@@ -93,7 +91,7 @@ possiblyAsync.call = function (callbacks, {catch: catchCallback, finally: finall
   });
 };
 
-possiblyAsync.forEach = function (
+possiblyAsync.forEach = function(
   iterable,
   callback,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
@@ -104,14 +102,14 @@ possiblyAsync.forEach = function (
 
   const iterator = iterable[Symbol.iterator]();
 
-  const iterate = function () {
+  const iterate = function() {
     const {value, done} = iterator.next();
     if (!done) {
       return possiblyAsync.call([
-        function () {
+        function() {
           return callback(value);
         },
-        function (callbackResult) {
+        function(callbackResult) {
           if (callbackResult !== BREAK) {
             return iterate();
           }
@@ -126,7 +124,7 @@ possiblyAsync.forEach = function (
   });
 };
 
-possiblyAsync.map = function (
+possiblyAsync.map = function(
   iterable,
   mapper,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
@@ -137,7 +135,7 @@ possiblyAsync.map = function (
 
   const results = [];
   return possiblyAsync(
-    possiblyAsync.forEach(iterable, function (value) {
+    possiblyAsync.forEach(iterable, function(value) {
       return possiblyAsync(mapper(value), {
         then(result) {
           results.push(result);
@@ -146,7 +144,7 @@ possiblyAsync.map = function (
     }),
     {
       then: [
-        function () {
+        function() {
           return results;
         },
         ...thenCallbacks
@@ -157,7 +155,7 @@ possiblyAsync.map = function (
   );
 };
 
-possiblyAsync.reduce = function (
+possiblyAsync.reduce = function(
   iterable,
   reducer,
   accumulator,
@@ -168,7 +166,7 @@ possiblyAsync.reduce = function (
   }
 
   return possiblyAsync(
-    possiblyAsync.forEach(iterable, function (value) {
+    possiblyAsync.forEach(iterable, function(value) {
       return possiblyAsync(reducer(accumulator, value), {
         then(result) {
           accumulator = result;
@@ -177,7 +175,7 @@ possiblyAsync.reduce = function (
     }),
     {
       then: [
-        function () {
+        function() {
           return accumulator;
         },
         ...thenCallbacks
@@ -188,7 +186,7 @@ possiblyAsync.reduce = function (
   );
 };
 
-possiblyAsync.some = function (
+possiblyAsync.some = function(
   iterable,
   callback,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
@@ -200,7 +198,7 @@ possiblyAsync.some = function (
   let result = false;
 
   return possiblyAsync(
-    possiblyAsync.forEach(iterable, function (value) {
+    possiblyAsync.forEach(iterable, function(value) {
       return possiblyAsync(callback(value), {
         then(callbackResult) {
           if (callbackResult) {
@@ -212,7 +210,7 @@ possiblyAsync.some = function (
     }),
     {
       then: [
-        function () {
+        function() {
           return result;
         },
         ...thenCallbacks
@@ -223,7 +221,7 @@ possiblyAsync.some = function (
   );
 };
 
-possiblyAsync.mapObject = function (
+possiblyAsync.mapObject = function(
   object,
   mapper,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
@@ -234,7 +232,7 @@ possiblyAsync.mapObject = function (
 
   const result = {};
   return possiblyAsync(
-    possiblyAsync.forEach(Object.entries(object), function ([key, value]) {
+    possiblyAsync.forEach(Object.entries(object), function([key, value]) {
       return possiblyAsync(mapper(value), {
         then(value) {
           result[key] = value;
@@ -243,7 +241,7 @@ possiblyAsync.mapObject = function (
     }),
     {
       then: [
-        function () {
+        function() {
           return result;
         },
         ...thenCallbacks
@@ -254,7 +252,7 @@ possiblyAsync.mapObject = function (
   );
 };
 
-possiblyAsync.all = function (
+possiblyAsync.all = function(
   iterable,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
 ) {
@@ -264,14 +262,14 @@ possiblyAsync.all = function (
 
   return possiblyAsync.map(
     iterable,
-    function (value) {
+    function(value) {
       return value;
     },
     {then: thenCallbacks, catch: catchCallback, finally: finallyCallback}
   );
 };
 
-possiblyAsync.possiblyMany = function (
+possiblyAsync.possiblyMany = function(
   valueOrPromise,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}
 ) {
