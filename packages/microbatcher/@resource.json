@@ -1,0 +1,13 @@
+{
+  "@import": "1place/npm-package#^0.2.0",
+  "name": "microbatcher",
+  "version": "0.1.0",
+  "description": "Helps batching microtasks",
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/microbatcher",
+  "dependencies": {},
+  "tests": {
+    "@include": "./tests"
+  }
+}
