@@ -40,7 +40,9 @@ describe('Serialization', () => {
     function fun() {}
 
     expect(serialize(fun)).toEqual({});
+
     fun.limit = 100;
+
     expect(serialize(fun)).toEqual({limit: 100});
   });
 
@@ -69,5 +71,11 @@ describe('Serialization', () => {
     movie.title = 'Inception';
 
     expect(serialize(movie, {objectHandler})).toEqual({__class: 'Movie', title: 'Inception'});
+    expect(serialize({currentMovie: movie}, {objectHandler})).toEqual({
+      currentMovie: {
+        __class: 'Movie',
+        title: 'Inception'
+      }
+    });
   });
 });

@@ -59,11 +59,22 @@ describe('Deserialization', () => {
     }
 
     const DeserializedMovie = deserialize({__Class: 'Movie', limit: 100}, {objectHandler});
+
     expect(DeserializedMovie).toBe(Movie);
     expect(DeserializedMovie.limit).toBe(100);
 
     const deserializedMovie = deserialize({__class: 'Movie', title: 'Inception'}, {objectHandler});
+
     expect(deserializedMovie).toBeInstanceOf(Movie);
     expect(deserializedMovie.title).toBe('Inception');
+
+    const deserializedObject = deserialize(
+      {currentMovie: {__class: 'Movie', title: 'Inception'}},
+      {objectHandler}
+    );
+
+    expect(Object.keys(deserializedObject)).toEqual(['currentMovie']);
+    expect(deserializedObject.currentMovie).toBeInstanceOf(Movie);
+    expect(deserializedObject.currentMovie.title).toBe('Inception');
   });
 });

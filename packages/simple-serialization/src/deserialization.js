@@ -19,7 +19,7 @@ export function deserialize(value, options) {
   return value;
 }
 
-function deserializeObject(object, {objectHandler, ...options} = {}) {
+function deserializeObject(object, options) {
   if (object.__undefined === true) {
     return undefined;
   }
@@ -27,6 +27,8 @@ function deserializeObject(object, {objectHandler, ...options} = {}) {
   if (object.__class === 'Date') {
     return new Date(object.value);
   }
+
+  const objectHandler = options?.objectHandler;
 
   if (objectHandler !== undefined) {
     const deserializedObject = objectHandler(object);

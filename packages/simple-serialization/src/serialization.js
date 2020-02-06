@@ -23,7 +23,9 @@ export function serialize(value, options) {
   return value;
 }
 
-function serializeObject(object, {objectHandler, ...options} = {}) {
+function serializeObject(object, options) {
+  const objectHandler = options?.objectHandler;
+
   if (objectHandler !== undefined) {
     const serializedObject = objectHandler(object);
 
