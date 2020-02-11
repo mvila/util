@@ -14,19 +14,5 @@
   },
   "simpleSerialization": {
     "@include": "./packages/simple-serialization"
-  },
-  "link": {
-    "@type": "method",
-    "@run": [
-      "(@import shell/bash) run \"npm-link ./packages/core-helpers\"",
-      "(@import shell/bash) run \"npm-link ./packages/microbatcher\"",
-      "(@import shell/bash) run \"npm-link ./packages/microbatcher/tests\"",
-      "(@import shell/bash) run \"npm-link ./packages/possibly-async\"",
-      "(@import shell/bash) run \"npm-link ./packages/possibly-async/tests\"",
-      "(@import shell/bash) run \"npm-link ./packages/possibly-many\"",
-      "(@import shell/bash) run \"npm-link ./packages/possibly-many/tests\"",
-      "(@import shell/bash) run \"npm-link ./packages/simple-serialization\"",
-      "(@import shell/bash) run \"npm-link ./packages/simple-serialization/tests\""
-    ]
   }
 }
