@@ -25,7 +25,11 @@ function deserializeObject(object, options) {
   }
 
   if (object.__class === 'Date') {
-    return new Date(object.value);
+    return deserializeDate(object);
+  }
+
+  if (object.__class === 'Error') {
+    return deserializeError(object, options);
   }
 
   const objectHandler = options?.objectHandler;
@@ -38,6 +42,27 @@ function deserializeObject(object, options) {
     }
   }
 
+  return deserializeAttributes(object, options);
+}
+
+function deserializeDate(object) {
+  return new Date(object.__value);
+}
+
+function deserializeError(object, options) {
+  const {message, ...attributes} = object;
+
+  const deserializedError = new Error(message);
+
+  return possiblyAsync(deserializeAttributes(attributes, options), {
+    then: deserializedAttributes => {
+      Object.assign(deserializedError, deserializedAttributes);
+      return deserializedError;
+    }
+  });
+}
+
+function deserializeAttributes(object, options) {
   return possiblyAsync.mapValues(object, value => deserialize(value, options));
 }
 

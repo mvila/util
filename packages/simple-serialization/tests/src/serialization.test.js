@@ -17,9 +17,22 @@ describe('Serialization', () => {
 
     expect(serialize(new Date('2020-01-25T08:40:53.407Z'))).toEqual({
       __class: 'Date',
-      value: '2020-01-25T08:40:53.407Z'
+      __value: '2020-01-25T08:40:53.407Z'
     });
     expect(() => serialize(new Date('invalid'))).toThrow('Cannot serialize an invalid date');
+
+    expect(serialize(new Error())).toStrictEqual({__class: 'Error'});
+    expect(serialize(new Error('Message'))).toStrictEqual({__class: 'Error', message: 'Message'});
+    expect(
+      serialize(
+        Object.assign(new Error('Message'), {displayMessage: 'Display message', code: 'CODE'})
+      )
+    ).toStrictEqual({
+      __class: 'Error',
+      message: 'Message',
+      displayMessage: 'Display message',
+      code: 'CODE'
+    });
 
     expect(serialize({title: 'Inception', country: undefined, duration: 120})).toEqual({
       title: 'Inception',

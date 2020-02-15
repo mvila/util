@@ -39,19 +39,45 @@ function serializeObject(object, options) {
   }
 
   if (object instanceof Date) {
-    const date = object;
+    return serializeDate(object);
+  }
 
-    if (isNaN(date.valueOf())) {
-      throw new Error('Cannot serialize an invalid date');
-    }
-
-    return {__class: 'Date', value: object.toISOString()};
+  if (object instanceof Error) {
+    return serializeError(object, options);
   }
 
   if (typeof object.toJSON === 'function') {
     return object.toJSON();
   }
 
+  return serializeAttributes(object, options);
+}
+
+function serializeDate(date) {
+  if (isNaN(date.valueOf())) {
+    throw new Error('Cannot serialize an invalid date');
+  }
+
+  return {__class: 'Date', __value: date.toISOString()};
+}
+
+function serializeError(error, options) {
+  const serializedError = {__class: 'Error'};
+
+  // Since the 'message' property is not enumerable, we must get it manually
+  if (typeof error.message === 'string' && error.message !== '') {
+    serializedError.message = error.message;
+  }
+
+  return possiblyAsync(serializeAttributes(error, options), {
+    then: serializedAttributes => {
+      Object.assign(serializedError, serializedAttributes);
+      return serializedError;
+    }
+  });
+}
+
+function serializeAttributes(object, options) {
   return possiblyAsync.mapValues(object, value => serialize(value, options));
 }
 

@@ -15,9 +15,26 @@ describe('Deserialization', () => {
     expect(deserialize('')).toBe('');
     expect(deserialize('Hello')).toBe('Hello');
 
-    expect(deserialize({__class: 'Date', value: '2020-01-25T08:40:53.407Z'}).valueOf()).toBe(
+    expect(deserialize({__class: 'Date', __value: '2020-01-25T08:40:53.407Z'}).valueOf()).toBe(
       new Date('2020-01-25T08:40:53.407Z').valueOf()
     );
+
+    let error = deserialize({__class: 'Error'});
+    expect(error).toBeInstanceOf(Error);
+    expect(error.message).toBe('');
+    error = deserialize({__class: 'Error', message: 'Message'});
+    expect(error).toBeInstanceOf(Error);
+    expect(error.message).toBe('Message');
+    error = deserialize({
+      __class: 'Error',
+      message: 'Message',
+      displayMessage: 'Display message',
+      code: 'CODE'
+    });
+    expect(error).toBeInstanceOf(Error);
+    expect(error.message).toBe('Message');
+    expect(error.displayMessage).toBe('Display message');
+    expect(error.code).toBe('CODE');
 
     expect(
       deserialize({title: 'Inception', country: {__undefined: true}, duration: 120})
