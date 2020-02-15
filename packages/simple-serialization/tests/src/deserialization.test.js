@@ -19,12 +19,32 @@ describe('Deserialization', () => {
       new Date('2020-01-25T08:40:53.407Z').valueOf()
     );
 
+    let func = deserialize({
+      __class: 'Function',
+      __value: 'function sum(a, b) { return a + b; }'
+    });
+    expect(typeof func).toBe('function');
+    expect(Object.keys(func)).toEqual([]);
+    expect(func.name).toBe('sum');
+    expect(func(1, 2)).toBe(3);
+    func = deserialize({
+      __class: 'Function',
+      __value: 'function sum(a, b) { return a + b; }',
+      displayName: 'sum'
+    });
+    expect(typeof func).toBe('function');
+    expect(func.name).toBe('sum');
+    expect(Object.keys(func)).toEqual(['displayName']);
+    expect(func.displayName).toBe('sum');
+    expect(func(1, 2)).toBe(3);
+
     let error = deserialize({__class: 'Error'});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('');
     error = deserialize({__class: 'Error', message: 'Message'});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('Message');
+    expect(Object.keys(error)).toEqual([]);
     error = deserialize({
       __class: 'Error',
       message: 'Message',
@@ -33,6 +53,7 @@ describe('Deserialization', () => {
     });
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('Message');
+    expect(Object.keys(error)).toEqual(['displayMessage', 'code']);
     expect(error.displayMessage).toBe('Display message');
     expect(error.code).toBe('CODE');
 

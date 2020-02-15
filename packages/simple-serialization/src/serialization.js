@@ -42,6 +42,10 @@ function serializeObject(object, options) {
     return serializeDate(object);
   }
 
+  if (typeof object === 'function') {
+    return serializeFunction(object, options);
+  }
+
   if (object instanceof Error) {
     return serializeError(object, options);
   }
@@ -59,6 +63,26 @@ function serializeDate(date) {
   }
 
   return {__class: 'Date', __value: date.toISOString()};
+}
+
+function serializeFunction(func, options) {
+  const functionCode = func.toString();
+
+  if (functionCode.startsWith('class')) {
+    throw new Error('Cannot serialize a class');
+  }
+
+  const serializedFunction = {
+    __class: 'Function',
+    __value: functionCode
+  };
+
+  return possiblyAsync(serializeAttributes(func, options), {
+    then: serializedAttributes => {
+      Object.assign(serializedFunction, serializedAttributes);
+      return serializedFunction;
+    }
+  });
 }
 
 function serializeError(error, options) {

@@ -21,6 +21,20 @@ describe('Serialization', () => {
     });
     expect(() => serialize(new Date('invalid'))).toThrow('Cannot serialize an invalid date');
 
+    function sum(a, b) {
+      return a + b;
+    }
+    expect(serialize(sum)).toEqual({
+      __class: 'Function',
+      __value: 'function sum(a, b) {\n      return a + b;\n    }'
+    });
+    sum.displayName = 'sum';
+    expect(serialize(sum)).toEqual({
+      __class: 'Function',
+      __value: 'function sum(a, b) {\n      return a + b;\n    }',
+      displayName: 'sum'
+    });
+
     expect(serialize(new Error())).toStrictEqual({__class: 'Error'});
     expect(serialize(new Error('Message'))).toStrictEqual({__class: 'Error', message: 'Message'});
     expect(
@@ -51,14 +65,6 @@ describe('Serialization', () => {
     };
 
     expect(serialize(movie)).toEqual({title: 'Inception'});
-
-    function fun() {}
-
-    expect(serialize(fun)).toEqual({});
-
-    fun.limit = 100;
-
-    expect(serialize(fun)).toEqual({limit: 100});
   });
 
   test('Custom serialization', async () => {

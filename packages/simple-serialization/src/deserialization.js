@@ -28,6 +28,10 @@ function deserializeObject(object, options) {
     return deserializeDate(object);
   }
 
+  if (object.__class === 'Function') {
+    return deserializeFunction(object, options);
+  }
+
   if (object.__class === 'Error') {
     return deserializeError(object, options);
   }
@@ -49,8 +53,22 @@ function deserializeDate(object) {
   return new Date(object.__value);
 }
 
+function deserializeFunction(object, options) {
+  const {__class: _, __value: functionCode, ...attributes} = object;
+
+  // eslint-disable-next-line no-new-func
+  const deserializedFunction = new Function(`return ${functionCode}`)();
+
+  return possiblyAsync(deserializeAttributes(attributes, options), {
+    then: deserializedAttributes => {
+      Object.assign(deserializedFunction, deserializedAttributes);
+      return deserializedFunction;
+    }
+  });
+}
+
 function deserializeError(object, options) {
-  const {message, ...attributes} = object;
+  const {__class: _, message, ...attributes} = object;
 
   const deserializedError = new Error(message);
 
