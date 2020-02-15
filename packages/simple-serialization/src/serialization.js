@@ -42,7 +42,7 @@ function serializeObject(object, options) {
     return object.toJSON();
   }
 
-  return possiblyAsync.mapObject(object, value => serialize(value, options));
+  return possiblyAsync.mapValues(object, value => serialize(value, options));
 }
 
 function serializeArray(array, options) {

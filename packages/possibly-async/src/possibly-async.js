@@ -221,7 +221,7 @@ possiblyAsync.some = function(
   );
 };
 
-possiblyAsync.mapObject = function(
+possiblyAsync.mapValues = function(
   object,
   mapper,
   {then: thenCallbacks = [], catch: catchCallback, finally: finallyCallback} = {}

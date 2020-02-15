@@ -331,11 +331,11 @@ describe('possibly-async', () => {
     expect(callback).toHaveBeenCalledTimes(10);
   });
 
-  test('possiblyAsync.mapObject()', async () => {
-    let results = possiblyAsync.mapObject({a: 1, b: 2, c: 3}, value => value * 2);
+  test('possiblyAsync.mapValues()', async () => {
+    let results = possiblyAsync.mapValues({a: 1, b: 2, c: 3}, value => value * 2);
     expect(results).toEqual({a: 2, b: 4, c: 6});
 
-    results = await possiblyAsync.mapObject({a: 1, b: 2, c: 3}, value => {
+    results = await possiblyAsync.mapValues({a: 1, b: 2, c: 3}, value => {
       if (value === 2) {
         return makePromise(value * 2);
       }

@@ -38,7 +38,7 @@ function deserializeObject(object, options) {
     }
   }
 
-  return possiblyAsync.mapObject(object, value => deserialize(value, options));
+  return possiblyAsync.mapValues(object, value => deserialize(value, options));
 }
 
 function deserializeArray(array, options) {
