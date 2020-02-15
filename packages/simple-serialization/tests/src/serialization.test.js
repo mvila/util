@@ -10,6 +10,7 @@ describe('Serialization', () => {
 
     expect(serialize(0)).toBe(0);
     expect(serialize(123.45)).toBe(123.45);
+    expect(() => serialize(0 / 0)).toThrow('Cannot serialize a NaN value');
 
     expect(serialize('')).toBe('');
     expect(serialize('Hello')).toBe('Hello');
@@ -18,6 +19,7 @@ describe('Serialization', () => {
       __class: 'Date',
       value: '2020-01-25T08:40:53.407Z'
     });
+    expect(() => serialize(new Date('invalid'))).toThrow('Cannot serialize an invalid date');
 
     expect(serialize({title: 'Inception', country: undefined, duration: 120})).toEqual({
       title: 'Inception',

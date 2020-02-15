@@ -20,6 +20,10 @@ export function serialize(value, options) {
     return serializeObject(value, options);
   }
 
+  if (Number.isNaN(value)) {
+    throw new Error('Cannot serialize a NaN value');
+  }
+
   return value;
 }
 
@@ -35,6 +39,12 @@ function serializeObject(object, options) {
   }
 
   if (object instanceof Date) {
+    const date = object;
+
+    if (isNaN(date.valueOf())) {
+      throw new Error('Cannot serialize an invalid date');
+    }
+
     return {__class: 'Date', value: object.toISOString()};
   }
 
