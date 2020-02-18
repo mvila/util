@@ -19,25 +19,6 @@ describe('Deserialization', () => {
       new Date('2020-01-25T08:40:53.407Z').valueOf()
     );
 
-    let func = deserialize({
-      __class: 'Function',
-      __value: 'function sum(a, b) { return a + b; }'
-    });
-    expect(typeof func).toBe('function');
-    expect(Object.keys(func)).toEqual([]);
-    expect(func.name).toBe('sum');
-    expect(func(1, 2)).toBe(3);
-    func = deserialize({
-      __class: 'Function',
-      __value: 'function sum(a, b) { return a + b; }',
-      displayName: 'sum'
-    });
-    expect(typeof func).toBe('function');
-    expect(func.name).toBe('sum');
-    expect(Object.keys(func)).toEqual(['displayName']);
-    expect(func.displayName).toBe('sum');
-    expect(func(1, 2)).toBe(3);
-
     let error = deserialize({__class: 'Error'});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('');
@@ -96,23 +77,47 @@ describe('Deserialization', () => {
       }
     }
 
-    const DeserializedMovie = deserialize({__Class: 'Movie', limit: 100}, {objectHandler});
+    function functionHandler(object) {
+      const {__function} = object;
+
+      if (__function !== undefined) {
+        // eslint-disable-next-line no-new-func
+        return new Function(`return ${__function}`)();
+      }
+    }
+
+    const options = {objectHandler, functionHandler};
+
+    expect(deserialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
+
+    const DeserializedMovie = deserialize({__Class: 'Movie', limit: 100}, options);
 
     expect(DeserializedMovie).toBe(Movie);
     expect(DeserializedMovie.limit).toBe(100);
 
-    const deserializedMovie = deserialize({__class: 'Movie', title: 'Inception'}, {objectHandler});
+    const deserializedMovie = deserialize({__class: 'Movie', title: 'Inception'}, options);
 
     expect(deserializedMovie).toBeInstanceOf(Movie);
     expect(deserializedMovie.title).toBe('Inception');
 
     const deserializedObject = deserialize(
       {currentMovie: {__class: 'Movie', title: 'Inception'}},
-      {objectHandler}
+      options
     );
 
     expect(Object.keys(deserializedObject)).toEqual(['currentMovie']);
     expect(deserializedObject.currentMovie).toBeInstanceOf(Movie);
     expect(deserializedObject.currentMovie.title).toBe('Inception');
+
+    const func = deserialize(
+      {
+        __function: 'function sum(a, b) { return a + b; }'
+      },
+      options
+    );
+
+    expect(typeof func).toBe('function');
+    expect(func.name).toBe('sum');
+    expect(func(1, 2)).toBe(3);
   });
 });

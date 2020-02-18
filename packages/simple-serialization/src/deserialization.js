@@ -13,13 +13,16 @@ export function deserialize(value, options) {
   }
 
   if (typeof value === 'object') {
-    return deserializeObject(value, options);
+    return deserializeObjectOrFunction(value, options);
   }
 
   return value;
 }
 
-function deserializeObject(object, options) {
+function deserializeObjectOrFunction(object, options) {
+  const objectHandler = options?.objectHandler;
+  const functionHandler = options?.functionHandler;
+
   if (object.__undefined === true) {
     return undefined;
   }
@@ -28,15 +31,9 @@ function deserializeObject(object, options) {
     return deserializeDate(object);
   }
 
-  if (object.__class === 'Function') {
-    return deserializeFunction(object, options);
-  }
-
   if (object.__class === 'Error') {
     return deserializeError(object, options);
   }
-
-  const objectHandler = options?.objectHandler;
 
   if (objectHandler !== undefined) {
     const deserializedObject = objectHandler(object);
@@ -46,25 +43,19 @@ function deserializeObject(object, options) {
     }
   }
 
+  if (functionHandler !== undefined) {
+    const deserializedFunction = functionHandler(object);
+
+    if (deserializedFunction !== undefined) {
+      return deserializedFunction;
+    }
+  }
+
   return deserializeAttributes(object, options);
 }
 
 function deserializeDate(object) {
   return new Date(object.__value);
-}
-
-function deserializeFunction(object, options) {
-  const {__class: _, __value: functionCode, ...attributes} = object;
-
-  // eslint-disable-next-line no-new-func
-  const deserializedFunction = new Function(`return ${functionCode}`)();
-
-  return possiblyAsync(deserializeAttributes(attributes, options), {
-    then: deserializedAttributes => {
-      Object.assign(deserializedFunction, deserializedAttributes);
-      return deserializedFunction;
-    }
-  });
 }
 
 function deserializeError(object, options) {

@@ -21,20 +21,6 @@ describe('Serialization', () => {
     });
     expect(() => serialize(new Date('invalid'))).toThrow('Cannot serialize an invalid date');
 
-    function sum(a, b) {
-      return a + b;
-    }
-    expect(serialize(sum)).toEqual({
-      __class: 'Function',
-      __value: 'function sum(a, b) {\n      return a + b;\n    }'
-    });
-    sum.displayName = 'sum';
-    expect(serialize(sum)).toEqual({
-      __class: 'Function',
-      __value: 'function sum(a, b) {\n      return a + b;\n    }',
-      displayName: 'sum'
-    });
-
     expect(serialize(new Error())).toStrictEqual({__class: 'Error'});
     expect(serialize(new Error('Message'))).toStrictEqual({__class: 'Error', message: 'Message'});
     expect(
@@ -86,17 +72,35 @@ describe('Serialization', () => {
       }
     }
 
-    expect(serialize(Movie, {objectHandler})).toEqual({__Class: 'Movie', limit: 100});
+    function functionHandler(func) {
+      return {
+        __function: func.toString()
+      };
+    }
+
+    const options = {objectHandler, functionHandler};
+
+    expect(serialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
+
+    expect(serialize(Movie, options)).toEqual({__Class: 'Movie', limit: 100});
 
     const movie = new Movie();
     movie.title = 'Inception';
 
-    expect(serialize(movie, {objectHandler})).toEqual({__class: 'Movie', title: 'Inception'});
-    expect(serialize({currentMovie: movie}, {objectHandler})).toEqual({
+    expect(serialize(movie, options)).toEqual({__class: 'Movie', title: 'Inception'});
+    expect(serialize({currentMovie: movie}, options)).toEqual({
       currentMovie: {
         __class: 'Movie',
         title: 'Inception'
       }
+    });
+
+    function sum(a, b) {
+      return a + b;
+    }
+
+    expect(serialize(sum, options)).toEqual({
+      __function: 'function sum(a, b) {\n      return a + b;\n    }'
     });
   });
 });

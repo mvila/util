@@ -17,7 +17,7 @@ export function serialize(value, options) {
   }
 
   if (typeof value === 'object' || typeof value === 'function') {
-    return serializeObject(value, options);
+    return serializeObjectOrFunction(value, options);
   }
 
   if (Number.isNaN(value)) {
@@ -27,8 +27,9 @@ export function serialize(value, options) {
   return value;
 }
 
-function serializeObject(object, options) {
+function serializeObjectOrFunction(object, options) {
   const objectHandler = options?.objectHandler;
+  const functionHandler = options?.functionHandler;
 
   if (objectHandler !== undefined) {
     const serializedObject = objectHandler(object);
@@ -38,12 +39,16 @@ function serializeObject(object, options) {
     }
   }
 
-  if (object instanceof Date) {
-    return serializeDate(object);
+  if (typeof object === 'function' && functionHandler !== undefined) {
+    const serializedFunction = functionHandler(object);
+
+    if (serializedFunction !== undefined) {
+      return serializedFunction;
+    }
   }
 
-  if (typeof object === 'function') {
-    return serializeFunction(object, options);
+  if (object instanceof Date) {
+    return serializeDate(object);
   }
 
   if (object instanceof Error) {
@@ -63,26 +68,6 @@ function serializeDate(date) {
   }
 
   return {__class: 'Date', __value: date.toISOString()};
-}
-
-function serializeFunction(func, options) {
-  const functionCode = func.toString();
-
-  if (functionCode.startsWith('class')) {
-    throw new Error('Cannot serialize a class');
-  }
-
-  const serializedFunction = {
-    __class: 'Function',
-    __value: functionCode
-  };
-
-  return possiblyAsync(serializeAttributes(func, options), {
-    then: serializedAttributes => {
-      Object.assign(serializedFunction, serializedAttributes);
-      return serializedFunction;
-    }
-  });
 }
 
 function serializeError(error, options) {
