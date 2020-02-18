@@ -20,6 +20,11 @@ describe('Serialization', () => {
     });
     expect(() => serialize(new Date('invalid'))).toThrow('Cannot serialize an invalid date');
 
+    expect(serialize(/.*/)).toEqual({__regExp: '/.*/'});
+    expect(serialize(/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/gm)).toEqual({
+      __regExp: '/[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+/gm'
+    });
+
     expect(serialize(new Error())).toStrictEqual({__error: ''});
     expect(serialize(new Error('Message'))).toStrictEqual({__error: 'Message'});
     expect(

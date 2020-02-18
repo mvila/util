@@ -19,6 +19,15 @@ describe('Deserialization', () => {
       new Date('2020-01-25T08:40:53.407Z').valueOf()
     );
 
+    let regExp = deserialize({__regExp: '/.*/'});
+    expect(regExp).toBeInstanceOf(RegExp);
+    expect(regExp.source).toBe('.*');
+    expect(regExp.flags).toBe('');
+    regExp = deserialize({__regExp: '/[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+/gm'});
+    expect(regExp).toBeInstanceOf(RegExp);
+    expect(regExp.source).toBe('[^@ \\t\\r\\n]+@[^@ \\t\\r\\n]+\\.[^@ \\t\\r\\n]+');
+    expect(regExp.flags).toBe('gm');
+
     let error = deserialize({__error: ''});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('');

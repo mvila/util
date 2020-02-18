@@ -32,6 +32,10 @@ function deserializeObjectOrFunction(object, options) {
     return deserializeDate(object);
   }
 
+  if (hasOwnProperty(object, '__regExp')) {
+    return deserializeRegExp(object);
+  }
+
   if (hasOwnProperty(object, '__error')) {
     return deserializeError(object, options);
   }
@@ -57,6 +61,20 @@ function deserializeObjectOrFunction(object, options) {
 
 function deserializeDate(object) {
   return new Date(object.__date);
+}
+
+function deserializeRegExp(object) {
+  const {__regExp: regExp} = object;
+
+  const fragments = regExp.match(/\/(.*?)\/([a-z]*)?$/i);
+
+  if (fragments === null) {
+    throw new Error(`Cannot deserialize an invalid RegExp ('${regExp}')`);
+  }
+
+  const [, source, flags] = fragments;
+
+  return new RegExp(source, flags);
 }
 
 function deserializeError(object, options) {

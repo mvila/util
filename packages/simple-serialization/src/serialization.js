@@ -51,6 +51,10 @@ function serializeObjectOrFunction(object, options) {
     return serializeDate(object);
   }
 
+  if (object instanceof RegExp) {
+    return serializeRegExp(object);
+  }
+
   if (object instanceof Error) {
     return serializeError(object, options);
   }
@@ -68,6 +72,10 @@ function serializeDate(date) {
   }
 
   return {__date: date.toISOString()};
+}
+
+function serializeRegExp(regExp) {
+  return {__regExp: regExp.toString()};
 }
 
 function serializeError(error, options) {
