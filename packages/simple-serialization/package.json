@@ -1,6 +1,6 @@
 {
   "name": "simple-serialization",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Simple serialization library that can serialize/deserialize anything including dates, undefined values, and function's attributes",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
@@ -12,6 +12,7 @@
   "module": "dist/node/esm",
   "browser": "dist/browser/esm",
   "dependencies": {
+    "core-helpers": "^0.1.0",
     "ow": "^0.15.0",
     "possibly-async": "^0.2.0"
   },

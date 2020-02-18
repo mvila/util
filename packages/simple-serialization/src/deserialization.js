@@ -1,3 +1,4 @@
+import {hasOwnProperty} from 'core-helpers';
 import {possiblyAsync} from 'possibly-async';
 import ow from 'ow';
 
@@ -23,15 +24,15 @@ function deserializeObjectOrFunction(object, options) {
   const objectHandler = options?.objectHandler;
   const functionHandler = options?.functionHandler;
 
-  if (object.__undefined === true) {
+  if (hasOwnProperty(object, '__undefined') && object.__undefined === true) {
     return undefined;
   }
 
-  if (object.__class === 'Date') {
+  if (hasOwnProperty(object, '__date')) {
     return deserializeDate(object);
   }
 
-  if (object.__class === 'Error') {
+  if (hasOwnProperty(object, '__error')) {
     return deserializeError(object, options);
   }
 
@@ -55,11 +56,11 @@ function deserializeObjectOrFunction(object, options) {
 }
 
 function deserializeDate(object) {
-  return new Date(object.__value);
+  return new Date(object.__date);
 }
 
 function deserializeError(object, options) {
-  const {__class: _, message, ...attributes} = object;
+  const {__error: message, ...attributes} = object;
 
   const deserializedError = new Error(message);
 

@@ -67,16 +67,11 @@ function serializeDate(date) {
     throw new Error('Cannot serialize an invalid date');
   }
 
-  return {__class: 'Date', __value: date.toISOString()};
+  return {__date: date.toISOString()};
 }
 
 function serializeError(error, options) {
-  const serializedError = {__class: 'Error'};
-
-  // Since the 'message' property is not enumerable, we must get it manually
-  if (typeof error.message === 'string' && error.message !== '') {
-    serializedError.message = error.message;
-  }
+  const serializedError = {__error: error.message};
 
   return possiblyAsync(serializeAttributes(error, options), {
     then: serializedAttributes => {

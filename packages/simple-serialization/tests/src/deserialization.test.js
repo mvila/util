@@ -15,23 +15,18 @@ describe('Deserialization', () => {
     expect(deserialize('')).toBe('');
     expect(deserialize('Hello')).toBe('Hello');
 
-    expect(deserialize({__class: 'Date', __value: '2020-01-25T08:40:53.407Z'}).valueOf()).toBe(
+    expect(deserialize({__date: '2020-01-25T08:40:53.407Z'}).valueOf()).toBe(
       new Date('2020-01-25T08:40:53.407Z').valueOf()
     );
 
-    let error = deserialize({__class: 'Error'});
+    let error = deserialize({__error: ''});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('');
-    error = deserialize({__class: 'Error', message: 'Message'});
+    error = deserialize({__error: 'Message'});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('Message');
     expect(Object.keys(error)).toEqual([]);
-    error = deserialize({
-      __class: 'Error',
-      message: 'Message',
-      displayMessage: 'Display message',
-      code: 'CODE'
-    });
+    error = deserialize({__error: 'Message', displayMessage: 'Display message', code: 'CODE'});
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('Message');
     expect(Object.keys(error)).toEqual(['displayMessage', 'code']);
