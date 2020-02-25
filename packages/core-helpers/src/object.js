@@ -1,4 +1,6 @@
 import isPlainObject from 'lodash/isPlainObject';
+import lowerFirst from 'lodash/lowerFirst';
+import fnName from 'fn-name';
 
 export function hasOwnProperty(object, name) {
   return _hasOwnProperty.call(object, name);
@@ -39,6 +41,58 @@ export function getPropertyDescriptor(object, name) {
 export function getInheritedPropertyDescriptor(object, name) {
   const prototype = Object.getPrototypeOf(object);
   return getPropertyDescriptor(prototype, name);
+}
+
+export function getFunctionName(func) {
+  return fnName(func) ?? '';
+}
+
+export function getTypeOf(value) {
+  if (value === undefined) {
+    return 'undefined';
+  }
+
+  if (value === null) {
+    return 'null';
+  }
+
+  if (typeof value === 'object') {
+    return lowerFirst(getFunctionName(value.constructor) || 'Object');
+  }
+
+  if (isES2015Class(value)) {
+    return getFunctionName(value) || 'Object';
+  }
+
+  return typeof value;
+}
+
+export function isClass(value) {
+  return typeof value === 'function' && hasOwnProperty(value, 'prototype');
+}
+
+export function isES2015Class(value) {
+  return typeof value === 'function' && value.toString().startsWith('class');
+}
+
+export function isInstance(value) {
+  return !isClass(value);
+}
+
+export function getClassOf(value) {
+  if (isClass(value)) {
+    return value;
+  }
+
+  return value?.constructor;
+}
+
+export function getInstanceOf(value) {
+  if (isInstance(value)) {
+    return value;
+  }
+
+  return value.prototype;
 }
 
 export const breakSymbol = Symbol('break');

@@ -1,12 +1,13 @@
 {
   "@import": "1place/npm-package#^0.2.0",
   "name": "core-helpers",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Little collection of utility functions",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
   "repository": "https://github.com/mvila/util/tree/master/packages/core-helpers",
   "dependencies": {
+    "fn-name": "^3.0.0",
     "lodash": "^4.17.15"
   },
   "tests": {

@@ -1,6 +1,6 @@
 {
   "name": "core-helpers",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Little collection of utility functions",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
@@ -12,6 +12,7 @@
   "module": "dist/node/esm",
   "browser": "dist/browser/esm",
   "dependencies": {
+    "fn-name": "^3.0.0",
     "lodash": "^4.17.15"
   },
   "@managed": {
