@@ -47,13 +47,27 @@ describe('Serialization', () => {
 
     const movie = {
       title: 'Inception',
+      director: undefined,
       _hidden: true,
       toJSON() {
-        return {title: this.title};
+        return {title: this.title, director: this.director};
       }
     };
 
-    expect(serialize(movie)).toEqual({title: 'Inception'});
+    expect(serialize(movie)).toStrictEqual({title: 'Inception', director: {__undefined: true}});
+
+    movie.director = {
+      name: 'Christopher Nolan',
+      _hidden: true,
+      toJSON() {
+        return {name: this.name};
+      }
+    };
+
+    expect(serialize(movie)).toStrictEqual({
+      title: 'Inception',
+      director: {name: 'Christopher Nolan'}
+    });
   });
 
   test('Custom serialization', async () => {

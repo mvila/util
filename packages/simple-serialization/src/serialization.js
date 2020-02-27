@@ -60,7 +60,7 @@ function serializeObjectOrFunction(object, options) {
   }
 
   if (typeof object.toJSON === 'function') {
-    return object.toJSON();
+    return serialize(object.toJSON(), options);
   }
 
   return serializeAttributes(object, options);
