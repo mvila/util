@@ -31,6 +31,11 @@ describe('Object', () => {
 
     expect(getTypeOf(Movie)).toBe('Movie');
     expect(getTypeOf(movie)).toBe('movie');
+
+    Movie.displayName = 'Film';
+
+    expect(getTypeOf(Movie)).toBe('Film');
+    expect(getTypeOf(movie)).toBe('film');
   });
 
   test('isClass()', async () => {

@@ -1,7 +1,7 @@
 {
   "@import": "1place/npm-package#^0.2.0",
   "name": "core-helpers",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Little collection of utility functions",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
