@@ -1,6 +1,5 @@
 import isPlainObject from 'lodash/isPlainObject';
 import lowerFirst from 'lodash/lowerFirst';
-import fnName from 'fn-name';
 
 export function hasOwnProperty(object, name) {
   return _hasOwnProperty.call(object, name);
@@ -43,11 +42,40 @@ export function getInheritedPropertyDescriptor(object, name) {
   return getPropertyDescriptor(prototype, name);
 }
 
-export function getFunctionName(func) {
-  return fnName(func) ?? '';
+export function getFunctionName(func, {humanize = false} = {}) {
+  if (typeof func !== 'function') {
+    throw new Error(`Expected a function, but received a value of type '${typeof func}'`);
+  }
+
+  let name = humanize ? func.humanName : undefined;
+
+  if (name !== undefined) {
+    return name;
+  }
+
+  name = func.displayName;
+
+  if (name !== undefined) {
+    return name;
+  }
+
+  name = func.name;
+
+  if (name !== undefined) {
+    return name;
+  }
+
+  // Source: https://github.com/sindresorhus/fn-name
+  name = (/function ([^(]+)?\(/.exec(func.toString()) || [])[1];
+
+  if (name !== undefined) {
+    return name;
+  }
+
+  return '';
 }
 
-export function getTypeOf(value) {
+export function getTypeOf(value, {humanize = false} = {}) {
   if (value === undefined) {
     return 'undefined';
   }
@@ -57,11 +85,11 @@ export function getTypeOf(value) {
   }
 
   if (typeof value === 'object') {
-    return lowerFirst(getFunctionName(value.constructor) || 'Object');
+    return lowerFirst(getFunctionName(value.constructor, {humanize}) || 'Object');
   }
 
   if (isES2015Class(value)) {
-    return getFunctionName(value) || 'Object';
+    return getFunctionName(value, {humanize}) || 'Object';
   }
 
   return typeof value;

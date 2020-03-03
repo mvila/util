@@ -36,6 +36,13 @@ describe('Object', () => {
 
     expect(getTypeOf(Movie)).toBe('Film');
     expect(getTypeOf(movie)).toBe('film');
+
+    Movie.humanName = 'Motion picture';
+
+    expect(getTypeOf(Movie)).toBe('Film');
+    expect(getTypeOf(movie)).toBe('film');
+    expect(getTypeOf(Movie, {humanize: true})).toBe('Motion picture');
+    expect(getTypeOf(movie, {humanize: true})).toBe('motion picture');
   });
 
   test('isClass()', async () => {
