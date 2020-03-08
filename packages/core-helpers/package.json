@@ -1,6 +1,6 @@
 {
   "name": "core-helpers",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Little collection of utility functions",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",

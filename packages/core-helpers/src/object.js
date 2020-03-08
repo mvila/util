@@ -95,6 +95,10 @@ export function getTypeOf(value, {humanize = false} = {}) {
   return typeof value;
 }
 
+export function getHumanTypeOf(value) {
+  return getTypeOf(value, {humanize: true});
+}
+
 export function isClass(value) {
   return typeof value === 'function' && hasOwnProperty(value, 'prototype');
 }
