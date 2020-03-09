@@ -2,7 +2,14 @@ import {possiblyAsync} from 'possibly-async';
 import ow from 'ow';
 
 export function serialize(value, options) {
-  ow(options, 'options', ow.optional.object.partialShape({objectHandler: ow.optional.function}));
+  ow(
+    options,
+    'options',
+    ow.optional.object.partialShape({
+      objectHandler: ow.optional.function,
+      functionHandler: ow.optional.function
+    })
+  );
 
   if (value === undefined) {
     return {__undefined: true};

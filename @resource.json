@@ -14,5 +14,8 @@
   },
   "simpleSerialization": {
     "@include": "./packages/simple-serialization"
+  },
+  "simpleForking": {
+    "@include": "./packages/simple-forking"
   }
 }
