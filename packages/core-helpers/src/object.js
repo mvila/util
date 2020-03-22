@@ -129,19 +129,19 @@ export function getInstanceOf(value) {
 
 export const breakSymbol = Symbol('break');
 
-export function forEachDeep(value, iteratee) {
+export function forEachDeep(value, iteratee, {nameOrIndex, objectOrArray} = {}) {
   const isObject = isPlainObject(value);
   const isArray = Array.isArray(value);
 
   if (!(isObject || isArray)) {
-    return iteratee(value);
+    return iteratee(value, nameOrIndex, objectOrArray);
   }
 
   if (isObject) {
     const object = value;
 
-    for (const value of Object.values(object)) {
-      const result = forEachDeep(value, iteratee);
+    for (const [name, value] of Object.entries(object)) {
+      const result = forEachDeep(value, iteratee, {nameOrIndex: name, objectOrArray: object});
 
       if (result === breakSymbol) {
         return breakSymbol;
@@ -152,8 +152,8 @@ export function forEachDeep(value, iteratee) {
   if (isArray) {
     const array = value;
 
-    for (const value of Object.values(array)) {
-      const result = forEachDeep(value, iteratee);
+    for (const [index, value] of array.entries()) {
+      const result = forEachDeep(value, iteratee, {nameOrIndex: index, objectOrArray: array});
 
       if (result === breakSymbol) {
         return breakSymbol;
@@ -170,4 +170,14 @@ export function someDeep(value, predicate) {
   });
 
   return result === breakSymbol;
+}
+
+export function deleteUndefinedProperties(value) {
+  forEachDeep(value, function(value, nameOrIndex, objectOrArray) {
+    if (value === undefined && nameOrIndex !== undefined && !Array.isArray(objectOrArray)) {
+      delete objectOrArray[nameOrIndex];
+    }
+  });
+
+  return value;
 }
