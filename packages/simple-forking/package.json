@@ -1,6 +1,6 @@
 {
   "name": "simple-forking",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple library that can fork/merge most JavaScript values including objects and arrays",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
@@ -12,8 +12,10 @@
   "module": "dist/node/esm",
   "browser": "dist/browser/esm",
   "dependencies": {
+    "core-helpers": "^0.1.0",
     "lodash": "^4.17.15",
-    "ow": "^0.15.0"
+    "ow": "^0.15.0",
+    "simple-cloning": "^0.1.0"
   },
   "@managed": {
     "warning": "This file contains properties managed by a Resource. You should not modify them directly or use a command such as `npm install <name>`.",

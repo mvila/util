@@ -12,10 +12,13 @@
   "possiblyMany": {
     "@include": "./packages/possibly-many"
   },
-  "simpleSerialization": {
-    "@include": "./packages/simple-serialization"
+  "simpleCloning": {
+    "@include": "./packages/simple-cloning"
   },
   "simpleForking": {
     "@include": "./packages/simple-forking"
+  },
+  "simpleSerialization": {
+    "@include": "./packages/simple-serialization"
   }
 }

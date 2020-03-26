@@ -3,12 +3,6 @@ import isEqual from 'lodash/isEqual';
 import {fork} from '../../..';
 
 describe('Forking', () => {
-  const testForkObject = object => {
-    const forkedObject = fork(object);
-
-    expect(forkedObject !== object && isEqual(forkedObject, object)).toBe(true);
-  };
-
   test('Basic forking', async () => {
     expect(fork(undefined)).toBe(undefined);
     expect(fork(null)).toBe(null);
@@ -22,6 +16,12 @@ describe('Forking', () => {
 
     expect(fork('')).toBe('');
     expect(fork('Hello')).toBe('Hello');
+
+    const testForkObject = object => {
+      const forkedObject = fork(object);
+
+      expect(forkedObject !== object && isEqual(forkedObject, object)).toBe(true);
+    };
 
     testForkObject(new Date('2020-01-25T08:40:53.407Z'));
     testForkObject(new Date('invalid'));
@@ -41,6 +41,10 @@ describe('Forking', () => {
 
     const movie = {title: 'Inception', director: {name: 'Christopher Nolan'}};
     const forkedMovie = fork(movie);
+
+    expect(Object.getPrototypeOf(forkedMovie)).toBe(movie);
+    expect(Object.getPrototypeOf(forkedMovie.director)).toBe(movie.director);
+
     forkedMovie.title = 'Inception 2';
     forkedMovie.director.name = 'Christopher Nolan 2';
 
@@ -51,21 +55,25 @@ describe('Forking', () => {
   });
 
   test('Custom forking', async () => {
-    class Component {}
+    class Movie {}
 
-    class Movie extends Component {}
+    function objectForker(object) {
+      if (object instanceof Movie) {
+        const movie = object;
 
-    function objectHandler(object) {
-      if (object instanceof Component) {
-        return Object.create(object);
+        const forkedMovie = Object.create(movie);
+
+        forkedMovie._forkedFrom = movie;
+
+        return forkedMovie;
       }
     }
 
-    testForkObject({title: 'Inception', country: undefined, duration: 120}, {objectHandler});
-
     const movie = new Movie();
-    const forkedMovie = fork(movie, {objectHandler});
+
+    const forkedMovie = fork(movie, {objectForker});
 
     expect(Object.getPrototypeOf(forkedMovie)).toBe(movie);
+    expect(forkedMovie._forkedFrom).toBe(movie);
   });
 });

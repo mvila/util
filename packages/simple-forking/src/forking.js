@@ -1,22 +1,15 @@
-import mapValues from 'lodash/mapValues';
+import {clone, isLeaf} from 'simple-cloning';
+import isObjectLike from 'lodash/isObjectLike';
 import ow from 'ow';
 
 export function fork(value, options) {
-  ow(options, 'options', ow.optional.object.partialShape({objectHandler: ow.optional.function}));
-
-  if (value === undefined) {
-    return undefined;
-  }
-
-  if (value === null) {
-    return null;
-  }
+  ow(options, 'options', ow.optional.object.partialShape({objectForker: ow.optional.function}));
 
   if (Array.isArray(value)) {
     return forkArray(value, options);
   }
 
-  if (typeof value === 'object') {
+  if (isObjectLike(value)) {
     return forkObject(value, options);
   }
 
@@ -28,50 +21,32 @@ export function fork(value, options) {
 }
 
 function forkObject(object, options) {
-  const objectHandler = options?.objectHandler;
+  const objectForker = options?.objectForker;
 
-  if (objectHandler !== undefined) {
-    const forkedObject = objectHandler(object);
+  if (objectForker !== undefined) {
+    const forkedObject = objectForker(object);
 
     if (forkedObject !== undefined) {
       return forkedObject;
     }
   }
 
-  if (object instanceof Date) {
-    return forkDate(object);
-  }
-
-  if (object instanceof RegExp) {
-    return forkRegExp(object);
-  }
-
-  if (object instanceof Error) {
-    return forkError(object, options);
+  if (isLeaf(object)) {
+    return clone(object);
   }
 
   return forkAttributes(object, options);
 }
 
-function forkDate(date) {
-  return new Date(date);
-}
-
-function forkRegExp(regExp) {
-  return new RegExp(regExp.source, regExp.flags);
-}
-
-function forkError(error, options) {
-  const forkedError = new Error(error.message);
-
-  Object.assign(forkedError, forkAttributes(error, options));
-
-  return forkedError;
-}
-
 function forkAttributes(object, options) {
+  const forkedObject = Object.create(object);
+
   // OPTIMIZE: Consider using a proxy to lazily fork the attributes
-  return mapValues(object, value => fork(value, options));
+  for (const [name, value] of Object.entries(object)) {
+    forkedObject[name] = fork(value, options);
+  }
+
+  return forkedObject;
 }
 
 function forkArray(array, options) {
