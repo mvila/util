@@ -66,7 +66,7 @@ describe('Deserialization', () => {
 
     expect(Movie.limit).toBeUndefined();
 
-    function objectHandler(object) {
+    function objectDeserializer(object) {
       const {__Class: ClassName, __class: className, ...attributes} = object;
 
       if (ClassName === 'Movie') {
@@ -81,7 +81,7 @@ describe('Deserialization', () => {
       }
     }
 
-    function functionHandler(object) {
+    function functionDeserializer(object) {
       const {__function} = object;
 
       if (__function !== undefined) {
@@ -90,7 +90,7 @@ describe('Deserialization', () => {
       }
     }
 
-    const options = {objectHandler, functionHandler};
+    const options = {objectDeserializer, functionDeserializer};
 
     expect(deserialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
 

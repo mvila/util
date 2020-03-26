@@ -3,7 +3,14 @@ import {possiblyAsync} from 'possibly-async';
 import ow from 'ow';
 
 export function deserialize(value, options) {
-  ow(options, 'options', ow.optional.object.partialShape({objectHandler: ow.optional.function}));
+  ow(
+    options,
+    'options',
+    ow.optional.object.partialShape({
+      objectDeserializer: ow.optional.function,
+      functionDeserializer: ow.optional.function
+    })
+  );
 
   if (value === null) {
     return null;
@@ -21,8 +28,7 @@ export function deserialize(value, options) {
 }
 
 function deserializeObjectOrFunction(object, options) {
-  const objectHandler = options?.objectHandler;
-  const functionHandler = options?.functionHandler;
+  const objectDeserializer = options?.objectDeserializer;
 
   if (hasOwnProperty(object, '__undefined') && object.__undefined === true) {
     return undefined;
@@ -40,16 +46,18 @@ function deserializeObjectOrFunction(object, options) {
     return deserializeError(object, options);
   }
 
-  if (objectHandler !== undefined) {
-    const deserializedObject = objectHandler(object);
+  if (objectDeserializer !== undefined) {
+    const deserializedObject = objectDeserializer(object);
 
     if (deserializedObject !== undefined) {
       return deserializedObject;
     }
   }
 
-  if (functionHandler !== undefined) {
-    const deserializedFunction = functionHandler(object);
+  const functionDeserializer = options?.functionDeserializer;
+
+  if (functionDeserializer !== undefined) {
+    const deserializedFunction = functionDeserializer(object);
 
     if (deserializedFunction !== undefined) {
       return deserializedFunction;

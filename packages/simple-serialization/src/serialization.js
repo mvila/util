@@ -6,8 +6,8 @@ export function serialize(value, options) {
     options,
     'options',
     ow.optional.object.partialShape({
-      objectHandler: ow.optional.function,
-      functionHandler: ow.optional.function
+      objectSerializer: ow.optional.function,
+      functionSerializer: ow.optional.function
     })
   );
 
@@ -35,19 +35,20 @@ export function serialize(value, options) {
 }
 
 function serializeObjectOrFunction(object, options) {
-  const objectHandler = options?.objectHandler;
-  const functionHandler = options?.functionHandler;
+  const objectSerializer = options?.objectSerializer;
 
-  if (objectHandler !== undefined) {
-    const serializedObject = objectHandler(object);
+  if (objectSerializer !== undefined) {
+    const serializedObject = objectSerializer(object);
 
     if (serializedObject !== undefined) {
       return serializedObject;
     }
   }
 
-  if (typeof object === 'function' && functionHandler !== undefined) {
-    const serializedFunction = functionHandler(object);
+  const functionSerializer = options?.functionSerializer;
+
+  if (typeof object === 'function' && functionSerializer !== undefined) {
+    const serializedFunction = functionSerializer(object);
 
     if (serializedFunction !== undefined) {
       return serializedFunction;

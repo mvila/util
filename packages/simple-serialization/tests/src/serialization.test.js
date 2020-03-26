@@ -83,19 +83,19 @@ describe('Serialization', () => {
       }
     }
 
-    function objectHandler(object) {
+    function objectSerializer(object) {
       if (typeof object.__serialize === 'function') {
         return object.__serialize();
       }
     }
 
-    function functionHandler(func) {
+    function functionSerializer(func) {
       return {
         __function: func.toString()
       };
     }
 
-    const options = {objectHandler, functionHandler};
+    const options = {objectSerializer, functionSerializer};
 
     expect(serialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
 
