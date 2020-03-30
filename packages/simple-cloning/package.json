@@ -1,6 +1,6 @@
 {
   "name": "simple-cloning",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple library that can deeply clone most JavaScript values including objects and arrays",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
@@ -13,7 +13,7 @@
   "browser": "dist/browser/esm",
   "dependencies": {
     "lodash": "^4.17.15",
-    "ow": "^0.15.0"
+    "ow": "^0.15.1"
   },
   "@managed": {
     "warning": "This file contains properties managed by a Resource. You should not modify them directly or use a command such as `npm install <name>`.",

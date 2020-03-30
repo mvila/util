@@ -1,7 +1,7 @@
 {
   "@import": "1place/npm-package#^0.2.0",
   "name": "simple-forking",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple library that can fork/merge most JavaScript values including objects and arrays",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "dependencies": {
     "core-helpers": "^0.1.0",
     "lodash": "^4.17.15",
-    "ow": "^0.15.0",
+    "ow": "^0.15.1",
     "simple-cloning": "^0.1.0"
   },
   "tests": {
