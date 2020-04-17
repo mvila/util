@@ -138,6 +138,11 @@ possiblyAsync.map = function(
     possiblyAsync.forEach(iterable, function(value) {
       return possiblyAsync(mapper(value), {
         then(result) {
+          if (isBreaking(result)) {
+            results.push(result[BREAK]);
+            return BREAK;
+          }
+
           results.push(result);
         }
       });
@@ -169,6 +174,11 @@ possiblyAsync.reduce = function(
     possiblyAsync.forEach(iterable, function(value) {
       return possiblyAsync(reducer(accumulator, value), {
         then(result) {
+          if (isBreaking(result)) {
+            accumulator = result[BREAK];
+            return BREAK;
+          }
+
           accumulator = result;
         }
       });
@@ -235,6 +245,11 @@ possiblyAsync.mapValues = function(
     possiblyAsync.forEach(Object.entries(object), function([key, value]) {
       return possiblyAsync(mapper(value), {
         then(value) {
+          if (isBreaking(value)) {
+            result[key] = value[BREAK];
+            return BREAK;
+          }
+
           result[key] = value;
         }
       });
@@ -287,3 +302,13 @@ possiblyAsync.possiblyMany = function(
     finally: finallyCallback
   });
 };
+
+possiblyAsync.break = BREAK;
+
+function isBreaking(value) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Object.prototype.hasOwnProperty.call(value, BREAK)
+  );
+}

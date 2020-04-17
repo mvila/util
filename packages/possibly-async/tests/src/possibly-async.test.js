@@ -284,6 +284,11 @@ describe('possibly-async', () => {
       return value * 2;
     });
     expect(results).toEqual([2, 4, 6]);
+
+    results = possiblyAsync.map([1, 2, 3], value =>
+      value === 2 ? {[possiblyAsync.break]: value * 2} : value * 2
+    );
+    expect(results).toEqual([2, 4]);
   });
 
   test('possiblyAsync.reduce()', async () => {
@@ -305,6 +310,16 @@ describe('possibly-async', () => {
       []
     );
     expect(results).toEqual([2, 4, 6]);
+
+    results = possiblyAsync.reduce(
+      [1, 2, 3],
+      (accumulator, currentValue) =>
+        currentValue === 2
+          ? {[possiblyAsync.break]: [...accumulator, currentValue * 2]}
+          : [...accumulator, currentValue * 2],
+      []
+    );
+    expect(results).toEqual([2, 4]);
   });
 
   test('possiblyAsync.some()', async () => {
@@ -342,6 +357,11 @@ describe('possibly-async', () => {
       return value * 2;
     });
     expect(results).toEqual({a: 2, b: 4, c: 6});
+
+    results = possiblyAsync.mapValues({a: 1, b: 2, c: 3}, value =>
+      value === 2 ? {[possiblyAsync.break]: value * 2} : value * 2
+    );
+    expect(results).toEqual({a: 2, b: 4});
   });
 
   test('possiblyAsync.all()', async () => {

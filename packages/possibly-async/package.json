@@ -1,6 +1,6 @@
 {
   "name": "possibly-async",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Helps implementing functions that are synchronous or asynchronous depending of their parameters",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
