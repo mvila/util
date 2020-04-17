@@ -1,6 +1,6 @@
 {
   "name": "simple-serialization",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Simple serialization library that can serialize/deserialize anything including dates, undefined values, and function's attributes",
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",

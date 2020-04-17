@@ -90,7 +90,11 @@ describe('Deserialization', () => {
       }
     }
 
-    const options = {objectDeserializer, functionDeserializer};
+    function errorHandler(error) {
+      throw error;
+    }
+
+    const options = {objectDeserializer, functionDeserializer, errorHandler};
 
     expect(deserialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
 
@@ -123,5 +127,7 @@ describe('Deserialization', () => {
     expect(typeof func).toBe('function');
     expect(func.name).toBe('sum');
     expect(func(1, 2)).toBe(3);
+
+    expect(() => deserialize({__error: 'An error occurred'}, options)).toThrow('An error occurred');
   });
 });

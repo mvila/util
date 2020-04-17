@@ -8,7 +8,8 @@ export function deserialize(value, options) {
     'options',
     ow.optional.object.partialShape({
       objectDeserializer: ow.optional.function,
-      functionDeserializer: ow.optional.function
+      functionDeserializer: ow.optional.function,
+      errorHandler: ow.optional.function
     })
   );
 
@@ -28,8 +29,6 @@ export function deserialize(value, options) {
 }
 
 function deserializeObjectOrFunction(object, options) {
-  const objectDeserializer = options?.objectDeserializer;
-
   if (hasOwnProperty(object, '__undefined') && object.__undefined === true) {
     return undefined;
   }
@@ -43,8 +42,20 @@ function deserializeObjectOrFunction(object, options) {
   }
 
   if (hasOwnProperty(object, '__error')) {
-    return deserializeError(object, options);
+    return possiblyAsync(deserializeError(object, options), {
+      then: error => {
+        const errorHandler = options?.errorHandler;
+
+        if (errorHandler !== undefined) {
+          return errorHandler(error);
+        }
+
+        return error;
+      }
+    });
   }
+
+  const objectDeserializer = options?.objectDeserializer;
 
   if (objectDeserializer !== undefined) {
     const deserializedObject = objectDeserializer(object);
