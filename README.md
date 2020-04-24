@@ -1,3 +1,3 @@
 # util
 
-A collection of package providing some utility functions.
+A collection of packages used by mvila's projects.

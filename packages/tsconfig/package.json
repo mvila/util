@@ -1,0 +1,22 @@
+{
+  "name": "@mvila/tsconfig",
+  "version": "1.0.0",
+  "description": "Shared TypeScript config used by mvila's projects",
+  "keywords": [
+    "tsconfig",
+    "typescript",
+    "ts",
+    "config",
+    "configuration"
+  ],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/tsconfig",
+  "files": [
+    "tsconfig.json"
+  ],
+  "main": "tsconfig.json",
+  "engines": {
+    "node": ">=10.0.0"
+  }
+}
