@@ -1,0 +1,21 @@
+{
+  "name": "@mvila/prettierrc",
+  "version": "1.0.0",
+  "description": "Shared Prettier config used by mvila's projects",
+  "keywords": [
+    "prettier",
+    "shared",
+    "config",
+    "configuration"
+  ],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/prettierrc",
+  "files": [
+    ".prettierrc.json"
+  ],
+  "main": ".prettierrc.json",
+  "engines": {
+    "node": ">=10.0.0"
+  }
+}
