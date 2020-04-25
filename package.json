@@ -1,17 +1,15 @@
 {
-  "dependencies": {
-    "@1place/eslint-config-1place": "~0.1.14",
-    "eslint": "~6.8.0",
-    "eslint-plugin-react": "~7.17.0",
-    "prettier": "~1.19.1"
-  },
-  "@managed": {
-    "warning": "This file contains properties managed by a Resource. You should not modify them directly or use a command such as `npm install <name>`.",
-    "properties": [
-      "dependencies",
-      "peerDependencies",
-      "optionalDependencies",
-      "devDependencies"
-    ]
+  "name": "util",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A collection of packages used by mvila's projects",
+  "keywords": [],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util",
+  "prettier": "@mvila/prettierrc",
+  "devDependencies": {
+    "@mvila/prettierrc": "^1.0.0",
+    "prettier": "^2.0.5"
   }
 }
