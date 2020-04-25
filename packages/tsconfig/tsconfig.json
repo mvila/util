@@ -5,7 +5,6 @@
     "lib": ["ES2018", "DOM"],
     "jsx": "react",
     "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
     "importHelpers": true,
     "strict": true,
