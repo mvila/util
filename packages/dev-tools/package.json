@@ -1,0 +1,38 @@
+{
+  "name": "@mvila/dev-tools",
+  "version": "1.0.1",
+  "description": "Simple development tools used by mvila's projects",
+  "keywords": [
+    "npm",
+    "scripts",
+    "tools"
+  ],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/dev-tools",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/node-cjs/index.js",
+  "bin": {
+    "dev-tools": "dist/node-cjs/cli.js"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc --module CommonJS --outDir dist/node-cjs"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5",
+    "rimraf": "^3.0.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {
+    "@mvila/tsconfig": "^1.0.1",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^13.13.2",
+    "@types/rimraf": "^3.0.0"
+  }
+}
