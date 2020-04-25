@@ -2,7 +2,15 @@ import ts from 'typescript';
 import fs from 'fs';
 import path from 'path';
 
-export async function compileTS({module, outDir}: {module: string; outDir: string}) {
+export async function compileTS({
+  defaultInclude,
+  module,
+  outDir
+}: {
+  defaultInclude: string[];
+  module: string;
+  outDir: string;
+}) {
   // Borrowed from:
   // - https://github.com/mobxjs/mobx/blob/master/scripts/build.js
   // - https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API#a-minimal-compiler
@@ -23,6 +31,10 @@ export async function compileTS({module, outDir}: {module: string; outDir: strin
     throw Object.assign(new Error("'tsconfig.json' is invalid"), {
       displayMessage: `An error occurred while parsing the JSON of the 'tsconfig.json' file (path: '${configFile}')`
     });
+  }
+
+  if (configJSON.include === undefined) {
+    configJSON.include = defaultInclude;
   }
 
   if (configJSON.compilerOptions === undefined) {
