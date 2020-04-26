@@ -1,3 +1,3 @@
 import {hello} from './hello';
 
-hello('Hello, World!');
+console.log(hello('universe'));

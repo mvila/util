@@ -4,10 +4,12 @@ import path from 'path';
 
 export async function compileTS({
   defaultInclude,
+  defaultExclude,
   module,
   outDir
 }: {
   defaultInclude: string[];
+  defaultExclude: string[];
   module: string;
   outDir: string;
 }) {
@@ -35,6 +37,10 @@ export async function compileTS({
 
   if (configJSON.include === undefined) {
     configJSON.include = defaultInclude;
+  }
+
+  if (configJSON.exclude === undefined) {
+    configJSON.exclude = defaultExclude;
   }
 
   if (configJSON.compilerOptions === undefined) {

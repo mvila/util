@@ -4,6 +4,10 @@ import {compileTS} from '../ts-compiler';
 
 export async function buildTSLibrary() {
   rimraf.sync('dist');
-  await compileTS({defaultInclude: ['src/**/*'], module: 'CommonJS', outDir: 'dist/node-cjs'});
-  await compileTS({defaultInclude: ['src/**/*'], module: 'ES2015', outDir: 'dist/node-esm'});
+
+  const options = {defaultInclude: ['src/**/*'], defaultExclude: ['src/**/*.test.ts']};
+
+  await compileTS({...options, module: 'CommonJS', outDir: 'dist/node-cjs'});
+
+  await compileTS({...options, module: 'ES2015', outDir: 'dist/node-esm'});
 }
