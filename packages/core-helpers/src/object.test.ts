@@ -9,7 +9,7 @@ import {
   someDeep,
   deleteUndefinedProperties,
   breakSymbol
-} from '../../..';
+} from './object';
 
 describe('Object', () => {
   test('getTypeOf()', async () => {
@@ -21,12 +21,15 @@ describe('Object', () => {
     expect(getTypeOf([1, 2, 3])).toBe('array');
     expect(getTypeOf({})).toBe('object');
     expect(getTypeOf(() => {})).toBe('function');
-    expect(getTypeOf(function() {})).toBe('function');
+    expect(getTypeOf(function () {})).toBe('function');
     expect(getTypeOf(new Date())).toBe('date');
     expect(getTypeOf(/abc/)).toBe('regExp');
     expect(getTypeOf(new Error())).toBe('error');
 
-    class Movie {}
+    class Movie {
+      static displayName: string;
+      static humanName: string;
+    }
 
     const movie = new Movie();
 
@@ -54,7 +57,7 @@ describe('Object', () => {
     expect(isClass([])).toBe(false);
     expect(isClass(() => {})).toBe(false);
 
-    expect(isClass(function() {})).toBe(true);
+    expect(isClass(function () {})).toBe(true);
 
     class Movie {}
 
@@ -72,7 +75,7 @@ describe('Object', () => {
     expect(isES2015Class([])).toBe(false);
     expect(isES2015Class(() => {})).toBe(false);
 
-    expect(isES2015Class(function() {})).toBe(false);
+    expect(isES2015Class(function () {})).toBe(false);
 
     class Movie {}
 
@@ -90,7 +93,7 @@ describe('Object', () => {
     expect(isInstance([])).toBe(true);
     expect(isInstance(() => {})).toBe(true);
 
-    expect(isInstance(function() {})).toBe(false);
+    expect(isInstance(function () {})).toBe(false);
 
     class Movie {}
 
@@ -117,7 +120,7 @@ describe('Object', () => {
 
   test('getInstanceOf()', async () => {
     const object = {};
-    const array = [];
+    const array: any[] = [];
 
     expect(getInstanceOf(undefined)).toBe(undefined);
     expect(getInstanceOf(null)).toBe(null);
@@ -135,10 +138,10 @@ describe('Object', () => {
   });
 
   test('forEachDeep', async () => {
-    const runForEachDeep = function(value) {
-      const results = [];
+    const runForEachDeep = function (value: any) {
+      const results: any[] = [];
 
-      const iteratee = (value, nameOrIndex, objectOrArray) => {
+      const iteratee = (value: any, nameOrIndex?: string | number, objectOrArray?: any) => {
         results.push({value, nameOrIndex, objectOrArray});
       };
 
@@ -148,9 +151,11 @@ describe('Object', () => {
     };
 
     const date = new Date();
-    const func = function() {};
+    const func = function () {};
 
-    class Class {}
+    class Class {
+      attribute?: string;
+    }
 
     const instance = new Class();
     instance.attribute = 'zzz';
@@ -195,8 +200,8 @@ describe('Object', () => {
       {value: instance, nameOrIndex: 'instance', objectOrArray: value}
     ]);
 
-    const results = [];
-    const iteratee = value => {
+    const results: any[] = [];
+    const iteratee = (value: any): symbol | void => {
       if (value === instance) {
         return breakSymbol;
       }
@@ -209,15 +214,17 @@ describe('Object', () => {
 
   test('someDeep', async () => {
     const date = new Date();
-    const func = function() {};
+    const func = function () {};
 
-    class Class {}
+    class Class {
+      attribute?: string;
+    }
 
     const instance = new Class();
     instance.attribute = 'zzz';
 
-    const predicate = jest.fn(value => value === instance);
-    let value = {
+    const predicate = jest.fn((value) => value === instance);
+    let value: any = {
       string: 'aaa',
       array: ['bbb', 'ccc', func, ['ddd'], {string: 'eee'}]
     };
@@ -228,7 +235,7 @@ describe('Object', () => {
     predicate.mockClear();
     value = {
       string: 'aaa',
-      array: ['bbb', 'ccc', func, ['ddd'], {string: 'eee', instance}],
+      array: ['bbb', 'ccc', func, ['ddd'], {string: 'eee'}, instance],
       object: {
         number: 111,
         date,

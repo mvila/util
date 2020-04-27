@@ -1,6 +1,6 @@
 # core-helpers
 
-Little collection of utility functions.
+Small collection of utility functions.
 
 ## Installation
 
