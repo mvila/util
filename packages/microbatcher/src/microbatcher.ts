@@ -1,10 +1,13 @@
 export class Microbatcher {
-  constructor(runner) {
+  _runner: runner;
+  _invocations: invocation[];
+
+  constructor(runner: runner) {
     this._runner = runner;
     this._invocations = [];
   }
 
-  batch(operation, ...params) {
+  batch(operation: string, ...params: any[]) {
     return new Promise((resolve, reject) => {
       if (this._invocations.length === 0) {
         setTimeout(() => {
@@ -18,3 +21,12 @@ export class Microbatcher {
     });
   }
 }
+
+type runner = (invocations: invocation[]) => void;
+
+type invocation = {
+  operation: string;
+  params: any[];
+  resolve: (value?: unknown) => void;
+  reject: (reason?: any) => void;
+};

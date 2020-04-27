@@ -1,5 +1,10 @@
 {
   "version": "independent",
   "npmClient": "npm",
-  "packages": ["packages/core-helpers", "packages/dev-tools", "packages/possibly-async"]
+  "packages": [
+    "packages/core-helpers",
+    "packages/dev-tools",
+    "packages/microbatcher",
+    "packages/possibly-async"
+  ]
 }

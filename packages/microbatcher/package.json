@@ -2,37 +2,33 @@
   "name": "microbatcher",
   "version": "0.1.0",
   "description": "Helps batching microtasks",
+  "keywords": [
+    "batch",
+    "task",
+    "microtask",
+    "promise"
+  ],
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
   "repository": "https://github.com/mvila/util/tree/master/packages/microbatcher",
   "files": [
     "dist"
   ],
-  "main": "dist/node/cjs",
-  "module": "dist/node/esm",
-  "browser": "dist/browser/esm",
-  "@managed": {
-    "warning": "This file contains properties managed by a Resource. You should not modify them directly or use a command such as `npm install <name>`.",
-    "properties": [
-      "name",
-      "version",
-      "private",
-      "description",
-      "keywords",
-      "homepage",
-      "author",
-      "contributors",
-      "license",
-      "repository",
-      "files",
-      "main",
-      "module",
-      "browser",
-      "bin",
-      "dependencies",
-      "peerDependencies",
-      "optionalDependencies",
-      "devDependencies"
-    ]
+  "main": "dist/node-cjs/index.js",
+  "module": "dist/node-esm/index.js",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "dev-tools build:ts-library",
+    "prepare": "npm run build && npm run test",
+    "test": "dev-tools test:ts-library"
+  },
+  "dependencies": {
+    "tslib": "^1.11.1"
+  },
+  "devDependencies": {
+    "@mvila/dev-tools": "^1.0.5",
+    "@mvila/tsconfig": "^1.0.3"
   }
 }

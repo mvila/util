@@ -1,9 +1,9 @@
-import {Microbatcher} from '../../..';
+import {Microbatcher} from './microbatcher';
 
 describe('Microbatcher', () => {
   test('Batching', async () => {
-    const run = jest.fn(async invocations => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    const run = jest.fn(async (invocations) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       for (const invocation of invocations) {
         if (invocation.operation === 'increment') {
@@ -16,7 +16,7 @@ describe('Microbatcher', () => {
 
     const batcher = new Microbatcher(run);
 
-    const increment = jest.fn(async number => {
+    const increment = jest.fn(async (number) => {
       return await batcher.batch('increment', number);
     });
 
