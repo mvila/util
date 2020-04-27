@@ -1,31 +1,33 @@
-import {possiblyAsync} from '../../..';
+import {possiblyAsync} from './possibly-async';
 
 describe('possibly-async', () => {
   test('possiblyAsync() with one then callback', async () => {
     const syncFunc = () => 'a';
-    let result = possiblyAsync(syncFunc(), {then: result => result + 'b'});
+    let result = possiblyAsync(syncFunc(), {then: (result) => result + 'b'});
     expect(result).toBe('ab');
 
-    const asyncFunc = () => new Promise(resolve => setTimeout(() => resolve('a'), 5));
-    result = await possiblyAsync(asyncFunc(), {then: result => result + 'b'});
+    const asyncFunc = () => new Promise((resolve) => setTimeout(() => resolve('a'), 5));
+    result = await possiblyAsync(asyncFunc(), {then: (result) => result + 'b'});
     expect(result).toBe('ab');
 
-    const asyncFunc2 = () => possiblyAsync(asyncFunc(), {then: result => result + 'b'});
-    result = await possiblyAsync(asyncFunc2(), {then: result => result + 'c'});
+    const asyncFunc2 = () => possiblyAsync(asyncFunc(), {then: (result) => result + 'b'});
+    result = await possiblyAsync(asyncFunc2(), {then: (result) => result + 'c'});
     expect(result).toBe('abc');
 
     const asyncFunc3 = () =>
       possiblyAsync(asyncFunc2(), {
-        then: result => new Promise(resolve => setTimeout(() => resolve(result + 'c'), 5))
+        then: (result) => new Promise((resolve) => setTimeout(() => resolve(result + 'c'), 5))
       });
-    result = await possiblyAsync(asyncFunc3(), {then: result => result + 'd'});
+    result = await possiblyAsync(asyncFunc3(), {then: (result) => result + 'd'});
     expect(result).toBe('abcd');
   });
 
   test('possiblyAsync() with multiple then callbacks', async () => {
-    const asyncFunc1 = () => new Promise(resolve => setTimeout(() => resolve('a'), 5));
-    const asyncFunc2 = result => new Promise(resolve => setTimeout(() => resolve(result + 'b'), 5));
-    const asyncFunc3 = result => new Promise(resolve => setTimeout(() => resolve(result + 'c'), 5));
+    const asyncFunc1 = () => new Promise((resolve) => setTimeout(() => resolve('a'), 5));
+    const asyncFunc2 = (result: any) =>
+      new Promise((resolve) => setTimeout(() => resolve(result + 'b'), 5));
+    const asyncFunc3 = (result: any) =>
+      new Promise((resolve) => setTimeout(() => resolve(result + 'c'), 5));
 
     expect(await possiblyAsync(asyncFunc1(), {then: [asyncFunc2, asyncFunc3]})).toBe('abc');
   });
@@ -34,7 +36,7 @@ describe('possibly-async', () => {
     const error1 = new Error('Error 1');
     const error2 = new Error('Error 2');
 
-    const catchCallback = jest.fn(error => {
+    const catchCallback = jest.fn((error) => {
       expect(error).toBe(error1);
       throw error2;
     });
@@ -75,7 +77,7 @@ describe('possibly-async', () => {
     expect(() => {
       result = possiblyAsync('a', {
         then: [
-          result => result + 'b',
+          (result) => result + 'b',
           () => {
             throw error1;
           }
@@ -90,26 +92,26 @@ describe('possibly-async', () => {
   test('possiblyAsync() with a finally callback', async () => {
     const finallyCallback = jest.fn();
 
-    let result = possiblyAsync('a', {then: result => result + 'b', finally: finallyCallback});
+    let result = possiblyAsync('a', {then: (result) => result + 'b', finally: finallyCallback});
     expect(result).toBe('ab');
     expect(finallyCallback).toHaveBeenCalledTimes(1);
 
     result = await possiblyAsync(Promise.resolve('a'), {
-      then: result => result + 'b',
+      then: (result) => result + 'b',
       finally: finallyCallback
     });
     expect(result).toBe('ab');
     expect(finallyCallback).toHaveBeenCalledTimes(2);
 
     result = await possiblyAsync(Promise.resolve('a'), {
-      then: async result => result + 'b',
+      then: async (result) => result + 'b',
       finally: finallyCallback
     });
     expect(result).toBe('ab');
     expect(finallyCallback).toHaveBeenCalledTimes(3);
 
     result = possiblyAsync('a', {
-      then: [result => result + 'b', result => result + 'c'],
+      then: [(result) => result + 'b', (result) => result + 'c'],
       finally: finallyCallback
     });
     expect(result).toBe('abc');
@@ -121,8 +123,8 @@ describe('possibly-async', () => {
     expect(() => {
       result = possiblyAsync('a', {
         then: [
-          result => result + 'b',
-          result => result + 'c',
+          (result) => result + 'b',
+          (result) => result + 'c',
           () => {
             throw error;
           }
@@ -138,8 +140,8 @@ describe('possibly-async', () => {
       (async () => {
         result = await possiblyAsync(Promise.resolve('a'), {
           then: [
-            async result => result + 'b',
-            result => result + 'c',
+            async (result) => result + 'b',
+            (result) => result + 'c',
             async () => {
               throw error;
             }
@@ -156,7 +158,7 @@ describe('possibly-async', () => {
     const error1 = new Error('Error 1');
     const error2 = new Error('Error 2');
 
-    const catchCallback = jest.fn(error => {
+    const catchCallback = jest.fn((error) => {
       expect(error).toBe(error1);
       return error2;
     });
@@ -193,7 +195,7 @@ describe('possibly-async', () => {
     expect(catchCallback).toHaveBeenCalledTimes(3);
     expect(finallyCallback).toHaveBeenCalledTimes(3);
 
-    const catchCallback2 = jest.fn(error => {
+    const catchCallback2 = jest.fn((error) => {
       expect(error).toBe(error1);
       throw error2;
     });
@@ -210,20 +212,21 @@ describe('possibly-async', () => {
   });
 
   test('possiblyAsync.forEach()', async () => {
-    let results = [];
-    possiblyAsync.forEach([1, 2, 3], value => {
+    let results: number[] = [];
+    possiblyAsync.forEach([1, 2, 3], (value) => {
       results.push(value * 2);
     });
     expect(results).toEqual([2, 4, 6]);
 
     results = [];
-    await possiblyAsync.forEach([1, 2, 3], value => {
+    await possiblyAsync.forEach([1, 2, 3], (value: number) => {
       if (value === 2) {
         return makePromise(() => {
           results.push(value * 2);
         });
       }
       results.push(value * 2);
+      return;
     });
     expect(results).toEqual([2, 4, 6]);
   });
@@ -232,15 +235,15 @@ describe('possibly-async', () => {
     const error1 = new Error('Error 1');
     const error2 = new Error('Error 2');
 
-    const catchCallback = jest.fn(error => {
+    const catchCallback = jest.fn((error) => {
       expect(error).toBe(error1);
       return error2;
     });
 
-    let accumulator = [];
+    let accumulator: number[] = [];
     let result = possiblyAsync.forEach(
       [1, 2, 3, 4, 5],
-      value => {
+      (value) => {
         if (value === 3) {
           throw error1;
         }
@@ -255,7 +258,7 @@ describe('possibly-async', () => {
     accumulator = [];
     result = await possiblyAsync.forEach(
       [1, 2, 3, 4, 5],
-      value => {
+      (value: number) => {
         if (value === 2) {
           return makePromise(() => {
             accumulator.push(value * 2);
@@ -265,6 +268,7 @@ describe('possibly-async', () => {
           throw error1;
         }
         accumulator.push(value * 2);
+        return;
       },
       {catch: catchCallback}
     );
@@ -274,10 +278,10 @@ describe('possibly-async', () => {
   });
 
   test('possiblyAsync.map()', async () => {
-    let results = possiblyAsync.map([1, 2, 3], value => value * 2);
+    let results = possiblyAsync.map([1, 2, 3], (value) => value * 2);
     expect(results).toEqual([2, 4, 6]);
 
-    results = await possiblyAsync.map([1, 2, 3], value => {
+    results = await possiblyAsync.map([1, 2, 3], (value) => {
       if (value === 2) {
         return makePromise(value * 2);
       }
@@ -285,8 +289,8 @@ describe('possibly-async', () => {
     });
     expect(results).toEqual([2, 4, 6]);
 
-    results = possiblyAsync.map([1, 2, 3], value =>
-      value === 2 ? {[possiblyAsync.break]: value * 2} : value * 2
+    results = possiblyAsync.map([1, 2, 3], (value) =>
+      value === 2 ? {[possiblyAsync.breakSymbol]: value * 2} : value * 2
     );
     expect(results).toEqual([2, 4]);
   });
@@ -315,7 +319,7 @@ describe('possibly-async', () => {
       [1, 2, 3],
       (accumulator, currentValue) =>
         currentValue === 2
-          ? {[possiblyAsync.break]: [...accumulator, currentValue * 2]}
+          ? {[possiblyAsync.breakSymbol]: [...accumulator, currentValue * 2]}
           : [...accumulator, currentValue * 2],
       []
     );
@@ -323,7 +327,7 @@ describe('possibly-async', () => {
   });
 
   test('possiblyAsync.some()', async () => {
-    const callback = jest.fn(value => value === 2);
+    const callback = jest.fn((value) => value === 2);
 
     let result = possiblyAsync.some([1, 2, 3], callback);
     expect(result).toBe(true);
@@ -333,13 +337,13 @@ describe('possibly-async', () => {
     expect(result).toBe(false);
     expect(callback).toHaveBeenCalledTimes(5);
 
-    result = await possiblyAsync.some([1, 2, 3], async value => {
+    result = await possiblyAsync.some([1, 2, 3], async (value) => {
       return callback(value);
     });
     expect(result).toBe(true);
     expect(callback).toHaveBeenCalledTimes(7);
 
-    result = await possiblyAsync.some([1, -2, 3], async value => {
+    result = await possiblyAsync.some([1, -2, 3], async (value) => {
       return callback(value);
     });
     expect(result).toBe(false);
@@ -347,10 +351,10 @@ describe('possibly-async', () => {
   });
 
   test('possiblyAsync.mapValues()', async () => {
-    let results = possiblyAsync.mapValues({a: 1, b: 2, c: 3}, value => value * 2);
+    let results = possiblyAsync.mapValues({a: 1, b: 2, c: 3}, (value) => value * 2);
     expect(results).toEqual({a: 2, b: 4, c: 6});
 
-    results = await possiblyAsync.mapValues({a: 1, b: 2, c: 3}, value => {
+    results = await possiblyAsync.mapValues({a: 1, b: 2, c: 3}, (value) => {
       if (value === 2) {
         return makePromise(value * 2);
       }
@@ -358,8 +362,8 @@ describe('possibly-async', () => {
     });
     expect(results).toEqual({a: 2, b: 4, c: 6});
 
-    results = possiblyAsync.mapValues({a: 1, b: 2, c: 3}, value =>
-      value === 2 ? {[possiblyAsync.break]: value * 2} : value * 2
+    results = possiblyAsync.mapValues({a: 1, b: 2, c: 3}, (value) =>
+      value === 2 ? {[possiblyAsync.breakSymbol]: value * 2} : value * 2
     );
     expect(results).toEqual({a: 2, b: 4});
   });
@@ -387,8 +391,8 @@ describe('possibly-async', () => {
   });
 });
 
-function makePromise(value) {
-  return new Promise(resolve => {
+function makePromise(value: any) {
+  return new Promise((resolve) => {
     setTimeout(() => {
       while (typeof value === 'function') {
         value = value();
