@@ -23,7 +23,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc --module CommonJS --outDir dist/node-cjs",
-    "prepare": "npm run build"
+    "prepack": "npm run build"
   },
   "dependencies": {
     "@types/jest": "^25.2.1",
