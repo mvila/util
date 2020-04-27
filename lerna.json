@@ -5,6 +5,7 @@
     "packages/core-helpers",
     "packages/dev-tools",
     "packages/microbatcher",
+    "packages/npm-linker",
     "packages/possibly-async"
   ]
 }

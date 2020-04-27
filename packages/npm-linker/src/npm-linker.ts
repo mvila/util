@@ -1,13 +1,13 @@
 import {resolve, join, relative, dirname} from 'path';
 import {existsSync, readdirSync} from 'fs';
 import {readJsonSync, ensureDirSync, removeSync, ensureSymlinkSync} from 'fs-extra';
-import isDirectory from 'is-directory';
+import fs from 'fs';
 
 const CONFIG_FILE_NAME = '.npm-linker.json';
 
-export function run(directory, {packageName} = {}) {
+export function run(directory: string, {packageName}: {packageName?: string} = {}) {
   try {
-    if (!isDirectory.sync(directory)) {
+    if (!isDirectory(directory)) {
       throw Object.assign(new Error("Directory doesn't exist"), {
         displayMessage: `The specified directory ('${directory}') doesn't exist`
       });
@@ -51,7 +51,7 @@ export function run(directory, {packageName} = {}) {
   }
 }
 
-function loadRootConfig(currentDirectory) {
+function loadRootConfig(currentDirectory: string) {
   const rootConfigFile = findRootConfigFile(currentDirectory);
 
   if (rootConfigFile === undefined) {
@@ -63,8 +63,8 @@ function loadRootConfig(currentDirectory) {
   return loadConfig(rootConfigFile);
 }
 
-function loadConfig(configFile) {
-  const mergedConfig = {packages: []};
+function loadConfig(configFile: string) {
+  const mergedConfig: {packages: string[]} = {packages: []};
 
   const configDirectory = dirname(configFile);
 
@@ -102,7 +102,7 @@ function loadConfig(configFile) {
   return mergedConfig;
 }
 
-function findRootConfigFile(currentDirectory) {
+function findRootConfigFile(currentDirectory: string) {
   let rootConfigFile;
 
   while (true) {
@@ -124,7 +124,7 @@ function findRootConfigFile(currentDirectory) {
   return rootConfigFile;
 }
 
-function loadPackageNames(directory) {
+function loadPackageNames(directory: string) {
   const packageFile = join(directory, 'package.json');
 
   if (!existsSync(packageFile)) {
@@ -136,7 +136,7 @@ function loadPackageNames(directory) {
   return Object.keys(dependencies);
 }
 
-function findLocalPackages(packages) {
+function findLocalPackages(packages: string[]) {
   const localPackages = Object.create(null);
 
   for (const localPackage of packages) {
@@ -144,7 +144,7 @@ function findLocalPackages(packages) {
       if (localPackage.slice(-2) === '/*') {
         const parentDirectory = localPackage.slice(0, -2);
 
-        if (!isDirectory.sync(parentDirectory)) {
+        if (!isDirectory(parentDirectory)) {
           throw Object.assign(new Error('Invalid package specifier'), {
             displayMessage: `The configuration contains a package specifier that does not match an existing directory (${localPackage})`
           });
@@ -159,7 +159,7 @@ function findLocalPackages(packages) {
     } else {
       const directory = localPackage;
 
-      if (!isDirectory.sync(directory)) {
+      if (!isDirectory(directory)) {
         throw Object.assign(new Error('Invalid package specifier'), {
           displayMessage: `The configuration contains a package specifier that does not match an existing directory (${localPackage})`
         });
@@ -172,7 +172,7 @@ function findLocalPackages(packages) {
   return localPackages;
 }
 
-function findLocalPackageFromDirectory(directory) {
+function findLocalPackageFromDirectory(directory: string) {
   const packageFile = join(directory, 'package.json');
 
   if (!existsSync(packageFile)) {
@@ -188,7 +188,7 @@ function findLocalPackageFromDirectory(directory) {
   return {[name]: directory};
 }
 
-function findLocalPackageFromParentDirectory(parentDirectory) {
+function findLocalPackageFromParentDirectory(parentDirectory: string) {
   const localPackages = Object.create(null);
 
   const entries = readdirSync(parentDirectory);
@@ -196,7 +196,7 @@ function findLocalPackageFromParentDirectory(parentDirectory) {
   for (let entry of entries) {
     entry = join(parentDirectory, entry);
 
-    if (!isDirectory.sync(entry)) {
+    if (!isDirectory(entry)) {
       continue;
     }
 
@@ -206,4 +206,8 @@ function findLocalPackageFromParentDirectory(parentDirectory) {
   }
 
   return localPackages;
+}
+
+function isDirectory(path: string): boolean {
+  return fs.existsSync(path) && fs.lstatSync(path).isDirectory();
 }

@@ -2,45 +2,41 @@
   "name": "npm-linker",
   "version": "1.0.1",
   "description": "`npm link`, easier",
+  "keywords": [
+    "npm",
+    "package",
+    "link",
+    "local",
+    "development"
+  ],
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
   "repository": "https://github.com/mvila/util/tree/master/packages/npm-linker",
   "files": [
     "dist"
   ],
-  "main": "dist/node/cjs",
-  "module": "dist/node/esm",
-  "browser": "dist/browser/esm",
+  "main": "dist/node-cjs/index.js",
+  "module": "dist/node-esm/index.js",
   "bin": {
-    "npm-linker": "dist/node/cjs/bin/index.js"
+    "npm-linker": "dist/node-cjs/cli.js"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "dev-tools build:ts-library",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
     "is-directory": "^0.3.1",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "tslib": "^1.11.1"
   },
-  "@managed": {
-    "warning": "This file contains properties managed by a Resource. You should not modify them directly or use a command such as `npm install <name>`.",
-    "properties": [
-      "name",
-      "version",
-      "private",
-      "description",
-      "keywords",
-      "homepage",
-      "author",
-      "contributors",
-      "license",
-      "repository",
-      "files",
-      "main",
-      "module",
-      "browser",
-      "bin",
-      "dependencies",
-      "peerDependencies",
-      "optionalDependencies",
-      "devDependencies"
-    ]
+  "devDependencies": {
+    "@mvila/dev-tools": "^1.0.5",
+    "@mvila/tsconfig": "^1.0.3",
+    "@types/fs-extra": "^8.1.0",
+    "@types/minimist": "^1.2.0"
   }
 }

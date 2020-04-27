@@ -3,7 +3,7 @@
 import {resolve} from 'path';
 import minimist from 'minimist';
 
-import {run} from '../npm-linker';
+import {run} from './npm-linker';
 
 const argv = minimist(process.argv);
 
