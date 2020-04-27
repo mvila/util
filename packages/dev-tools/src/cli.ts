@@ -1,31 +1,33 @@
 #!/usr/bin/env node
 
-import minimist from 'minimist';
+import sade from 'sade';
 import process from 'process';
 
-import {run} from './runner';
+import {buildTSLibrary} from './commands/build-ts-library';
+import {programName, programVersion, logMessage, logError} from './util';
 
 async function main() {
-  const commandName = process.argv[2];
+  const program = sade(programName);
 
-  if (commandName === undefined) {
-    throw Object.assign(new Error('Command is missing'), {
-      displayMessage: 'Please specify a command (e.g., `dev-tools build:ts-library`)'
-    });
-  }
+  program
+    .version(programVersion)
+    .command('build:ts-library')
+    .describe('Build a library implemented in TypeScript')
+    .action(buildTSLibrary);
 
-  const {_: args, ...options} = minimist(process.argv.slice(3));
+  const command: any = program.parse(process.argv, {lazy: true});
 
-  await run(commandName, args, options);
+  await command.handler(...command.args);
 
-  console.log(`dev-tools: Command '${commandName}' executed`);
+  logMessage(`Command '${command.name}' executed successfully`);
 }
 
-main().catch(error => {
-  if (error.displayMessage !== undefined) {
-    console.error(`dev-tools: ${error.displayMessage}`);
-    process.exit(1);
+main().catch((error) => {
+  if (error?.displayMessage !== undefined) {
+    logError(error.displayMessage);
+  } else {
+    console.error(error);
   }
 
-  throw error;
+  process.exit(1);
 });

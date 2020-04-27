@@ -1,5 +1,6 @@
 {
   "name": "@mvila/dev-tools",
+  "displayName": "dev-tools",
   "version": "1.0.2",
   "description": "Simple development tools used by mvila's projects",
   "keywords": [
@@ -27,13 +28,15 @@
   "dependencies": {
     "minimist": "^1.2.5",
     "rimraf": "^3.0.2",
+    "sade": "^1.7.3",
     "tslib": "^1.11.1",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
-    "@mvila/tsconfig": "^1.0.1",
+    "@mvila/tsconfig": "^1.0.2",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^13.13.2",
-    "@types/rimraf": "^3.0.0"
+    "@types/node": "^13.13.4",
+    "@types/rimraf": "^3.0.0",
+    "@types/sade": "^1.6.0"
   }
 }
