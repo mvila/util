@@ -1,7 +1,7 @@
 {
   "name": "@mvila/dev-tools",
   "displayName": "dev-tools",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Simple development tools used by mvila's projects",
   "keywords": [
     "npm",
