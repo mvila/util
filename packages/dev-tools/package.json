@@ -1,7 +1,7 @@
 {
   "name": "@mvila/dev-tools",
   "displayName": "dev-tools",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple development tools used by mvila's projects",
   "keywords": [
     "npm",
@@ -26,15 +26,17 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "minimist": "^1.2.5",
+    "@types/jest": "^25.2.1",
+    "jest": "^25.4.0",
+    "jest-watch-typeahead": "^0.5.0",
     "rimraf": "^3.0.2",
     "sade": "^1.7.3",
+    "ts-jest": "^25.4.0",
     "tslib": "^1.11.1",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
     "@mvila/tsconfig": "^1.0.2",
-    "@types/minimist": "^1.2.0",
     "@types/node": "^13.13.4",
     "@types/rimraf": "^3.0.0",
     "@types/sade": "^1.6.0"

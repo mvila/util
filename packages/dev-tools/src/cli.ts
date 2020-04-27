@@ -3,23 +3,30 @@
 import sade from 'sade';
 import process from 'process';
 
-import {buildTSLibrary} from './commands/build-ts-library';
+import {buildTSLibrary, testTSLibrary} from './commands';
 import {programName, programVersion, logMessage, logError} from './util';
 
 async function main() {
-  const program = sade(programName);
+  const program = sade(programName).version(programVersion);
 
   program
-    .version(programVersion)
     .command('build:ts-library')
     .describe('Build a library implemented in TypeScript')
     .action(buildTSLibrary);
 
+  program
+    .command('test:ts-library')
+    .describe('Test a library implemented in TypeScript (using Jest and TSJest)')
+    .option('--watch', 'Enable watch mode')
+    .action(testTSLibrary);
+
   const command: any = program.parse(process.argv, {lazy: true});
 
-  await command.handler(...command.args);
+  const exitSilently = await command.handler(...command.args);
 
-  logMessage(`Command '${command.name}' executed successfully`);
+  if (!exitSilently) {
+    logMessage(`Command '${command.name}' executed successfully`);
+  }
 }
 
 main().catch((error) => {
