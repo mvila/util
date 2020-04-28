@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
 import sade from 'sade';
-import process from 'process';
 
-import {buildTSLibrary, testTSLibrary} from './commands';
+import {linkLocalPackages, buildTSLibrary, testTSLibrary} from './commands';
 import {programName, programVersion, logMessage, logError} from './util';
 
 async function main() {
   const program = sade(programName).version(programVersion);
+
+  program
+    .command('link:local-packages')
+    .describe('Link dependencies to local development packages')
+    .action(linkLocalPackages);
 
   program
     .command('build:ts-library')
