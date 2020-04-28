@@ -1,6 +1,6 @@
 {
   "name": "simple-cloning",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple library that can deeply clone most JavaScript values including objects and arrays",
   "keywords": [
     "clone",
