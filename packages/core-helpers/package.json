@@ -1,6 +1,6 @@
 {
   "name": "core-helpers",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Small collection of utility functions",
   "keywords": [
     "util",
@@ -31,7 +31,7 @@
     "tslib": "^1.11.1"
   },
   "devDependencies": {
-    "@mvila/dev-tools": "^1.0.7",
+    "@mvila/dev-tools": "^1.0.9",
     "@mvila/tsconfig": "^1.0.3",
     "@types/lodash": "^4.14.150"
   }
