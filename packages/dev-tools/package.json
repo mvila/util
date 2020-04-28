@@ -24,7 +24,6 @@
   "scripts": {
     "build": "rm -rf dist && tsc --module CommonJS --outDir dist/node-cjs && chmod a+x dist/node-cjs/cli.js",
     "link": "npm-linker",
-    "preinstall": "npm run link",
     "prepare": "npm run build"
   },
   "dependencies": {
