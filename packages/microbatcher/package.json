@@ -1,6 +1,6 @@
 {
   "name": "microbatcher",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Helps batching microtasks",
   "keywords": [
     "batch",
@@ -29,7 +29,7 @@
     "tslib": "^1.11.1"
   },
   "devDependencies": {
-    "@mvila/dev-tools": "^1.0.9",
+    "@mvila/dev-tools": "^1.0.10",
     "@mvila/tsconfig": "^1.0.3"
   }
 }
