@@ -24,10 +24,10 @@
   "scripts": {
     "build": "rm -rf dist && tsc --module CommonJS --outDir dist/node-cjs && chmod a+x dist/node-cjs/cli.js",
     "link": "npm-linker",
-    "prepare": "npm run link && npm run build"
+    "preinstall": "npm run link",
+    "prepare": "npm run build"
   },
   "dependencies": {
-    "@types/jest": "^25.2.1",
     "jest": "^25.4.0",
     "jest-watch-typeahead": "^0.5.0",
     "npm-linker": "^1.0.7",
