@@ -7,3 +7,7 @@ Helps implementing functions that are synchronous or asynchronous depending of t
 ```
 npm install possibly-async
 ```
+
+## License
+
+MIT

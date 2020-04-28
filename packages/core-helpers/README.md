@@ -7,3 +7,7 @@ Small collection of utility functions.
 ```
 npm install core-helpers
 ```
+
+## License
+
+MIT

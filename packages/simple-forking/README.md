@@ -7,3 +7,7 @@ Simple library that can fork/merge most JavaScript values including objects and 
 ```
 npm install simple-forking
 ```
+
+## License
+
+MIT

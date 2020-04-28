@@ -7,3 +7,7 @@ Helps batching microtasks.
 ```
 npm install microbatcher
 ```
+
+## License
+
+MIT

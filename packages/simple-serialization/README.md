@@ -7,3 +7,7 @@ Simple serialization library that can serialize/deserialize anything including d
 ```
 npm install simple-serialization
 ```
+
+## License
+
+MIT

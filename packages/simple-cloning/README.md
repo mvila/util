@@ -7,3 +7,7 @@ Simple library that can deeply clone most JavaScript values including objects an
 ```
 npm install simple-cloning
 ```
+
+## License
+
+MIT

@@ -7,3 +7,7 @@
 ```
 npm install npm-linker
 ```
+
+## License
+
+MIT

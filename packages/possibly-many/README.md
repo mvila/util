@@ -7,3 +7,7 @@ Helps handling values that are one (scalar) or many (array) indifferently.
 ```
 npm install possibly-many
 ```
+
+## License
+
+MIT

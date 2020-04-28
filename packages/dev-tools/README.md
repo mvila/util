@@ -15,7 +15,8 @@ To build a TypeScript project, add the following in your `package.json` file:
 ```json
 {
   "scripts": {
-    "build": "dev-tools build:ts-library"
+    "build": "dev-tools build:ts-library",
+    "test": "dev-tools test:ts-library"
   }
 }
 ```
