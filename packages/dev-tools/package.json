@@ -22,7 +22,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --module CommonJS --outDir dist/node-cjs",
+    "build": "rm -rf dist && tsc --module CommonJS --outDir dist/node-cjs && chmod a+x dist/node-cjs/cli.js",
     "prepare": "npm run build"
   },
   "dependencies": {
