@@ -15,6 +15,11 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
 
     const config = loadRootConfig(directory);
 
+    if (config === undefined) {
+      console.warn('npm-linker: Config file not found');
+      return;
+    }
+
     let packageNames;
     if (packageName) {
       packageNames = [packageName];
@@ -67,11 +72,12 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
     }
   } catch (error) {
     if (error.displayMessage !== undefined) {
-      console.error(error.displayMessage);
-      process.exit(1);
+      console.error(`npm-linker: ${error.displayMessage}`);
+    } else {
+      console.error(error);
     }
 
-    throw error;
+    process.exit(1);
   }
 }
 
@@ -79,9 +85,7 @@ function loadRootConfig(currentDirectory: string) {
   const rootConfigFile = findRootConfigFile(currentDirectory);
 
   if (rootConfigFile === undefined) {
-    throw Object.assign(new Error('Config file not found'), {
-      displayMessage: 'Configuration file not found'
-    });
+    return;
   }
 
   return loadConfig(rootConfigFile);
