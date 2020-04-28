@@ -28,16 +28,40 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
     const relativeDirectory = relative(process.cwd(), directory) || '.';
 
     for (const packageName of packageNames) {
-      const packageDirectory = localPackages[packageName];
+      const localPackage = localPackages[packageName];
 
-      if (packageDirectory === undefined) {
+      if (localPackage === undefined) {
         continue;
       }
 
       ensureDirSync(modulesDirectory);
+
       const linkFile = join(modulesDirectory, packageName);
       removeSync(linkFile);
-      ensureSymlinkSync(relative(dirname(linkFile), packageDirectory), linkFile);
+      ensureSymlinkSync(relative(dirname(linkFile), localPackage.directory), linkFile);
+
+      const {
+        json: {bin}
+      } = localPackage;
+
+      if (typeof bin === 'object') {
+        const binDirectory = join(modulesDirectory, '.bin');
+
+        ensureDirSync(binDirectory);
+
+        for (let [executableName, executableFileRelative] of Object.entries(bin)) {
+          if (typeof executableFileRelative !== 'string') {
+            continue; // TODO: Throw a useful error
+          }
+
+          const executableLinkFile = join(binDirectory, executableName);
+          const executableFile = join(modulesDirectory, packageName, executableFileRelative);
+          ensureSymlinkSync(
+            relative(dirname(executableLinkFile), executableFile),
+            executableLinkFile
+          );
+        }
+      }
 
       console.log(`${relativeDirectory}: '${packageName}' linked`);
     }
@@ -131,9 +155,9 @@ function loadPackageNames(directory: string) {
     return [];
   }
 
-  const {dependencies = {}} = readJsonSync(packageFile);
+  const {dependencies = {}, devDependencies = {}} = readJsonSync(packageFile);
 
-  return Object.keys(dependencies);
+  return [...Object.keys(dependencies), ...Object.keys(devDependencies)];
 }
 
 function findLocalPackages(packages: string[]) {
@@ -179,13 +203,13 @@ function findLocalPackageFromDirectory(directory: string) {
     return undefined;
   }
 
-  const {name} = readJsonSync(packageFile);
+  const json = readJsonSync(packageFile);
 
-  if (name === undefined) {
+  if (json.name === undefined) {
     return undefined;
   }
 
-  return {[name]: directory};
+  return {[json.name]: {directory, json}};
 }
 
 function findLocalPackageFromParentDirectory(parentDirectory: string) {
