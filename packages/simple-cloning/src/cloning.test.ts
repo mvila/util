@@ -1,10 +1,10 @@
 import isEqual from 'lodash/isEqual';
 
-import {clone} from '../../..';
+import {clone, cloneOptions} from './cloning';
 
 describe('Cloning', () => {
-  const testCloneObject = object => {
-    const clonedObject = clone(object);
+  const testCloneObject = (object: object, options?: cloneOptions) => {
+    const clonedObject = clone(object, options);
 
     expect(clonedObject !== object && isEqual(clonedObject, object)).toBe(true);
   };
@@ -52,21 +52,28 @@ describe('Cloning', () => {
   });
 
   test('Custom cloning', async () => {
-    class Component {}
+    class Component {
+      clonedFrom?: Component;
+    }
 
     class Movie extends Component {}
 
-    function objectCloner(object) {
+    function objectCloner(object: object): object | void {
       if (object instanceof Component) {
-        return new object.constructor();
+        const clonedObject = new (object.constructor as {new (): Component})();
+        clonedObject.clonedFrom = object;
+        return clonedObject;
       }
     }
 
     testCloneObject({title: 'Inception', country: undefined, duration: 120}, {objectCloner});
 
     const movie = new Movie();
+
     const clonedMovie = clone(movie, {objectCloner});
 
     expect(clonedMovie).toBeInstanceOf(Movie);
+    expect(clonedMovie).not.toBe(movie);
+    expect(clonedMovie.clonedFrom).toBe(movie);
   });
 });

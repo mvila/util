@@ -1,4 +1,4 @@
-import {isLeaf} from '../../..';
+import {isLeaf} from './utilities';
 
 describe('Utilities', () => {
   test('isLeaf()', async () => {

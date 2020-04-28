@@ -6,6 +6,7 @@
     "packages/dev-tools",
     "packages/microbatcher",
     "packages/npm-linker",
-    "packages/possibly-async"
+    "packages/possibly-async",
+    "packages/simple-cloning"
   ]
 }

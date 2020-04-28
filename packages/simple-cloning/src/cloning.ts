@@ -1,10 +1,9 @@
 import isObjectLike from 'lodash/isObjectLike';
 import mapValues from 'lodash/mapValues';
-import ow from 'ow';
 
-export function clone(value, options) {
-  ow(options, 'options', ow.optional.object.partialShape({objectCloner: ow.optional.function}));
+export type cloneOptions = {objectCloner?: (object: object) => object | void};
 
+export function clone(value: any, options?: cloneOptions): any {
   if (Array.isArray(value)) {
     return cloneArray(value, options);
   }
@@ -20,7 +19,7 @@ export function clone(value, options) {
   return value;
 }
 
-function cloneObject(object, options) {
+function cloneObject(object: object, options?: cloneOptions) {
   const objectCloner = options?.objectCloner;
 
   if (objectCloner !== undefined) {
@@ -46,15 +45,19 @@ function cloneObject(object, options) {
   return cloneAttributes(object, options);
 }
 
-function cloneDate(date) {
+function cloneArray(array: any[], options?: cloneOptions) {
+  return array.map((item) => clone(item, options));
+}
+
+function cloneDate(date: Date) {
   return new Date(date);
 }
 
-function cloneRegExp(regExp) {
+function cloneRegExp(regExp: RegExp) {
   return new RegExp(regExp.source, regExp.flags);
 }
 
-function cloneError(error, options) {
+function cloneError(error: Error, options?: cloneOptions) {
   const clonedError = new Error(error.message);
 
   Object.assign(clonedError, cloneAttributes(error, options));
@@ -62,10 +65,6 @@ function cloneError(error, options) {
   return clonedError;
 }
 
-function cloneAttributes(object, options) {
-  return mapValues(object, value => clone(value, options));
-}
-
-function cloneArray(array, options) {
-  return array.map(item => clone(item, options));
+function cloneAttributes(object: object, options?: cloneOptions) {
+  return mapValues(object, (value) => clone(value, options));
 }
