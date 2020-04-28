@@ -22,7 +22,8 @@
   },
   "scripts": {
     "build": "dev-tools build:ts-library",
-    "prepare": "npm run build && npm run test",
+    "link": "dev-tools link:local-packages",
+    "prepare": "npm run link && npm run build && npm run test",
     "test": "dev-tools test:ts-library"
   },
   "dependencies": {
