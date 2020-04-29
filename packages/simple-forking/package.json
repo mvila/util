@@ -1,6 +1,6 @@
 {
   "name": "simple-forking",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Simple library that can fork/merge most JavaScript values including objects and arrays",
   "keywords": [
     "fork",
