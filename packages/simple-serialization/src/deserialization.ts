@@ -1,18 +1,13 @@
 import {hasOwnProperty} from 'core-helpers';
 import {possiblyAsync} from 'possibly-async';
-import ow from 'ow';
 
-export function deserialize(value, options) {
-  ow(
-    options,
-    'options',
-    ow.optional.object.partialShape({
-      objectDeserializer: ow.optional.function,
-      functionDeserializer: ow.optional.function,
-      errorHandler: ow.optional.function
-    })
-  );
+export type deserializeOptions = {
+  objectDeserializer?: (object: object) => object | void;
+  functionDeserializer?: (object: object) => Function | void;
+  errorHandler?: (error: Error) => any;
+};
 
+export function deserialize(value: any, options?: deserializeOptions): any {
   if (value === null) {
     return null;
   }
@@ -28,7 +23,7 @@ export function deserialize(value, options) {
   return value;
 }
 
-function deserializeObjectOrFunction(object, options) {
+function deserializeObjectOrFunction(object: {[key: string]: any}, options?: deserializeOptions) {
   if (hasOwnProperty(object, '__undefined') && object.__undefined === true) {
     return undefined;
   }
@@ -43,7 +38,7 @@ function deserializeObjectOrFunction(object, options) {
 
   if (hasOwnProperty(object, '__error')) {
     return possiblyAsync(deserializeError(object, options), {
-      then: error => {
+      then: (error) => {
         const errorHandler = options?.errorHandler;
 
         if (errorHandler !== undefined) {
@@ -78,11 +73,11 @@ function deserializeObjectOrFunction(object, options) {
   return deserializeAttributes(object, options);
 }
 
-function deserializeDate(object) {
+function deserializeDate(object: {[key: string]: any}) {
   return new Date(object.__date);
 }
 
-function deserializeRegExp(object) {
+function deserializeRegExp(object: {[key: string]: any}) {
   const {__regExp: regExp} = object;
 
   const fragments = regExp.match(/\/(.*?)\/([a-z]*)?$/i);
@@ -96,23 +91,23 @@ function deserializeRegExp(object) {
   return new RegExp(source, flags);
 }
 
-function deserializeError(object, options) {
+function deserializeError(object: {[key: string]: any}, options?: deserializeOptions) {
   const {__error: message, ...attributes} = object;
 
   const deserializedError = new Error(message);
 
   return possiblyAsync(deserializeAttributes(attributes, options), {
-    then: deserializedAttributes => {
+    then: (deserializedAttributes) => {
       Object.assign(deserializedError, deserializedAttributes);
       return deserializedError;
     }
   });
 }
 
-function deserializeAttributes(object, options) {
-  return possiblyAsync.mapValues(object, value => deserialize(value, options));
+function deserializeAttributes(object: object, options?: deserializeOptions) {
+  return possiblyAsync.mapValues(object, (value) => deserialize(value, options));
 }
 
-function deserializeArray(array, options) {
-  return possiblyAsync.map(array, item => deserialize(item, options));
+function deserializeArray(array: any[], options?: deserializeOptions) {
+  return possiblyAsync.map(array, (item) => deserialize(item, options));
 }

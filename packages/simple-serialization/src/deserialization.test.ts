@@ -1,4 +1,4 @@
-import {deserialize} from '../../..';
+import {deserialize} from './deserialization';
 
 describe('Deserialization', () => {
   test('Basic deserialization', async () => {
@@ -55,18 +55,20 @@ describe('Deserialization', () => {
 
   test('Custom deserialization', async () => {
     class Movie {
-      static __deserialize(attributes) {
+      static limit?: number;
+
+      static __deserialize(attributes: object) {
         Object.assign(this, attributes);
       }
 
-      __deserialize(attributes) {
+      __deserialize(attributes: object) {
         Object.assign(this, attributes);
       }
     }
 
     expect(Movie.limit).toBeUndefined();
 
-    function objectDeserializer(object) {
+    function objectDeserializer(object: {[key: string]: any}): object | void {
       const {__Class: ClassName, __class: className, ...attributes} = object;
 
       if (ClassName === 'Movie') {
@@ -81,7 +83,7 @@ describe('Deserialization', () => {
       }
     }
 
-    function functionDeserializer(object) {
+    function functionDeserializer(object: {[key: string]: any}) {
       const {__function} = object;
 
       if (__function !== undefined) {
@@ -90,7 +92,7 @@ describe('Deserialization', () => {
       }
     }
 
-    function errorHandler(error) {
+    function errorHandler(error: Error) {
       throw error;
     }
 

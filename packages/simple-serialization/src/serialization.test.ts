@@ -1,4 +1,4 @@
-import {serialize} from '../../..';
+import {serialize} from './serialization';
 
 describe('Serialization', () => {
   test('Basic serialization', async () => {
@@ -45,7 +45,7 @@ describe('Serialization', () => {
 
     expect(serialize([1, 2, undefined, 3])).toEqual([1, 2, {__undefined: true}, 3]);
 
-    const movie = {
+    const movie: {[key: string]: any} = {
       title: 'Inception',
       director: undefined,
       _hidden: true,
@@ -74,6 +74,8 @@ describe('Serialization', () => {
     class Movie {
       static limit = 100;
 
+      title?: string;
+
       static __serialize() {
         return {__Class: 'Movie', ...this};
       }
@@ -83,15 +85,15 @@ describe('Serialization', () => {
       }
     }
 
-    function objectSerializer(object) {
+    function objectSerializer(object: {[key: string]: any}) {
       if (typeof object.__serialize === 'function') {
         return object.__serialize();
       }
     }
 
-    function functionSerializer(func) {
+    function functionSerializer(func: Function) {
       return {
-        __function: func.toString()
+        __function: func.toString().replace(/\n +/g, '\n')
       };
     }
 
@@ -112,12 +114,12 @@ describe('Serialization', () => {
       }
     });
 
-    function sum(a, b) {
+    function sum(a: number, b: number) {
       return a + b;
     }
 
     expect(serialize(sum, options)).toEqual({
-      __function: 'function sum(a, b) {\n      return a + b;\n    }'
+      __function: 'function sum(a, b) {\nreturn a + b;\n}'
     });
   });
 });

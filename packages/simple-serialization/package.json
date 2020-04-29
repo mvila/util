@@ -2,42 +2,42 @@
   "name": "simple-serialization",
   "version": "0.2.6",
   "description": "Simple serialization library that can serialize/deserialize anything including dates, undefined values, and function's attributes",
+  "keywords": [
+    "serialize",
+    "deserialize",
+    "object",
+    "array",
+    "date",
+    "regexp",
+    "error",
+    "function",
+    "undefined"
+  ],
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
   "repository": "https://github.com/mvila/util/tree/master/packages/simple-serialization",
   "files": [
     "dist"
   ],
-  "main": "dist/node/cjs",
-  "module": "dist/node/esm",
-  "browser": "dist/browser/esm",
+  "main": "dist/node-cjs/index.js",
+  "module": "dist/node-esm/index.js",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "dev-tools build:ts-library",
+    "link": "dev-tools link:local-packages",
+    "prepare": "npm run build && npm run test",
+    "test": "dev-tools test:ts-library"
+  },
   "dependencies": {
     "core-helpers": "^0.1.0",
-    "ow": "^0.15.1",
-    "possibly-async": "^0.2.0"
+    "possibly-async": "^0.2.0",
+    "tslib": "^1.11.1"
   },
-  "@managed": {
-    "warning": "This file contains properties managed by a Resource. You should not modify them directly or use a command such as `npm install <name>`.",
-    "properties": [
-      "name",
-      "version",
-      "private",
-      "description",
-      "keywords",
-      "homepage",
-      "author",
-      "contributors",
-      "license",
-      "repository",
-      "files",
-      "main",
-      "module",
-      "browser",
-      "bin",
-      "dependencies",
-      "peerDependencies",
-      "optionalDependencies",
-      "devDependencies"
-    ]
+  "devDependencies": {
+    "@mvila/dev-tools": "^1.0.13",
+    "@mvila/tsconfig": "^1.0.3",
+    "@types/jest": "^25.2.1"
   }
 }
