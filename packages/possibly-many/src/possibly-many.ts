@@ -1,6 +1,6 @@
-export const possiblyMany = {};
+export const possiblyMany: {[key: string]: any} = {};
 
-possiblyMany.get = function(value, index) {
+possiblyMany.get = function (value, index) {
   if (index !== undefined) {
     const values = value;
     if (!Array.isArray(values)) {
@@ -14,7 +14,7 @@ possiblyMany.get = function(value, index) {
   return value;
 };
 
-possiblyMany.call = function(value, func) {
+possiblyMany.call = function (value, func) {
   if (Array.isArray(value)) {
     const values = value;
     for (let index = 0; index < values.length; index++) {
@@ -29,7 +29,7 @@ possiblyMany.call = function(value, func) {
   return func(value);
 };
 
-possiblyMany.callAsync = async function(value, func) {
+possiblyMany.callAsync = async function (value, func) {
   if (Array.isArray(value)) {
     const values = value;
     for (let index = 0; index < values.length; index++) {
@@ -44,7 +44,7 @@ possiblyMany.callAsync = async function(value, func) {
   return await func(value);
 };
 
-possiblyMany.map = function(value, func) {
+possiblyMany.map = function (value, func) {
   if (Array.isArray(value)) {
     const values = value;
     const results = [];
@@ -58,7 +58,7 @@ possiblyMany.map = function(value, func) {
   return func(value);
 };
 
-possiblyMany.mapAsync = async function(value, func) {
+possiblyMany.mapAsync = async function (value, func) {
   if (Array.isArray(value)) {
     const values = value;
     const results = [];
@@ -72,7 +72,7 @@ possiblyMany.mapAsync = async function(value, func) {
   return await func(value);
 };
 
-possiblyMany.find = function(value, func) {
+possiblyMany.find = function (value, func) {
   if (Array.isArray(value)) {
     const values = value;
     for (let index = 0; index < values.length; index++) {
@@ -86,7 +86,7 @@ possiblyMany.find = function(value, func) {
   return func(value) ? value : undefined;
 };
 
-possiblyMany.findAsync = async function(value, func) {
+possiblyMany.findAsync = async function (value, func) {
   if (Array.isArray(value)) {
     const values = value;
     for (let index = 0; index < values.length; index++) {

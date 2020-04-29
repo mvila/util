@@ -1,0 +1,6 @@
+{
+  "extends": "@mvila/tsconfig",
+  "compilerOptions": {
+    "strict": false
+  }
+}
