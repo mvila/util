@@ -1,6 +1,6 @@
 {
   "name": "simple-forking",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Simple library that can fork/merge most JavaScript values including objects and arrays",
   "keywords": [
     "fork",
@@ -31,7 +31,7 @@
   "dependencies": {
     "core-helpers": "^0.1.18",
     "lodash": "^4.17.15",
-    "simple-cloning": "^0.1.9",
+    "simple-cloning": "^0.1.10",
     "tslib": "^1.11.1"
   },
   "devDependencies": {
