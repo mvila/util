@@ -1,13 +1,13 @@
 import {hasOwnProperty} from 'core-helpers';
 import {possiblyAsync} from 'possibly-async';
 
-export type deserializeOptions = {
+export type DeserializeOptions = {
   objectDeserializer?: (object: object) => object | void;
   functionDeserializer?: (object: object) => Function | void;
   errorHandler?: (error: Error) => any;
 };
 
-export function deserialize(value: any, options?: deserializeOptions): any {
+export function deserialize(value: any, options?: DeserializeOptions): any {
   if (value === null) {
     return null;
   }
@@ -23,7 +23,7 @@ export function deserialize(value: any, options?: deserializeOptions): any {
   return value;
 }
 
-function deserializeObjectOrFunction(object: {[key: string]: any}, options?: deserializeOptions) {
+function deserializeObjectOrFunction(object: {[key: string]: any}, options?: DeserializeOptions) {
   if (hasOwnProperty(object, '__undefined') && object.__undefined === true) {
     return undefined;
   }
@@ -91,7 +91,7 @@ function deserializeRegExp(object: {[key: string]: any}) {
   return new RegExp(source, flags);
 }
 
-function deserializeError(object: {[key: string]: any}, options?: deserializeOptions) {
+function deserializeError(object: {[key: string]: any}, options?: DeserializeOptions) {
   const {__error: message, ...attributes} = object;
 
   const deserializedError = new Error(message);
@@ -104,10 +104,10 @@ function deserializeError(object: {[key: string]: any}, options?: deserializeOpt
   });
 }
 
-function deserializeAttributes(object: object, options?: deserializeOptions) {
+function deserializeAttributes(object: object, options?: DeserializeOptions) {
   return possiblyAsync.mapValues(object, (value) => deserialize(value, options));
 }
 
-function deserializeArray(array: any[], options?: deserializeOptions) {
+function deserializeArray(array: any[], options?: DeserializeOptions) {
   return possiblyAsync.map(array, (item) => deserialize(item, options));
 }

@@ -1,8 +1,8 @@
 export class Microbatcher {
-  _runner: runner;
-  _invocations: invocation[];
+  _runner: Runner;
+  _invocations: Invocation[];
 
-  constructor(runner: runner) {
+  constructor(runner: Runner) {
     this._runner = runner;
     this._invocations = [];
   }
@@ -22,9 +22,9 @@ export class Microbatcher {
   }
 }
 
-type runner = (invocations: invocation[]) => void;
+type Runner = (invocations: Invocation[]) => void;
 
-type invocation = {
+type Invocation = {
   operation: string;
   params: any[];
   resolve: (value?: unknown) => void;

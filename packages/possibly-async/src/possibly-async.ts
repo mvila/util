@@ -2,14 +2,14 @@ import isPromise from 'is-promise';
 
 const breakSymbol = Symbol('BREAK');
 
-type thenCallback = (value: any) => any;
-type catchCallback = (value: any) => any;
-type finallyCallback = () => void;
+type ThenCallback = (value: any) => any;
+type CatchCallback = (value: any) => any;
+type FinallyCallback = () => void;
 
-type thenCatchFinallyCallbacks = {
-  then?: thenCallback | thenCallback[];
-  catch?: catchCallback;
-  finally?: finallyCallback;
+type ThenCatchFinallyCallbacks = {
+  then?: ThenCallback | ThenCallback[];
+  catch?: CatchCallback;
+  finally?: FinallyCallback;
 };
 
 export const possiblyAsync = function possiblyAsync(
@@ -18,7 +18,7 @@ export const possiblyAsync = function possiblyAsync(
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ): any {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -79,7 +79,7 @@ export const possiblyAsync = function possiblyAsync(
   }
 };
 
-function _possiblyAsync(valueOrPromise: any, thenCallbacks: thenCallback[]): any {
+function _possiblyAsync(valueOrPromise: any, thenCallbacks: ThenCallback[]): any {
   function callThenCallbacks(value: any) {
     if (thenCallbacks.length === 0) {
       return value;
@@ -98,13 +98,13 @@ function _possiblyAsync(valueOrPromise: any, thenCallbacks: thenCallback[]): any
 }
 
 possiblyAsync.call = function (
-  callbacks: thenCallback | thenCallback[],
+  callbacks: ThenCallback | ThenCallback[],
   {
     catch: catchCallback,
     finally: finallyCallback
   }: {
-    catch?: catchCallback;
-    finally?: finallyCallback;
+    catch?: CatchCallback;
+    finally?: FinallyCallback;
   } = {}
 ) {
   return possiblyAsync(undefined, {
@@ -121,7 +121,7 @@ possiblyAsync.forEach = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -159,7 +159,7 @@ possiblyAsync.map = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -202,7 +202,7 @@ possiblyAsync.reduce = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -242,7 +242,7 @@ possiblyAsync.some = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -283,7 +283,7 @@ possiblyAsync.mapValues = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -324,7 +324,7 @@ possiblyAsync.all = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];
@@ -345,7 +345,7 @@ possiblyAsync.possiblyMany = function (
     then: thenCallbacks = [],
     catch: catchCallback,
     finally: finallyCallback
-  }: thenCatchFinallyCallbacks = {}
+  }: ThenCatchFinallyCallbacks = {}
 ) {
   if (!Array.isArray(thenCallbacks)) {
     thenCallbacks = [thenCallbacks];

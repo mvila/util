@@ -1,9 +1,9 @@
 import isEqual from 'lodash/isEqual';
 
-import {clone, cloneOptions} from './cloning';
+import {clone, CloneOptions} from './cloning';
 
 describe('Cloning', () => {
-  const testCloneObject = (object: object, options?: cloneOptions) => {
+  const testCloneObject = (object: object, options?: CloneOptions) => {
     const clonedObject = clone(object, options);
 
     expect(clonedObject !== object && isEqual(clonedObject, object)).toBe(true);
