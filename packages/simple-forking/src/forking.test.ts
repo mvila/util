@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual';
 
-import {fork} from '../../..';
+import {fork} from './forking';
 
 describe('Forking', () => {
   test('Basic forking', async () => {
@@ -17,7 +17,7 @@ describe('Forking', () => {
     expect(fork('')).toBe('');
     expect(fork('Hello')).toBe('Hello');
 
-    const testForkObject = object => {
+    const testForkObject = (object: object) => {
       const forkedObject = fork(object);
 
       expect(forkedObject !== object && isEqual(forkedObject, object)).toBe(true);
@@ -57,7 +57,7 @@ describe('Forking', () => {
   test('Custom forking', async () => {
     class Movie {}
 
-    function objectForker(object) {
+    function objectForker(object: object) {
       if (object instanceof Movie) {
         const movie = object;
 

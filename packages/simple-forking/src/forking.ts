@@ -1,10 +1,9 @@
 import {clone, isLeaf} from 'simple-cloning';
 import isObjectLike from 'lodash/isObjectLike';
-import ow from 'ow';
 
-export function fork(value, options) {
-  ow(options, 'options', ow.optional.object.partialShape({objectForker: ow.optional.function}));
+export type forkOptions = {objectForker?: (object: object) => object | void};
 
+export function fork(value: any, options?: forkOptions): any {
   if (Array.isArray(value)) {
     return forkArray(value, options);
   }
@@ -20,7 +19,7 @@ export function fork(value, options) {
   return value;
 }
 
-function forkObject(object, options) {
+function forkObject(object: object, options?: forkOptions) {
   const objectForker = options?.objectForker;
 
   if (objectForker !== undefined) {
@@ -38,7 +37,12 @@ function forkObject(object, options) {
   return forkAttributes(object, options);
 }
 
-function forkAttributes(object, options) {
+function forkArray(array: any[], options?: forkOptions) {
+  // OPTIMIZE: Consider using a proxy to lazily fork the items
+  return array.map((item) => fork(item, options));
+}
+
+function forkAttributes(object: object, options?: forkOptions) {
   const forkedObject = Object.create(object);
 
   // OPTIMIZE: Consider using a proxy to lazily fork the attributes
@@ -47,9 +51,4 @@ function forkAttributes(object, options) {
   }
 
   return forkedObject;
-}
-
-function forkArray(array, options) {
-  // OPTIMIZE: Consider using a proxy to lazily fork the items
-  return array.map(item => fork(item, options));
 }

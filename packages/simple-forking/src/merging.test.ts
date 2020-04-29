@@ -1,4 +1,5 @@
-import {fork, merge} from '../../..';
+import {fork} from './forking';
+import {merge} from './merging';
 
 describe('Merging', () => {
   test('Basic merging', async () => {
@@ -34,12 +35,10 @@ describe('Merging', () => {
 
   test('Custom merging', async () => {
     class Movie {
-      constructor(title) {
-        this.title = title;
-      }
+      constructor(public title: string) {}
     }
 
-    function objectForker(object) {
+    function objectForker(object: object) {
       if (object instanceof Movie) {
         const movie = object;
 
@@ -51,19 +50,19 @@ describe('Merging', () => {
       }
     }
 
-    function objectMerger(object, forkedObject) {
+    function objectMerger(object: object, forkedObject: object): object | void {
       if (object instanceof Movie && forkedObject instanceof Movie) {
         const movie = object;
         const forkedMovie = forkedObject;
 
         movie.title = forkedMovie.title;
-        movie._mergedFrom = forkedMovie;
+        (movie as any)._mergedFrom = forkedMovie;
 
         return movie;
       }
     }
 
-    const movie = new Movie({title: 'Inception'});
+    const movie = new Movie('Inception');
 
     const forkedMovie = fork(movie, {objectForker});
 

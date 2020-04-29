@@ -1,18 +1,13 @@
 import {clone} from 'simple-cloning';
 import {isPrototypeOf} from 'core-helpers';
 import isObjectLike from 'lodash/isObjectLike';
-import ow from 'ow';
 
-export function merge(value, forkedValue, options) {
-  ow(
-    options,
-    'options',
-    ow.optional.object.partialShape({
-      objectMerger: ow.optional.function,
-      objectCloner: ow.optional.function
-    })
-  );
+export type mergeOptions = {
+  objectMerger?: (object: object, forkedObject: object) => object | void;
+  objectCloner?: (object: object) => object | void;
+};
 
+export function merge(value: any, forkedValue: any, options?: mergeOptions) {
   if (isObjectLike(value) && isObjectLike(forkedValue) && isPrototypeOf(value, forkedValue)) {
     return mergeObject(value, forkedValue, options);
   }
@@ -24,7 +19,7 @@ export function merge(value, forkedValue, options) {
   return clone(forkedValue, options);
 }
 
-function mergeObject(object, forkedObject, options) {
+function mergeObject(object: object, forkedObject: object, options?: mergeOptions) {
   const objectMerger = options?.objectMerger;
 
   if (objectMerger !== undefined) {
@@ -40,7 +35,11 @@ function mergeObject(object, forkedObject, options) {
   return object;
 }
 
-function mergeAttributes(object, forkedObject, options) {
+function mergeAttributes(
+  object: {[key: string]: any},
+  forkedObject: object,
+  options?: mergeOptions
+) {
   for (const [name, forkedValue] of Object.entries(forkedObject)) {
     const value = object[name];
 
