@@ -1,6 +1,6 @@
 {
   "name": "npm-linker",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "`npm link`, easier",
   "keywords": [
     "npm",
