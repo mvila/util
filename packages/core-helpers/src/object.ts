@@ -1,28 +1,28 @@
 import isPlainObject from 'lodash/isPlainObject';
-import lowerFirst from 'lodash/lowerFirst';
+import isObjectLike from 'lodash/isObjectLike';
+import {Class} from 'type-fest';
 
-export function hasOwnProperty(object: Object, name: string | number | symbol): boolean {
+import {getTypeOf} from './utilities';
+
+export function hasOwnProperty(object: Object, name: string | number | symbol) {
   return _hasOwnProperty.call(object, name);
 }
 
 const _hasOwnProperty = Object.prototype.hasOwnProperty;
 
-export function isPrototypeOf(object: Object, other: Object): boolean {
+export function isPrototypeOf(object: Object, other: Object) {
   return _isPrototypeOf.call(object, other);
 }
 
 const _isPrototypeOf = Object.prototype.isPrototypeOf;
 
-export function propertyIsEnumerable(object: Object, name: string | number | symbol): boolean {
+export function propertyIsEnumerable(object: Object, name: string | number | symbol) {
   return _propertyIsEnumerable.call(object, name);
 }
 
 const _propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 
-export function getPropertyDescriptor(
-  object: Object,
-  name: string | number | symbol
-): PropertyDescriptor | undefined {
+export function getPropertyDescriptor(object: Object, name: string | number | symbol) {
   if (!((typeof object === 'object' && object !== null) || typeof object === 'function')) {
     return undefined;
   }
@@ -42,100 +42,101 @@ export function getPropertyDescriptor(
   return undefined;
 }
 
-export function getInheritedPropertyDescriptor(
-  object: Object,
-  name: string | number | symbol
-): PropertyDescriptor | undefined {
+export function getInheritedPropertyDescriptor(object: Object, name: string | number | symbol) {
   const prototype = Object.getPrototypeOf(object);
   return getPropertyDescriptor(prototype, name);
 }
 
-export function getFunctionName(
-  func: Function & {displayName?: string; humanName?: string},
-  {humanize = false} = {}
-): string {
-  if (typeof func !== 'function') {
-    throw new Error(`Expected a function, but received a value of type '${typeof func}'`);
+export function assertIsObjectLike(value: any) {
+  if (!isObjectLike(value)) {
+    throw new Error(`Expected an object-like, but received a value of type '${getTypeOf(value)}'`);
   }
-
-  let name = humanize ? func.humanName : undefined;
-
-  if (name !== undefined) {
-    return name;
-  }
-
-  name = func.displayName;
-
-  if (name !== undefined) {
-    return name;
-  }
-
-  name = func.name;
-
-  if (name !== undefined) {
-    return name;
-  }
-
-  // Source: https://github.com/sindresorhus/fn-name
-  name = (/function ([^(]+)?\(/.exec(func.toString()) || [])[1];
-
-  if (name !== undefined) {
-    return name;
-  }
-
-  return '';
 }
 
-export function getTypeOf(value: any, {humanize = false} = {}): string {
-  if (value === undefined) {
-    return 'undefined';
+export function assertIsPlainObject(value: any) {
+  if (!isPlainObject(value)) {
+    throw new Error(`Expected a plain object, but received a value of type '${getTypeOf(value)}'`);
   }
-
-  if (value === null) {
-    return 'null';
-  }
-
-  if (typeof value === 'object') {
-    return lowerFirst(getFunctionName(value.constructor, {humanize}) || 'Object');
-  }
-
-  if (isES2015Class(value)) {
-    return getFunctionName(value, {humanize}) || 'Object';
-  }
-
-  return typeof value;
 }
 
-export function getHumanTypeOf(value: any): string {
-  return getTypeOf(value, {humanize: true});
-}
+export type ClassLike = Function & {prototype: Object};
 
-export function isClass(value: any): boolean {
+export function isClass(value: any): value is ClassLike {
   return typeof value === 'function' && hasOwnProperty(value, 'prototype');
 }
 
-export function isES2015Class(value: any): boolean {
-  return typeof value === 'function' && value.toString().startsWith('class');
+export function isES2015Class(value: any): value is Class {
+  return (
+    typeof value === 'function' &&
+    hasOwnProperty(value, 'prototype') &&
+    value.toString().startsWith('class ') === true
+  );
 }
 
-export function isInstance(value: any): boolean {
-  return !isClass(value);
+export type InstanceLike = {constructor: ClassLike};
+
+export function isInstance(value: any): value is InstanceLike {
+  return isObjectLike(value) && isClass(value.constructor);
 }
 
-export function getClassOf(value: any): Function | undefined {
+export type Instance = {constructor: Class};
+
+export function isES2015Instance(value: any): value is Instance {
+  return isObjectLike(value) && isES2015Class(value.constructor);
+}
+
+export function ensureClass(value: any): ClassLike {
   if (isClass(value)) {
     return value;
   }
 
-  return value?.constructor;
+  if (isInstance(value)) {
+    return value.constructor;
+  }
+
+  throw new Error(
+    `Expected a class or an instance, but received a value of type '${getTypeOf(value)}'`
+  );
 }
 
-export function getInstanceOf(value: any): Object {
+export function ensureInstance(value: any): InstanceLike {
   if (isInstance(value)) {
     return value;
   }
 
-  return value.prototype;
+  if (isClass(value)) {
+    return value.prototype;
+  }
+
+  throw new Error(
+    `Expected a class or an instance, but received a value of type '${getTypeOf(value)}'`
+  );
+}
+
+export function assertIsClass(value: any) {
+  if (!isClass(value)) {
+    throw new Error(`Expected a class, but received a value of type '${getTypeOf(value)}'`);
+  }
+}
+
+export function assertIsES2015Class(value: any) {
+  if (!isES2015Class(value)) {
+    throw new Error(`Expected an ES2015 class, but received a value of type '${getTypeOf(value)}'`);
+  }
+}
+
+export function assertIsInstance(value: any) {
+  if (!isInstance(value)) {
+    throw new Error(`Expected an instance, but received a value of type '${getTypeOf(value)}'`);
+  }
+}
+
+export function assertIsES2015Instance(value: any) {
+  if (!isES2015Instance(value)) {
+    throw new Error(
+      `Expected an instance of an ES2015 class, but received a value of type '${getTypeOf(value)}'`
+    );
+  }
 }
 
 export const breakSymbol = Symbol('break');

@@ -1,10 +1,9 @@
 import {
-  getTypeOf,
   isClass,
   isES2015Class,
   isInstance,
-  getClassOf,
-  getInstanceOf,
+  ensureClass,
+  ensureInstance,
   forEachDeep,
   someDeep,
   deleteUndefinedProperties,
@@ -12,43 +11,6 @@ import {
 } from './object';
 
 describe('Object', () => {
-  test('getTypeOf()', async () => {
-    expect(getTypeOf(undefined)).toBe('undefined');
-    expect(getTypeOf(null)).toBe('null');
-    expect(getTypeOf(true)).toBe('boolean');
-    expect(getTypeOf(123)).toBe('number');
-    expect(getTypeOf('abc')).toBe('string');
-    expect(getTypeOf([1, 2, 3])).toBe('array');
-    expect(getTypeOf({})).toBe('object');
-    expect(getTypeOf(() => {})).toBe('function');
-    expect(getTypeOf(function () {})).toBe('function');
-    expect(getTypeOf(new Date())).toBe('date');
-    expect(getTypeOf(/abc/)).toBe('regExp');
-    expect(getTypeOf(new Error())).toBe('error');
-
-    class Movie {
-      static displayName: string;
-      static humanName: string;
-    }
-
-    const movie = new Movie();
-
-    expect(getTypeOf(Movie)).toBe('Movie');
-    expect(getTypeOf(movie)).toBe('movie');
-
-    Movie.displayName = 'Film';
-
-    expect(getTypeOf(Movie)).toBe('Film');
-    expect(getTypeOf(movie)).toBe('film');
-
-    Movie.humanName = 'Motion picture';
-
-    expect(getTypeOf(Movie)).toBe('Film');
-    expect(getTypeOf(movie)).toBe('film');
-    expect(getTypeOf(Movie, {humanize: true})).toBe('Motion picture');
-    expect(getTypeOf(movie, {humanize: true})).toBe('motion picture');
-  });
-
   test('isClass()', async () => {
     expect(isClass(undefined)).toBe(false);
     expect(isClass(null)).toBe(false);
@@ -86,13 +48,12 @@ describe('Object', () => {
   });
 
   test('isInstance()', async () => {
-    expect(isInstance(undefined)).toBe(true);
-    expect(isInstance(null)).toBe(true);
-    expect(isInstance('abc')).toBe(true);
+    expect(isInstance(undefined)).toBe(false);
+    expect(isInstance(null)).toBe(false);
+    expect(isInstance('abc')).toBe(false);
     expect(isInstance({})).toBe(true);
     expect(isInstance([])).toBe(true);
-    expect(isInstance(() => {})).toBe(true);
-
+    expect(isInstance(() => {})).toBe(false);
     expect(isInstance(function () {})).toBe(false);
 
     class Movie {}
@@ -103,38 +64,50 @@ describe('Object', () => {
     expect(isInstance(movie)).toBe(true);
   });
 
-  test('getClassOf()', async () => {
-    expect(getClassOf(undefined)).toBe(undefined);
-    expect(getClassOf(null)).toBe(undefined);
-    expect(getClassOf({})).toBe(Object);
-    expect(getClassOf([])).toBe(Array);
-    expect(getClassOf('abc')).toBe(String);
+  test('ensureClass()', async () => {
+    expect(() => ensureClass(undefined)).toThrow(
+      "Expected a class or an instance, but received a value of type 'undefined'"
+    );
+    expect(() => ensureClass(null)).toThrow(
+      "Expected a class or an instance, but received a value of type 'null'"
+    );
+    expect(() => ensureClass('abc')).toThrow(
+      "Expected a class or an instance, but received a value of type 'string'"
+    );
+    expect(ensureClass({})).toBe(Object);
+    expect(ensureClass([])).toBe(Array);
 
     class Movie {}
 
     const movie = new Movie();
 
-    expect(getClassOf(Movie)).toBe(Movie);
-    expect(getClassOf(movie)).toBe(Movie);
+    expect(ensureClass(Movie)).toBe(Movie);
+    expect(ensureClass(movie)).toBe(Movie);
   });
 
-  test('getInstanceOf()', async () => {
+  test('ensureInstance()', async () => {
     const object = {};
     const array: any[] = [];
 
-    expect(getInstanceOf(undefined)).toBe(undefined);
-    expect(getInstanceOf(null)).toBe(null);
-    expect(getInstanceOf(object)).toBe(object);
-    expect(getInstanceOf(array)).toBe(array);
-    expect(getInstanceOf('abc')).toBe('abc');
+    expect(() => ensureInstance(undefined)).toThrow(
+      "Expected a class or an instance, but received a value of type 'undefined'"
+    );
+    expect(() => ensureInstance(null)).toThrow(
+      "Expected a class or an instance, but received a value of type 'null'"
+    );
+    expect(() => ensureInstance('abc')).toThrow(
+      "Expected a class or an instance, but received a value of type 'string'"
+    );
+    expect(ensureInstance(object)).toBe(object);
+    expect(ensureInstance(array)).toBe(array);
 
     class Movie {}
 
     const movie = new Movie();
 
-    expect(getInstanceOf(Movie)).toBe(Movie.prototype);
-    expect(getInstanceOf(Movie.prototype)).toBe(Movie.prototype);
-    expect(getInstanceOf(movie)).toBe(movie);
+    expect(ensureInstance(Movie)).toBe(Movie.prototype);
+    expect(ensureInstance(Movie.prototype)).toBe(Movie.prototype);
+    expect(ensureInstance(movie)).toBe(movie);
   });
 
   test('forEachDeep', async () => {
