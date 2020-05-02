@@ -1,6 +1,6 @@
 {
   "name": "npm-linker",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "`npm link`, easier",
   "keywords": [
     "npm",
@@ -34,7 +34,7 @@
     "tslib": "^1.11.1"
   },
   "devDependencies": {
-    "@mvila/tsconfig": "^1.0.3",
+    "@mvila/tsconfig": "^1.0.4",
     "@types/fs-extra": "^8.1.0",
     "@types/minimist": "^1.2.0"
   }

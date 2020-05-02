@@ -1,6 +1,6 @@
 {
   "name": "simple-cloning",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Simple library that can deeply clone most JavaScript values including objects and arrays",
   "keywords": [
     "clone",
@@ -33,8 +33,8 @@
     "tslib": "^1.11.1"
   },
   "devDependencies": {
-    "@mvila/dev-tools": "^1.0.13",
-    "@mvila/tsconfig": "^1.0.3",
+    "@mvila/dev-tools": "^1.0.14",
+    "@mvila/tsconfig": "^1.0.4",
     "@types/jest": "^25.2.1",
     "@types/lodash": "^4.14.150"
   }
