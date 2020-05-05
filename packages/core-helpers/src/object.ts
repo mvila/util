@@ -1,11 +1,13 @@
-import isPlainObject from 'lodash/isPlainObject';
-import isObjectLike from 'lodash/isObjectLike';
+import lodashIsPlainObject from 'lodash/isPlainObject';
+import lodashIsObjectLike from 'lodash/isObjectLike';
 import {Class} from 'type-fest';
 
 import {getTypeOf} from './utilities';
 
-export function hasOwnProperty(object: Object, name: string | number | symbol) {
-  return _hasOwnProperty.call(object, name);
+export type PropertyKey = string | number | symbol;
+
+export function hasOwnProperty(object: Object, key: PropertyKey) {
+  return _hasOwnProperty.call(object, key);
 }
 
 const _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -16,23 +18,23 @@ export function isPrototypeOf(object: Object, other: Object) {
 
 const _isPrototypeOf = Object.prototype.isPrototypeOf;
 
-export function propertyIsEnumerable(object: Object, name: string | number | symbol) {
-  return _propertyIsEnumerable.call(object, name);
+export function propertyIsEnumerable(object: Object, key: PropertyKey) {
+  return _propertyIsEnumerable.call(object, key);
 }
 
 const _propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 
-export function getPropertyDescriptor(object: Object, name: string | number | symbol) {
+export function getPropertyDescriptor(object: Object, key: PropertyKey) {
   if (!((typeof object === 'object' && object !== null) || typeof object === 'function')) {
     return undefined;
   }
 
-  if (!(name in object)) {
+  if (!(key in object)) {
     return undefined;
   }
 
   while (object !== null) {
-    const descriptor = Object.getOwnPropertyDescriptor(object, name);
+    const descriptor = Object.getOwnPropertyDescriptor(object, key);
     if (descriptor) {
       return descriptor;
     }
@@ -42,9 +44,21 @@ export function getPropertyDescriptor(object: Object, name: string | number | sy
   return undefined;
 }
 
-export function getInheritedPropertyDescriptor(object: Object, name: string | number | symbol) {
+export function getInheritedPropertyDescriptor(object: Object, key: PropertyKey) {
   const prototype = Object.getPrototypeOf(object);
-  return getPropertyDescriptor(prototype, name);
+  return getPropertyDescriptor(prototype, key);
+}
+
+export type ObjectLike = {[key: string]: any};
+
+export function isObjectLike(value: any): value is ObjectLike {
+  return lodashIsObjectLike(value);
+}
+
+export type PlainObject = {[key: string]: any};
+
+export function isPlainObject(value: any): value is PlainObject {
+  return lodashIsPlainObject(value);
 }
 
 export function assertIsObjectLike(value: any) {
