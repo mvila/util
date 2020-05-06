@@ -3,21 +3,7 @@ import * as ta from 'type-assertions';
 import {possiblyAsync} from './possibly-async';
 
 describe('possibly-async', () => {
-  test('possiblyAsync(value)', async () => {
-    const r1 = possiblyAsync(1);
-    ta.assert<ta.Equal<typeof r1, number>>();
-    expect(r1).toBe(1);
-
-    const r2 = possiblyAsync(makePromise(1));
-    ta.assert<ta.Equal<typeof r2, PromiseLike<number>>>();
-    await expect(r2).resolves.toBe(1);
-
-    const r3 = possiblyAsync(makePromise('ERROR'));
-    ta.assert<ta.Equal<typeof r3, PromiseLike<never>>>();
-    await expect(r3).rejects.toBe('ERROR');
-  });
-
-  test('possiblyAsync(value, onFulfilled)', async () => {
+  test('possiblyAsync()', async () => {
     const r1 = possiblyAsync(1, (value) => value + 1);
     ta.assert<ta.Equal<typeof r1, number>>();
     expect(r1).toBe(2);
@@ -59,52 +45,6 @@ describe('possibly-async', () => {
     );
     ta.assert<ta.Equal<typeof r9, PromiseLike<number>>>();
     await expect(r9).rejects.toBe('ERROR');
-  });
-
-  test('possiblyAsync(value, onFulfilled, onRejected)', async () => {
-    const r1 = possiblyAsync(
-      1,
-      (value) => value + 1,
-      (reason) => ({reason})
-    );
-    ta.assert<ta.Equal<typeof r1, number>>();
-    expect(r1).toBe(2);
-
-    const r2 = possiblyAsync(1, (value) =>
-      possiblyAsync(
-        value,
-        (value) => String(value),
-        (reason) => ({reason})
-      )
-    );
-    ta.assert<ta.Equal<typeof r2, string>>();
-    expect(r2).toBe('1');
-
-    const r3 = possiblyAsync(
-      makePromise(1),
-      (value) => value + 1,
-      (reason) => ({reason})
-    );
-    ta.assert<ta.Equal<typeof r3, PromiseLike<number | {reason: any}>>>();
-    await expect(r3).resolves.toBe(2);
-
-    const r4 = possiblyAsync(1, (value) =>
-      possiblyAsync(
-        makePromise(value),
-        (value) => String(value),
-        (reason) => ({reason})
-      )
-    );
-    ta.assert<ta.Equal<typeof r4, PromiseLike<string | {reason: any}>>>();
-    await expect(r4).resolves.toBe('1');
-
-    const r5 = possiblyAsync(
-      makePromise('ERROR'),
-      (value) => value + 1,
-      (reason) => ({reason})
-    );
-    ta.assert<ta.Equal<typeof r5, PromiseLike<number | {reason: any}>>>();
-    await expect(r5).resolves.toEqual({reason: 'ERROR'});
   });
 });
 
