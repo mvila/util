@@ -54,49 +54,91 @@ describe('possibly-async', () => {
 
   test('possiblyAsync.forEach()', async () => {
     const a1: number[] = [];
-    const r1 = possiblyAsync.forEach(
-      [1, 2],
-      (v) => a1.push(v + 1),
-      () => a1
+    const r1 = possiblyAsync.forEach([1, 2], (v) => a1.push(v + 1));
+    ta.assert<ta.Equal<typeof r1, void>>();
+    expect(a1).toEqual([2, 3]);
+
+    const a2: number[] = [];
+    const r2 = possiblyAsync.forEach([1, 2], (v) => possiblyAsync(v + 1, (newV) => a2.push(newV)));
+    ta.assert<ta.Equal<typeof r2, void>>();
+    expect(a2).toEqual([2, 3]);
+
+    const a3: number[] = [];
+    const r3 = possiblyAsync.forEach([1, 2], (v) => makePromise(a3.push(v + 1)));
+    ta.assert<ta.Equal<typeof r3, PromiseLike<void>>>();
+    await r3;
+    expect(a3).toEqual([2, 3]);
+
+    const a4: number[] = [];
+    const r4 = possiblyAsync.forEach([1, 2], (v) =>
+      possiblyAsync(makePromise(v + 1), (newV) => a4.push(newV))
     );
+    ta.assert<ta.Equal<typeof r4, PromiseLike<void>>>();
+    await r4;
+    expect(a4).toEqual([2, 3]);
+
+    const a5: number[] = [];
+    const r5 = possiblyAsync.forEach([1, 2], (v) =>
+      v === 1 ? makePromise(a5.push(v + 1)) : a5.push(v + 1)
+    );
+    ta.assert<ta.Equal<typeof r5, void | PromiseLike<void>>>();
+    await r5;
+    expect(a5).toEqual([2, 3]);
+  });
+
+  test('possiblyAsync.map()', async () => {
+    const r1 = possiblyAsync.map([1, 2], (v) => v + 1);
     ta.assert<ta.Equal<typeof r1, number[]>>();
     expect(r1).toEqual([2, 3]);
 
-    const a2: number[] = [];
-    const r2 = possiblyAsync.forEach(
-      [1, 2],
-      (v) => possiblyAsync(v + 1, (newV) => a2.push(newV)),
-      () => a2
-    );
-    ta.assert<ta.Equal<typeof r2, number[]>>();
-    expect(r2).toEqual([2, 3]);
+    const r2 = possiblyAsync.map([1, 2], (v) => possiblyAsync(v + 1, (v) => String(v)));
+    ta.assert<ta.Equal<typeof r2, string[]>>();
+    expect(r2).toEqual(['2', '3']);
 
-    const a3: number[] = [];
-    const r3 = possiblyAsync.forEach(
-      [1, 2],
-      (v) => makePromise(a3.push(v + 1)),
-      () => a3
-    );
+    const r3 = possiblyAsync.map([1, 2], (v) => makePromise(v + 1));
     ta.assert<ta.Equal<typeof r3, PromiseLike<number[]>>>();
     await expect(r3).resolves.toEqual([2, 3]);
 
-    const a4: number[] = [];
-    const r4 = possiblyAsync.forEach(
-      [1, 2],
-      (v) => possiblyAsync(makePromise(v + 1), (newV) => a4.push(newV)),
-      () => a4
+    const r4 = possiblyAsync.map([1, 2], (v) =>
+      possiblyAsync(makePromise(v + 1), (v) => String(v))
     );
-    ta.assert<ta.Equal<typeof r4, PromiseLike<number[]>>>();
-    await expect(r4).resolves.toEqual([2, 3]);
+    ta.assert<ta.Equal<typeof r4, PromiseLike<string[]>>>();
+    await expect(r4).resolves.toEqual(['2', '3']);
 
-    const a5: number[] = [];
-    const r5 = possiblyAsync.forEach(
-      [1, 2],
-      (v) => (v === 1 ? makePromise(a5.push(v + 1)) : a5.push(v + 1)),
-      () => a5
+    const r5 = possiblyAsync.map([1, 2], (v) => (v === 1 ? makePromise(String(v + 1)) : v + 1));
+    ta.assert<ta.Equal<typeof r5, (string | number)[] | PromiseLike<(string | number)[]>>>();
+    await expect(r5).resolves.toEqual(['2', 3]);
+  });
+
+  test('possiblyAsync.mapValues()', async () => {
+    const r1 = possiblyAsync.mapValues({x: 1, y: 2}, (v) => v + 1);
+    ta.assert<ta.Equal<typeof r1, {[key: string]: number}>>();
+    expect(r1).toEqual({x: 2, y: 3});
+
+    const r2 = possiblyAsync.mapValues({x: 1, y: 2}, (v) => possiblyAsync(v + 1, (v) => String(v)));
+    ta.assert<ta.Equal<typeof r2, {[key: string]: string}>>();
+    expect(r2).toEqual({x: '2', y: '3'});
+
+    const r3 = possiblyAsync.mapValues({x: 1, y: 2}, (v) => makePromise(v + 1));
+    ta.assert<ta.Equal<typeof r3, PromiseLike<{[key: string]: number}>>>();
+    await expect(r3).resolves.toEqual({x: 2, y: 3});
+
+    const r4 = possiblyAsync.mapValues({x: 1, y: 2}, (v) =>
+      possiblyAsync(makePromise(v + 1), (v) => String(v))
     );
-    ta.assert<ta.Equal<typeof r5, number[] | PromiseLike<number[]>>>();
-    await expect(r5).resolves.toEqual([2, 3]);
+    ta.assert<ta.Equal<typeof r4, PromiseLike<{[key: string]: string}>>>();
+    await expect(r4).resolves.toEqual({x: '2', y: '3'});
+
+    const r5 = possiblyAsync.mapValues({x: 1, y: 2}, (v) =>
+      v === 1 ? makePromise(v + 1) : String(v + 1)
+    );
+    ta.assert<
+      ta.Equal<
+        typeof r5,
+        {[key: string]: number | string} | PromiseLike<{[key: string]: number | string}>
+      >
+    >();
+    await expect(r5).resolves.toEqual({x: 2, y: '3'});
   });
 });
 

@@ -16,20 +16,19 @@ export namespace possiblyAsync {
   export function forEach<
     Value,
     IterateeResultValueOrPromise,
-    CallbackResult,
     IterateeResultValue = PromiseLikeValue<IterateeResultValueOrPromise>,
     Result = IterateeResultValueOrPromise extends PromiseLike<IterateeResultValue>
-      ? PromiseLike<CallbackResult>
-      : CallbackResult
+      ? PromiseLike<void>
+      : void
   >(
     iterable: Iterable<Value>,
-    iteratee: (value: Value, index: number) => IterateeResultValueOrPromise,
-    callback: () => CallbackResult
-  ): Result {
+    iteratee: (value: Value, index: number) => IterateeResultValueOrPromise
+  ): Result;
+  export function forEach(iterable: any, iteratee: (value: any, index: number) => any) {
     const iterator = iterable[Symbol.iterator]();
     let index = 0;
 
-    const iterate = function (): void | PromiseLike<void> {
+    const iterate = (): any => {
       const {value, done} = iterator.next();
 
       if (!done) {
@@ -37,6 +36,54 @@ export namespace possiblyAsync {
       }
     };
 
-    return possiblyAsync(iterate(), callback);
+    return iterate();
+  }
+
+  export function map<
+    Value,
+    MapperResultValueOrPromise,
+    MapperResultValue = PromiseLikeValue<MapperResultValueOrPromise>,
+    Result = MapperResultValueOrPromise extends PromiseLike<MapperResultValue>
+      ? PromiseLike<MapperResultValue[]>
+      : MapperResultValue[]
+  >(
+    iterable: Iterable<Value>,
+    mapper: (value: Value, index: number) => MapperResultValueOrPromise
+  ): Result;
+  export function map(iterable: any, mapper: (value: any, index: number) => any) {
+    let result: any[] = [];
+
+    return possiblyAsync(
+      possiblyAsync.forEach(iterable, (value, index) =>
+        possiblyAsync(mapper(value, index), (mappedValue) => {
+          result.push(mappedValue);
+        })
+      ),
+      () => result
+    );
+  }
+
+  export function mapValues<
+    Value,
+    MapperResultValueOrPromise,
+    MapperResultValue = PromiseLikeValue<MapperResultValueOrPromise>,
+    Result = MapperResultValueOrPromise extends PromiseLike<MapperResultValue>
+      ? PromiseLike<{[key: string]: MapperResultValue}>
+      : {[key: string]: MapperResultValue}
+  >(
+    object: {[key: string]: Value},
+    mapper: (value: Value, key: string) => MapperResultValueOrPromise
+  ): Result;
+  export function mapValues(object: any, mapper: (value: any, key: string) => any) {
+    let result: {[key: string]: any} = {};
+
+    return possiblyAsync(
+      possiblyAsync.forEach(Object.entries(object), ([key, value]) =>
+        possiblyAsync(mapper(value, key), (mappedValue) => {
+          result[key] = mappedValue;
+        })
+      ),
+      () => result
+    );
   }
 }

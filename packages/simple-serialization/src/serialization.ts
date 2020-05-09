@@ -1,3 +1,4 @@
+import {PlainObject} from 'core-helpers';
 import {possiblyAsync} from 'possibly-async';
 
 export type SerializeOptions = {
@@ -84,15 +85,13 @@ function serializeRegExp(regExp: RegExp) {
 function serializeError(error: Error, options?: SerializeOptions) {
   const serializedError = {__error: error.message};
 
-  return possiblyAsync(serializeAttributes(error, options), {
-    then: (serializedAttributes) => {
-      Object.assign(serializedError, serializedAttributes);
-      return serializedError;
-    }
+  return possiblyAsync(serializeAttributes(error, options), (serializedAttributes) => {
+    Object.assign(serializedError, serializedAttributes);
+    return serializedError;
   });
 }
 
-function serializeAttributes(object: object, options?: SerializeOptions) {
+function serializeAttributes(object: PlainObject, options?: SerializeOptions) {
   return possiblyAsync.mapValues(object, (value) => serialize(value, options));
 }
 
