@@ -29,7 +29,7 @@
     "test": "dev-tools test:ts-library"
   },
   "dependencies": {
-    "is-promise": "^3.0.0",
+    "is-promise": "^4.0.0",
     "tslib": "^1.11.1"
   },
   "devDependencies": {
