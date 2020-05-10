@@ -29,7 +29,7 @@ export function getFunctionName(
   return '';
 }
 
-export function assertIsFunction(value: Function) {
+export function assertIsFunction(value: Function): asserts value is Function {
   if (typeof value !== 'function') {
     throw new Error(`Expected a function, but received a value of type '${getTypeOf(value)}'`);
   }

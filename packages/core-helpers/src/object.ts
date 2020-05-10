@@ -61,13 +61,13 @@ export function isPlainObject(value: any): value is PlainObject {
   return lodashIsPlainObject(value);
 }
 
-export function assertIsObjectLike(value: any) {
+export function assertIsObjectLike(value: any): asserts value is ObjectLike {
   if (!isObjectLike(value)) {
     throw new Error(`Expected an object-like, but received a value of type '${getTypeOf(value)}'`);
   }
 }
 
-export function assertIsPlainObject(value: any) {
+export function assertIsPlainObject(value: any): asserts value is PlainObject {
   if (!isPlainObject(value)) {
     throw new Error(`Expected a plain object, but received a value of type '${getTypeOf(value)}'`);
   }
@@ -127,25 +127,25 @@ export function ensureInstance(value: any): InstanceLike {
   );
 }
 
-export function assertIsClass(value: any) {
+export function assertIsClass(value: any): asserts value is ClassLike {
   if (!isClass(value)) {
     throw new Error(`Expected a class, but received a value of type '${getTypeOf(value)}'`);
   }
 }
 
-export function assertIsES2015Class(value: any) {
+export function assertIsES2015Class(value: any): asserts value is Class {
   if (!isES2015Class(value)) {
     throw new Error(`Expected an ES2015 class, but received a value of type '${getTypeOf(value)}'`);
   }
 }
 
-export function assertIsInstance(value: any) {
+export function assertIsInstance(value: any): asserts value is InstanceLike {
   if (!isInstance(value)) {
     throw new Error(`Expected an instance, but received a value of type '${getTypeOf(value)}'`);
   }
 }
 
-export function assertIsES2015Instance(value: any) {
+export function assertIsES2015Instance(value: any): asserts value is Instance {
   if (!isES2015Instance(value)) {
     throw new Error(
       `Expected an instance of an ES2015 class, but received a value of type '${getTypeOf(value)}'`

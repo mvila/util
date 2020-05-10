@@ -2,8 +2,8 @@ import {hasOwnProperty, PlainObject} from 'core-helpers';
 import {possiblyAsync} from 'possibly-async';
 
 export type DeserializeOptions = {
-  objectDeserializer?: (object: object) => object | void;
-  functionDeserializer?: (object: object) => Function | void;
+  objectDeserializer?: (object: PlainObject) => object | void;
+  functionDeserializer?: (object: PlainObject) => Function | void;
   errorHandler?: (error: Error) => any;
 };
 
