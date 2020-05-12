@@ -24,3 +24,11 @@ export function getTypeOf(value: any) {
 
   return typeof value;
 }
+
+export function assertNoUnknownOptions(unknownOptions: {}) {
+  const keys = Object.keys(unknownOptions);
+
+  if (keys.length > 0) {
+    throw new Error(`Did not expect the option '${keys[0]}' to exist`);
+  }
+}
