@@ -11,7 +11,8 @@ export function getTypeOf(value: any) {
   }
 
   if (typeof value === 'object' && typeof value.constructor === 'function') {
-    return getFunctionName(value.constructor) || 'Object';
+    const result = getFunctionName(value.constructor) || 'Object';
+    return result === 'Object' ? 'object' : result;
   }
 
   if (isES2015Class(value)) {

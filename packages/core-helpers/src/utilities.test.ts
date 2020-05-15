@@ -8,7 +8,7 @@ describe('Utilities', () => {
     expect(getTypeOf(123)).toBe('number');
     expect(getTypeOf('abc')).toBe('string');
     expect(getTypeOf([1, 2, 3])).toBe('Array');
-    expect(getTypeOf({})).toBe('Object');
+    expect(getTypeOf({})).toBe('object');
     expect(getTypeOf(() => {})).toBe('Function');
     expect(getTypeOf(function () {})).toBe('Function');
     expect(getTypeOf(new Date())).toBe('Date');
