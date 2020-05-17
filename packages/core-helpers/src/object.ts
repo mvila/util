@@ -73,6 +73,8 @@ export function assertIsPlainObject(value: any): asserts value is PlainObject {
   }
 }
 
+export type ClassConstructor = new (...args: any[]) => {};
+
 export type ClassLike = Function & {prototype: Object};
 
 export function isClass(value: any): value is ClassLike {
