@@ -4,12 +4,25 @@ export type PromiseLikeValue<Input> = Input extends PromiseLike<infer Value> ? V
 
 export function possiblyAsync<
   ValueOrPromise,
-  CallbackResult,
+  OnFulfilledResult,
+  OnRejectedResult = never,
   Value = PromiseLikeValue<ValueOrPromise>,
-  Result = ValueOrPromise extends PromiseLike<Value> ? PromiseLike<CallbackResult> : CallbackResult
->(valueOrPromise: ValueOrPromise, callback: (value: Value) => CallbackResult): Result;
-export function possiblyAsync(valueOrPromise: any, callback: (value: any) => any) {
-  return isPromise(valueOrPromise) ? valueOrPromise.then(callback) : callback(valueOrPromise);
+  Result = ValueOrPromise extends PromiseLike<Value>
+    ? PromiseLike<OnFulfilledResult> | PromiseLike<OnRejectedResult>
+    : OnFulfilledResult
+>(
+  valueOrPromise: ValueOrPromise,
+  onFulfilled: (value: Value) => OnFulfilledResult,
+  onRejected?: (reason: any) => OnRejectedResult
+): Result;
+export function possiblyAsync(
+  valueOrPromise: any,
+  onFulfilled: (value: any) => any,
+  onRejected?: (reason: any) => any
+) {
+  return isPromise(valueOrPromise)
+    ? valueOrPromise.then(onFulfilled, onRejected)
+    : onFulfilled(valueOrPromise);
 }
 
 export namespace possiblyAsync {

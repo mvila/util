@@ -50,6 +50,24 @@ describe('possibly-async', () => {
     );
     ta.assert<ta.Equal<typeof r10, PromiseLike<number>>>();
     await expect(r10).rejects.toBe('ERROR');
+
+    const r11 = possiblyAsync(
+      makePromise('ERROR'),
+      (value) => value + 1,
+      (reason) => `${reason} (caught)`
+    );
+    ta.assert<ta.Equal<typeof r11, PromiseLike<number> | PromiseLike<string>>>();
+    await expect(r11).resolves.toBe('ERROR (caught)');
+
+    const r12 = possiblyAsync(
+      makePromise('ERROR'),
+      (value) => value + 1,
+      (reason) => {
+        throw new Error(`${reason} (rethrown)`);
+      }
+    );
+    ta.assert<ta.Equal<typeof r12, PromiseLike<number> | PromiseLike<never>>>();
+    await expect(r12).rejects.toThrow('ERROR (rethrown)');
   });
 
   test('possiblyAsync.forEach()', async () => {
