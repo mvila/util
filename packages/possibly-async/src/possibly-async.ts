@@ -26,6 +26,35 @@ export function possiblyAsync(
 }
 
 export namespace possiblyAsync {
+  export function invoke<
+    ValueOrPromise,
+    OnFulfilledResult,
+    OnRejectedResult = never,
+    Value = PromiseLikeValue<ValueOrPromise>,
+    Result = ValueOrPromise extends PromiseLike<Value>
+      ? PromiseLike<OnFulfilledResult> | PromiseLike<OnRejectedResult>
+      : OnFulfilledResult | OnRejectedResult
+  >(
+    func: () => ValueOrPromise,
+    onFulfilled: (value: Value) => OnFulfilledResult,
+    onRejected?: (reason: any) => OnRejectedResult
+  ): Result;
+  export function invoke(
+    func: () => any,
+    onFulfilled: (value: any) => any,
+    onRejected?: (reason: any) => any
+  ) {
+    try {
+      return possiblyAsync(func(), onFulfilled, onRejected);
+    } catch (error) {
+      if (onRejected !== undefined) {
+        return onRejected(error);
+      }
+
+      throw error;
+    }
+  }
+
   export function forEach<
     Value,
     IterateeResultValueOrPromise,

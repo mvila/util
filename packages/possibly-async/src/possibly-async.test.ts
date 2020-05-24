@@ -70,6 +70,63 @@ describe('possibly-async', () => {
     await expect(r12).rejects.toThrow('ERROR (rethrown)');
   });
 
+  test('possiblyAsync.invoke()', async () => {
+    const r1 = possiblyAsync.invoke(
+      () => 1,
+      (value) => value + 1
+    );
+    ta.assert<ta.Equal<typeof r1, number>>();
+    expect(r1).toBe(2);
+
+    const r2 = possiblyAsync.invoke(
+      () => makePromise(1),
+      (value) => value + 1
+    );
+    ta.assert<ta.Equal<typeof r2, PromiseLike<number>>>();
+    await expect(r2).resolves.toBe(2);
+
+    expect(() =>
+      possiblyAsync.invoke(
+        () => {
+          throw '1';
+        },
+        (value) => value + 1
+      )
+    ).toThrow('1');
+
+    const r3 = possiblyAsync.invoke(
+      () => {
+        if (1 === 1) {
+          throw 1;
+        }
+
+        return 1;
+      },
+      (value) => value + 1,
+      (reason) => `${reason} (caught)`
+    );
+    ta.assert<ta.Equal<typeof r3, number | string>>();
+    expect(r3).toBe('1 (caught)');
+
+    const r4 = possiblyAsync.invoke(
+      () => makePromise('ERROR'),
+      (value) => value + 1,
+      (reason) => `${reason} (caught)`
+    );
+    ta.assert<ta.Equal<typeof r4, PromiseLike<number> | PromiseLike<string>>>();
+    await expect(r4).resolves.toBe('ERROR (caught)');
+
+    const r5 = possiblyAsync.invoke(
+      () => makePromise('ERROR'),
+      (value) => value + 1,
+      (reason) => {
+        throw `${reason} (rethrown)`;
+      }
+    );
+    ta.assert<ta.Equal<typeof r5, PromiseLike<number> | PromiseLike<never>>>();
+    await expect(r5).rejects.toBe('ERROR (rethrown)');
+  });
+
   test('possiblyAsync.forEach()', async () => {
     const a1: number[] = [];
     const r1 = possiblyAsync.forEach([1, 2], (v) => a1.push(v + 1));
