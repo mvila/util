@@ -159,6 +159,21 @@ describe('possibly-async', () => {
     ta.assert<ta.Equal<typeof r5, void | PromiseLike<void>>>();
     await r5;
     expect(a5).toEqual([2, 3]);
+
+    const a6: number[] = [];
+    const r6 = possiblyAsync.forEach([1, 2], (v) =>
+      v !== 2 ? a6.push(v + 1) : possiblyAsync.breakSymbol
+    );
+    ta.assert<ta.Equal<typeof r6, void>>();
+    expect(a6).toEqual([2]);
+
+    const a7: number[] = [];
+    const r7 = possiblyAsync.forEach([1, 2], (v) =>
+      makePromise(v !== 2 ? a7.push(v + 1) : possiblyAsync.breakSymbol)
+    );
+    ta.assert<ta.Equal<typeof r7, PromiseLike<void>>>();
+    await r7;
+    expect(a7).toEqual([2]);
   });
 
   test('possiblyAsync.map()', async () => {
@@ -183,6 +198,18 @@ describe('possibly-async', () => {
     const r5 = possiblyAsync.map([1, 2], (v) => (v === 1 ? makePromise(String(v + 1)) : v + 1));
     ta.assert<ta.Equal<typeof r5, (string | number)[] | PromiseLike<(string | number)[]>>>();
     await expect(r5).resolves.toEqual(['2', 3]);
+
+    const r6 = possiblyAsync.map([1, 2, 3], (v) =>
+      v !== 2 ? v + 1 : {[possiblyAsync.breakSymbol]: 'BREAK'}
+    );
+    ta.assert<ta.Equal<typeof r6, (number | string)[]>>();
+    expect(r6).toEqual([2, 'BREAK']);
+
+    const r7 = possiblyAsync.map([1, 2, 3], (v) =>
+      makePromise(v !== 2 ? v + 1 : {[possiblyAsync.breakSymbol]: 'BREAK'})
+    );
+    ta.assert<ta.Equal<typeof r7, PromiseLike<(number | string)[]>>>();
+    await expect(r7).resolves.toEqual([2, 'BREAK']);
   });
 
   test('possiblyAsync.mapValues()', async () => {
@@ -214,6 +241,18 @@ describe('possibly-async', () => {
       >
     >();
     await expect(r5).resolves.toEqual({x: 2, y: '3'});
+
+    const r6 = possiblyAsync.mapValues({x: 1, y: 2, z: 3}, (v) =>
+      v !== 2 ? v + 1 : {[possiblyAsync.breakSymbol]: 'BREAK'}
+    );
+    ta.assert<ta.Equal<typeof r6, {[key: string]: number | string}>>();
+    expect(r6).toEqual({x: 2, y: 'BREAK'});
+
+    const r7 = possiblyAsync.mapValues({x: 1, y: 2, z: 3}, (v) =>
+      makePromise(v !== 2 ? v + 1 : {[possiblyAsync.breakSymbol]: 'BREAK'})
+    );
+    ta.assert<ta.Equal<typeof r7, PromiseLike<{[key: string]: number | string}>>>();
+    await expect(r7).resolves.toEqual({x: 2, y: 'BREAK'});
   });
 });
 

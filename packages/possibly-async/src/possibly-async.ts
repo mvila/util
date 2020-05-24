@@ -74,7 +74,11 @@ export namespace possiblyAsync {
       const {value, done} = iterator.next();
 
       if (!done) {
-        return possiblyAsync(iteratee(value, index++), iterate);
+        return possiblyAsync(iteratee(value, index++), (result: any) => {
+          if (result !== breakSymbol) {
+            return iterate();
+          }
+        });
       }
     };
 
@@ -85,9 +89,12 @@ export namespace possiblyAsync {
     Value,
     MapperResultValueOrPromise,
     MapperResultValue = PromiseLikeValue<MapperResultValueOrPromise>,
+    UnwrappedMapperResultValue = MapperResultValue extends {[breakSymbol]: infer UnwrappedValue}
+      ? UnwrappedValue
+      : MapperResultValue,
     Result = MapperResultValueOrPromise extends PromiseLike<MapperResultValue>
-      ? PromiseLike<MapperResultValue[]>
-      : MapperResultValue[]
+      ? PromiseLike<UnwrappedMapperResultValue[]>
+      : UnwrappedMapperResultValue[]
   >(
     iterable: Iterable<Value>,
     mapper: (value: Value, index: number) => MapperResultValueOrPromise
@@ -97,7 +104,12 @@ export namespace possiblyAsync {
 
     return possiblyAsync(
       possiblyAsync.forEach(iterable, (value, index) =>
-        possiblyAsync(mapper(value, index), (mappedValue) => {
+        possiblyAsync(mapper(value, index), (mappedValue): void | typeof breakSymbol => {
+          if (isBreaking(mappedValue)) {
+            result.push(mappedValue[breakSymbol]);
+            return breakSymbol;
+          }
+
           result.push(mappedValue);
         })
       ),
@@ -109,9 +121,12 @@ export namespace possiblyAsync {
     Value,
     MapperResultValueOrPromise,
     MapperResultValue = PromiseLikeValue<MapperResultValueOrPromise>,
+    UnwrappedMapperResultValue = MapperResultValue extends {[breakSymbol]: infer UnwrappedValue}
+      ? UnwrappedValue
+      : MapperResultValue,
     Result = MapperResultValueOrPromise extends PromiseLike<MapperResultValue>
-      ? PromiseLike<{[key: string]: MapperResultValue}>
-      : {[key: string]: MapperResultValue}
+      ? PromiseLike<{[key: string]: UnwrappedMapperResultValue}>
+      : {[key: string]: UnwrappedMapperResultValue}
   >(
     object: {[key: string]: Value},
     mapper: (value: Value, key: string) => MapperResultValueOrPromise
@@ -121,11 +136,26 @@ export namespace possiblyAsync {
 
     return possiblyAsync(
       possiblyAsync.forEach(Object.entries(object), ([key, value]) =>
-        possiblyAsync(mapper(value, key), (mappedValue) => {
+        possiblyAsync(mapper(value, key), (mappedValue): void | typeof breakSymbol => {
+          if (isBreaking(mappedValue)) {
+            result[key] = mappedValue[breakSymbol];
+            return breakSymbol;
+          }
+
           result[key] = mappedValue;
         })
       ),
       () => result
+    );
+  }
+
+  export const breakSymbol = Symbol('BREAK');
+
+  function isBreaking(value: any) {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      Object.prototype.hasOwnProperty.call(value, breakSymbol)
     );
   }
 }
