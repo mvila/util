@@ -5,7 +5,15 @@ export type PromiseLikeValue<Input> = Input extends PromiseLike<infer Value> ? V
 export function possiblyAsync<
   ValueOrPromise,
   OnFulfilledResult,
-  OnRejectedResult = never,
+  Value = PromiseLikeValue<ValueOrPromise>,
+  Result = ValueOrPromise extends PromiseLike<Value>
+    ? PromiseLike<OnFulfilledResult>
+    : OnFulfilledResult
+>(valueOrPromise: ValueOrPromise, onFulfilled: (value: Value) => OnFulfilledResult): Result;
+export function possiblyAsync<
+  ValueOrPromise,
+  OnFulfilledResult,
+  OnRejectedResult,
   Value = PromiseLikeValue<ValueOrPromise>,
   Result = ValueOrPromise extends PromiseLike<Value>
     ? PromiseLike<OnFulfilledResult> | PromiseLike<OnRejectedResult>
@@ -13,7 +21,7 @@ export function possiblyAsync<
 >(
   valueOrPromise: ValueOrPromise,
   onFulfilled: (value: Value) => OnFulfilledResult,
-  onRejected?: (reason: any) => OnRejectedResult
+  onRejected: ((reason: any) => OnRejectedResult) | undefined
 ): Result;
 export function possiblyAsync(
   valueOrPromise: any,
@@ -29,7 +37,15 @@ export namespace possiblyAsync {
   export function invoke<
     ValueOrPromise,
     OnFulfilledResult,
-    OnRejectedResult = never,
+    Value = PromiseLikeValue<ValueOrPromise>,
+    Result = ValueOrPromise extends PromiseLike<Value>
+      ? PromiseLike<OnFulfilledResult>
+      : OnFulfilledResult
+  >(func: () => ValueOrPromise, onFulfilled: (value: Value) => OnFulfilledResult): Result;
+  export function invoke<
+    ValueOrPromise,
+    OnFulfilledResult,
+    OnRejectedResult,
     Value = PromiseLikeValue<ValueOrPromise>,
     Result = ValueOrPromise extends PromiseLike<Value>
       ? PromiseLike<OnFulfilledResult> | PromiseLike<OnRejectedResult>
@@ -37,7 +53,7 @@ export namespace possiblyAsync {
   >(
     func: () => ValueOrPromise,
     onFulfilled: (value: Value) => OnFulfilledResult,
-    onRejected?: (reason: any) => OnRejectedResult
+    onRejected: ((reason: any) => OnRejectedResult) | undefined
   ): Result;
   export function invoke(
     func: () => any,
