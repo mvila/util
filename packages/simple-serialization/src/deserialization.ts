@@ -1,12 +1,32 @@
 import {hasOwnProperty, PlainObject} from 'core-helpers';
 import {possiblyAsync} from 'possibly-async';
 
+import {serializeUndefined, serializeDate, serializeRegExp, serializeError} from './serialization';
+
 export type DeserializeOptions = {
   objectDeserializer?: (object: PlainObject) => object | void;
   functionDeserializer?: (object: PlainObject) => Function | void;
-  errorHandler?: (error: Error) => any;
+  errorHandler?: (error: Error) => unknown;
 };
 
+export type DeserializeResult<Value> = Value extends ReturnType<typeof serializeUndefined>
+  ? undefined
+  : Value extends ReturnType<typeof serializeDate>
+  ? Date
+  : Value extends ReturnType<typeof serializeRegExp>
+  ? RegExp
+  : Value extends ReturnType<typeof serializeError>
+  ? Error
+  : Value extends Array<infer Element>
+  ? Array<DeserializeResult<Element>>
+  : Value extends object
+  ? object
+  : Value;
+
+export function deserialize<Value>(
+  value: Value,
+  options?: DeserializeOptions
+): DeserializeResult<Value>;
 export function deserialize(value: any, options?: DeserializeOptions): any {
   if (value === null) {
     return null;

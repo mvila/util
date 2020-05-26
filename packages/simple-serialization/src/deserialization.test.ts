@@ -39,8 +39,8 @@ describe('Deserialization', () => {
     expect(error).toBeInstanceOf(Error);
     expect(error.message).toBe('Message');
     expect(Object.keys(error)).toEqual(['displayMessage', 'code']);
-    expect(error.displayMessage).toBe('Display message');
-    expect(error.code).toBe('CODE');
+    expect((error as any).displayMessage).toBe('Display message');
+    expect((error as any).code).toBe('CODE');
 
     expect(
       deserialize({title: 'Inception', country: {__undefined: true}, duration: 120})
@@ -57,6 +57,8 @@ describe('Deserialization', () => {
     class Movie {
       static limit?: number;
 
+      title?: string;
+
       static __deserialize(attributes: object) {
         Object.assign(this, attributes);
       }
@@ -69,14 +71,14 @@ describe('Deserialization', () => {
     expect(Movie.limit).toBeUndefined();
 
     function objectDeserializer(object: {[key: string]: any}): object | void {
-      const {__Class: ClassName, __class: className, ...attributes} = object;
+      const {__type: type, ...attributes} = object;
 
-      if (ClassName === 'Movie') {
+      if (type === 'typeof Movie') {
         Movie.__deserialize(attributes);
         return Movie;
       }
 
-      if (className === 'Movie') {
+      if (type === 'Movie') {
         const movie = new Movie();
         movie.__deserialize(attributes);
         return movie;
@@ -100,20 +102,23 @@ describe('Deserialization', () => {
 
     expect(deserialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
 
-    const DeserializedMovie = deserialize({__Class: 'Movie', limit: 100}, options);
+    const DeserializedMovie = deserialize(
+      {__type: 'typeof Movie', limit: 100},
+      options
+    ) as typeof Movie;
 
     expect(DeserializedMovie).toBe(Movie);
     expect(DeserializedMovie.limit).toBe(100);
 
-    const deserializedMovie = deserialize({__class: 'Movie', title: 'Inception'}, options);
+    const deserializedMovie = deserialize({__type: 'Movie', title: 'Inception'}, options) as Movie;
 
     expect(deserializedMovie).toBeInstanceOf(Movie);
     expect(deserializedMovie.title).toBe('Inception');
 
     const deserializedObject = deserialize(
-      {currentMovie: {__class: 'Movie', title: 'Inception'}},
+      {currentMovie: {__type: 'Movie', title: 'Inception'}},
       options
-    );
+    ) as {currentMovie: Movie};
 
     expect(Object.keys(deserializedObject)).toEqual(['currentMovie']);
     expect(deserializedObject.currentMovie).toBeInstanceOf(Movie);
@@ -124,7 +129,7 @@ describe('Deserialization', () => {
         __function: 'function sum(a, b) { return a + b; }'
       },
       options
-    );
+    ) as Function;
 
     expect(typeof func).toBe('function');
     expect(func.name).toBe('sum');

@@ -6,9 +6,24 @@ export type SerializeOptions = {
   functionSerializer?: (object: Function) => object | void;
 };
 
+export type SerializeResult<Value> = Value extends undefined
+  ? ReturnType<typeof serializeUndefined>
+  : Value extends Date
+  ? ReturnType<typeof serializeDate>
+  : Value extends RegExp
+  ? ReturnType<typeof serializeRegExp>
+  : Value extends Error
+  ? ReturnType<typeof serializeError>
+  : Value extends Array<infer Element>
+  ? Array<SerializeResult<Element>>
+  : Value extends object
+  ? object
+  : Value;
+
+export function serialize<Value>(value: Value, options?: SerializeOptions): SerializeResult<Value>;
 export function serialize(value: any, options?: SerializeOptions): any {
   if (value === undefined) {
-    return {__undefined: true};
+    return serializeUndefined();
   }
 
   if (value === null) {
@@ -28,6 +43,10 @@ export function serialize(value: any, options?: SerializeOptions): any {
   }
 
   return value;
+}
+
+export function serializeUndefined(): {__undefined: true} {
+  return {__undefined: true};
 }
 
 function serializeObjectOrFunction(object: object, options?: SerializeOptions) {
@@ -70,7 +89,7 @@ function serializeObjectOrFunction(object: object, options?: SerializeOptions) {
   return serializeAttributes(object, options);
 }
 
-function serializeDate(date: Date) {
+export function serializeDate(date: Date) {
   if (isNaN(date.valueOf())) {
     throw new Error('Cannot serialize an invalid date');
   }
@@ -78,11 +97,14 @@ function serializeDate(date: Date) {
   return {__date: date.toISOString()};
 }
 
-function serializeRegExp(regExp: RegExp) {
+export function serializeRegExp(regExp: RegExp) {
   return {__regExp: regExp.toString()};
 }
 
-function serializeError(error: Error, options?: SerializeOptions) {
+export function serializeError(
+  error: Error,
+  options?: SerializeOptions
+): {__error: string} & PlainObject {
   const serializedError = {__error: error.message};
 
   return possiblyAsync(serializeAttributes(error, options), (serializedAttributes) => {
@@ -95,6 +117,6 @@ function serializeAttributes(object: PlainObject, options?: SerializeOptions) {
   return possiblyAsync.mapValues(object, (value) => serialize(value, options));
 }
 
-function serializeArray(array: any[], options?: SerializeOptions) {
+function serializeArray(array: unknown[], options?: SerializeOptions) {
   return possiblyAsync.map(array, (item) => serialize(item, options));
 }

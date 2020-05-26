@@ -77,11 +77,11 @@ describe('Serialization', () => {
       title?: string;
 
       static __serialize() {
-        return {__Class: 'Movie', ...this};
+        return {__type: 'typeof Movie', ...this};
       }
 
       __serialize() {
-        return {__class: 'Movie', ...this};
+        return {__type: 'Movie', ...this};
       }
     }
 
@@ -101,15 +101,15 @@ describe('Serialization', () => {
 
     expect(serialize({title: 'Inception'}, options)).toEqual({title: 'Inception'});
 
-    expect(serialize(Movie, options)).toEqual({__Class: 'Movie', limit: 100});
+    expect(serialize(Movie, options)).toEqual({__type: 'typeof Movie', limit: 100});
 
     const movie = new Movie();
     movie.title = 'Inception';
 
-    expect(serialize(movie, options)).toEqual({__class: 'Movie', title: 'Inception'});
+    expect(serialize(movie, options)).toEqual({__type: 'Movie', title: 'Inception'});
     expect(serialize({currentMovie: movie}, options)).toEqual({
       currentMovie: {
-        __class: 'Movie',
+        __type: 'Movie',
         title: 'Inception'
       }
     });

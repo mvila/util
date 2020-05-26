@@ -1,13 +1,12 @@
 import isPromise from 'is-promise';
-
-export type PromiseLikeValue<Input> = Input extends PromiseLike<infer Value> ? Value : Input;
+import {PromiseLikeValue, EnsurePromiseLike} from 'core-helpers';
 
 export function possiblyAsync<
   ValueOrPromise,
   OnFulfilledResult,
   Value = PromiseLikeValue<ValueOrPromise>,
   Result = ValueOrPromise extends PromiseLike<Value>
-    ? PromiseLike<OnFulfilledResult>
+    ? EnsurePromiseLike<OnFulfilledResult>
     : OnFulfilledResult
 >(valueOrPromise: ValueOrPromise, onFulfilled: (value: Value) => OnFulfilledResult): Result;
 export function possiblyAsync<
@@ -16,7 +15,7 @@ export function possiblyAsync<
   OnRejectedResult,
   Value = PromiseLikeValue<ValueOrPromise>,
   Result = ValueOrPromise extends PromiseLike<Value>
-    ? PromiseLike<OnFulfilledResult> | PromiseLike<OnRejectedResult>
+    ? EnsurePromiseLike<OnFulfilledResult> | EnsurePromiseLike<OnRejectedResult>
     : OnFulfilledResult
 >(
   valueOrPromise: ValueOrPromise,
@@ -39,7 +38,7 @@ export namespace possiblyAsync {
     OnFulfilledResult,
     Value = PromiseLikeValue<ValueOrPromise>,
     Result = ValueOrPromise extends PromiseLike<Value>
-      ? PromiseLike<OnFulfilledResult>
+      ? EnsurePromiseLike<OnFulfilledResult>
       : OnFulfilledResult
   >(func: () => ValueOrPromise, onFulfilled: (value: Value) => OnFulfilledResult): Result;
   export function invoke<
@@ -48,7 +47,7 @@ export namespace possiblyAsync {
     OnRejectedResult,
     Value = PromiseLikeValue<ValueOrPromise>,
     Result = ValueOrPromise extends PromiseLike<Value>
-      ? PromiseLike<OnFulfilledResult> | PromiseLike<OnRejectedResult>
+      ? EnsurePromiseLike<OnFulfilledResult> | EnsurePromiseLike<OnRejectedResult>
       : OnFulfilledResult | OnRejectedResult
   >(
     func: () => ValueOrPromise,

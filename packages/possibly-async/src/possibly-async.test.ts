@@ -33,7 +33,7 @@ describe('possibly-async', () => {
     const r7 = possiblyAsync(makePromise(1), (value) =>
       possiblyAsync(makePromise(value + 1), (value) => value + 1)
     );
-    ta.assert<ta.Equal<typeof r7, PromiseLike<PromiseLike<number>>>>();
+    ta.assert<ta.Equal<typeof r7, PromiseLike<number>>>();
     await expect(r7).resolves.toBe(3);
 
     (function (valueProvider: () => number | PromiseLike<number>) {
