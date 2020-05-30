@@ -5,7 +5,10 @@ import {compileTS} from '../ts-compiler';
 export async function buildTSLibrary() {
   rimraf.sync('dist');
 
-  const options = {defaultInclude: ['src/**/*'], defaultExclude: ['src/**/*.test.ts']};
+  const options = {
+    defaultInclude: ['src/**/*'],
+    defaultExclude: ['src/**/*.test.ts', 'src/**/*.fixture.ts']
+  };
 
   await compileTS({...options, module: 'CommonJS', outDir: 'dist/node-cjs'});
 

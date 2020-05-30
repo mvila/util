@@ -73,7 +73,9 @@ export function assertIsPlainObject(value: any): asserts value is PlainObject {
   }
 }
 
-export type ClassConstructor = new (...args: any[]) => {};
+// Helps to implement the "modern" mixin pattern
+// https://mariusschulz.com/blog/mixin-classes-in-typescript
+export type Constructor<T = {}> = new (...args: any[]) => T;
 
 export type ClassLike = Function & {prototype: Object};
 
