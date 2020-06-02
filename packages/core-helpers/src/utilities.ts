@@ -1,4 +1,4 @@
-import {isES2015Class} from './object';
+import {isES2015Class} from './class';
 import {getFunctionName} from './function';
 
 export function getTypeOf(value: any) {

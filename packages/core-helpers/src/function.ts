@@ -1,5 +1,10 @@
 import {getTypeOf} from './utilities';
 
+export type SyncFunction<Args extends any[] = any[], Result = any> = (...args: Args) => Result;
+export type AsyncFunction<Args extends any[] = any[], Result = any> = (
+  ...args: Args
+) => Promise<Result>;
+
 export function getFunctionName(
   func: Function & {
     displayName?: string;
