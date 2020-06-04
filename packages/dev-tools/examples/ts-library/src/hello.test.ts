@@ -6,16 +6,4 @@ describe('hello (TS)', () => {
 
     expect(hello('universe')).toBe('Hello, Universe!');
   });
-
-  test('@decorate', () => {
-    function decorate(_target: any, _name: string, descriptor: any) {
-      expect(typeof descriptor).toBe('undefined');
-    }
-
-    // @ts-ignore
-    class Test {
-      // @ts-ignore
-      @decorate static attribute: string;
-    }
-  });
 });
