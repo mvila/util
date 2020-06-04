@@ -1,6 +1,13 @@
 import {run as runJest} from 'jest';
 
-export async function testTSLibrary({watch = false}: {watch: boolean}) {
+export async function testTSLibrary({
+  all = false,
+  cache = true,
+  clearCache = false,
+  notify = false,
+  verbose = false,
+  watch = false
+}) {
   // Partially borrowed from:
   // - https://github.com/jaredpalmer/tsdx/blob/master/src/index.ts
   // - https://github.com/jaredpalmer/tsdx/blob/master/src/createJestConfig.ts
@@ -22,7 +29,7 @@ export async function testTSLibrary({watch = false}: {watch: boolean}) {
       '.(ts|tsx)$': require.resolve('ts-jest/dist'),
       '.(js|jsx)$': [require.resolve('babel-jest'), babelConfig]
     },
-    transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
+    transformIgnorePatterns: ['[/\\\\](node_modules|dist)[/\\\\].+\\.js$'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     watchPlugins: [
       require.resolve('jest-watch-typeahead/filename'),
@@ -31,6 +38,26 @@ export async function testTSLibrary({watch = false}: {watch: boolean}) {
   };
 
   const args = ['--config', JSON.stringify(jestConfig)];
+
+  if (all) {
+    args.push('--all');
+  }
+
+  if (!cache) {
+    args.push('--no-cache');
+  }
+
+  if (clearCache) {
+    args.push('--clearCache');
+  }
+
+  if (notify) {
+    args.push('--notify');
+  }
+
+  if (verbose) {
+    args.push('--verbose');
+  }
 
   if (watch) {
     args.push('--watch');

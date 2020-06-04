@@ -21,15 +21,25 @@ async function main() {
   program
     .command('test:ts-library')
     .describe('Test a library implemented in TypeScript (using Jest and TSJest)')
-    .option('--watch', 'Enable watch mode')
+    .option(
+      '--all',
+      'Force Jest to run all tests instead of running only tests related to changed files'
+    )
+    .option('--cache', 'Whether to use the transform cache')
+    .option('--clearCache', 'Clears the configured Jest cache directory and then exits')
+    .option('--notify', 'Activates notifications for test results')
+    .option('--verbose', 'Display individual test results with the test suite hierarchy')
+    .option('--watch', 'Watch files for changes and rerun tests related to changed files')
     .action(testTSLibrary);
 
   const command: any = program.parse(process.argv, {lazy: true});
 
-  const exitSilently = await command.handler(...command.args);
+  if (command !== undefined) {
+    const exitSilently = await command.handler(...command.args);
 
-  if (!exitSilently) {
-    logMessage(`Command '${command.name}' executed successfully`);
+    if (!exitSilently) {
+      logMessage(`Command '${command.name}' executed successfully`);
+    }
   }
 }
 
