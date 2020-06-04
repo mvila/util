@@ -1,6 +1,6 @@
 import {hello} from './hello';
 
-describe('hello (TS)', () => {
+describe('hello (JS)', () => {
   test('hello()', () => {
     expect(hello()).toBe('Hello, World!');
 
@@ -8,14 +8,12 @@ describe('hello (TS)', () => {
   });
 
   test('@decorate', () => {
-    function decorate(_target: any, _name: string, descriptor: any) {
-      expect(typeof descriptor).toBe('undefined');
+    function decorate(_target, _name, descriptor) {
+      expect(typeof descriptor).toBe('object');
     }
 
-    // @ts-ignore
     class Test {
-      // @ts-ignore
-      @decorate static attribute: string;
+      @decorate static attribute;
     }
   });
 });

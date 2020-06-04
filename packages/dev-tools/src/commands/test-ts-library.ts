@@ -7,10 +7,21 @@ export async function testTSLibrary({watch = false}: {watch: boolean}) {
 
   const rootDir = 'src';
 
-  const config = {
+  const babelConfig = {
+    presets: [[require.resolve('@babel/preset-env'), {targets: {node: '10'}, loose: true}]],
+    plugins: [
+      [require.resolve('@babel/plugin-proposal-decorators'), {legacy: true}],
+      [require.resolve('@babel/plugin-proposal-class-properties'), {loose: true}]
+    ]
+  };
+
+  const jestConfig = {
     rootDir,
     testMatch: ['<rootDir>/**/*.(spec|test).{ts,tsx,js,jsx}'],
-    transform: {'.(ts|tsx)$': require.resolve('ts-jest/dist')},
+    transform: {
+      '.(ts|tsx)$': require.resolve('ts-jest/dist'),
+      '.(js|jsx)$': [require.resolve('babel-jest'), babelConfig]
+    },
     transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     watchPlugins: [
@@ -19,7 +30,7 @@ export async function testTSLibrary({watch = false}: {watch: boolean}) {
     ]
   };
 
-  const args = ['--config', JSON.stringify(config)];
+  const args = ['--config', JSON.stringify(jestConfig)];
 
   if (watch) {
     args.push('--watch');

@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@mvila/tsconfig": "^1.0.1",
+    "@types/jest": "^25.2.1",
     "@types/lodash": "^4.14.150"
   }
 }
