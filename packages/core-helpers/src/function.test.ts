@@ -13,11 +13,11 @@ describe('Function', () => {
 
     expect(getFunctionName(func)).toBe('function');
 
-    // @ts-ignore
+    // @ts-expect-error
     expect(() => getFunctionName(undefined)).toThrow(
       "Expected a function, but received a value of type 'undefined'"
     );
-    // @ts-ignore
+    // @ts-expect-error
     expect(() => getFunctionName('abc')).toThrow(
       "Expected a function, but received a value of type 'string'"
     );
@@ -27,11 +27,11 @@ describe('Function', () => {
     expect(() => assertIsFunction(() => {})).not.toThrow();
     expect(() => assertIsFunction(function () {})).not.toThrow();
 
-    // @ts-ignore
+    // @ts-expect-error
     expect(() => assertIsFunction(undefined)).toThrow(
       "Expected a function, but received a value of type 'undefined'"
     );
-    // @ts-ignore
+    // @ts-expect-error
     expect(() => assertIsFunction('abc')).toThrow(
       "Expected a function, but received a value of type 'string'"
     );
