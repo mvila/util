@@ -1,0 +1,52 @@
+{
+  "name": "simple-deployment",
+  "version": "0.1.0",
+  "description": "Simple deployment tool",
+  "keywords": [
+    "frontend",
+    "backend",
+    "deployment",
+    "tool"
+  ],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/simple-deployment",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/node-cjs/index.js",
+  "module": "dist/node-esm/index.js",
+  "bin": {
+    "deploy": "dist/node-cjs/cli.js"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "dev-tools build:ts-library",
+    "link": "dev-tools link:local-packages",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "ajv": "^6.12.2",
+    "aws-sdk": "^2.692.0",
+    "core-helpers": "^0.1.0",
+    "cross-zip": "^3.1.0",
+    "fs-extra": "^9.0.1",
+    "hasha": "^5.2.0",
+    "is-directory": "^0.3.1",
+    "lodash": "^4.17.15",
+    "sade": "^1.7.3",
+    "sleep-promise": "^8.0.1",
+    "temp-dir": "^2.0.0",
+    "tslib": "^1.11.1"
+  },
+  "devDependencies": {
+    "@mvila/dev-tools": "^1.0.14",
+    "@mvila/tsconfig": "^1.0.4",
+    "@types/fs-extra": "^9.0.1",
+    "@types/lodash": "^4.14.155",
+    "@types/node": "^13.13.4",
+    "@types/sade": "^1.6.0"
+  }
+}
