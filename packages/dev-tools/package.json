@@ -1,7 +1,7 @@
 {
   "name": "@mvila/dev-tools",
   "displayName": "dev-tools",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Simple development tools used by mvila's projects",
   "keywords": [
     "npm",
@@ -32,7 +32,7 @@
     "@babel/preset-env": "^7.10.2",
     "jest": "^25.4.0",
     "jest-watch-typeahead": "^0.5.0",
-    "npm-linker": "^1.0.11",
+    "npm-linker": "^1.0.12",
     "rimraf": "^3.0.2",
     "sade": "^1.7.3",
     "ts-jest": "^25.4.0",
