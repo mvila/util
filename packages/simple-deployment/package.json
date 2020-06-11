@@ -1,6 +1,6 @@
 {
   "name": "simple-deployment",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple deployment tool",
   "keywords": [
     "frontend",
@@ -30,7 +30,7 @@
   "dependencies": {
     "ajv": "^6.12.2",
     "aws-sdk": "^2.692.0",
-    "core-helpers": "^0.1.21",
+    "core-helpers": "^0.1.22",
     "cross-zip": "^3.1.0",
     "fs-extra": "^9.0.1",
     "hasha": "^5.2.0",
@@ -42,7 +42,7 @@
     "tslib": "^1.11.1"
   },
   "devDependencies": {
-    "@mvila/dev-tools": "^1.0.15",
+    "@mvila/dev-tools": "^1.0.16",
     "@mvila/tsconfig": "^1.0.4",
     "@types/fs-extra": "^9.0.1",
     "@types/lodash": "^4.14.155",
