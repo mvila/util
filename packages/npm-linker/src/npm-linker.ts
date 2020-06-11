@@ -13,15 +13,12 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
       });
     }
 
-    const rootConfigFile = findRootConfigFile(directory);
+    const config = loadRootConfig(directory);
 
-    if (rootConfigFile === undefined) {
+    if (config === undefined) {
       console.warn('npm-linker: Config file not found');
       return;
     }
-
-    const config = loadConfig(rootConfigFile);
-    const rootDirectory = dirname(rootConfigFile);
 
     let packageNames;
     if (packageName) {
@@ -32,12 +29,8 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
 
     const localPackages = findLocalPackages(config.packages);
 
-    const rootModulesDirectory = join(rootDirectory, 'node_modules');
     const modulesDirectory = join(directory, 'node_modules');
     const relativeDirectory = relative(process.cwd(), directory) || '.';
-
-    ensureDirSync(rootModulesDirectory);
-    ensureDirSync(modulesDirectory);
 
     for (const packageName of packageNames) {
       const localPackage = localPackages[packageName];
@@ -46,13 +39,11 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
         continue;
       }
 
-      const rootLinkFile = join(rootModulesDirectory, packageName);
-      removeSync(rootLinkFile);
-      ensureSymlinkSync(relative(dirname(rootLinkFile), localPackage.directory), rootLinkFile);
+      ensureDirSync(modulesDirectory);
 
       const linkFile = join(modulesDirectory, packageName);
       removeSync(linkFile);
-      ensureSymlinkSync(relative(dirname(linkFile), rootLinkFile), linkFile);
+      ensureSymlinkSync(relative(dirname(linkFile), localPackage.directory), linkFile);
 
       const {
         json: {bin}
@@ -69,8 +60,7 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
           }
 
           const executableLinkFile = join(binDirectory, executableName);
-          removeSync(executableLinkFile);
-          const executableFile = join(localPackage.directory, executableFileRelative);
+          const executableFile = join(modulesDirectory, packageName, executableFileRelative);
           ensureSymlinkSync(
             relative(dirname(executableLinkFile), executableFile),
             executableLinkFile
@@ -89,6 +79,16 @@ export function run(directory: string, {packageName}: {packageName?: string} = {
 
     process.exit(1);
   }
+}
+
+function loadRootConfig(currentDirectory: string) {
+  const rootConfigFile = findRootConfigFile(currentDirectory);
+
+  if (rootConfigFile === undefined) {
+    return;
+  }
+
+  return loadConfig(rootConfigFile);
 }
 
 function loadConfig(configFile: string) {
