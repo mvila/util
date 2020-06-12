@@ -1,0 +1,40 @@
+import fetch from 'cross-fetch';
+import {execFileSync} from 'child_process';
+
+import {loadPackage} from '../npm-helpers';
+
+const NPM_REGISTRY = 'https://registry.npmjs.org';
+
+export async function publishPackage({access}: {access?: string}) {
+  const directory = process.cwd();
+
+  const {name, version} = loadPackage(directory);
+
+  if (await packageIsPublished(name, version)) {
+    return;
+  }
+
+  const args = ['publish', `--registry=${NPM_REGISTRY}`];
+
+  if (access !== undefined) {
+    args.push(`--access=${access}`);
+  }
+
+  execFileSync('npm', args, {stdio: 'inherit'});
+}
+
+async function packageIsPublished(name: string, version: string) {
+  const publishedPackage = await getJSON(`${NPM_REGISTRY}/${encodeURIComponent(name)}`);
+
+  return publishedPackage !== undefined && Object.keys(publishedPackage.versions).includes(version);
+}
+
+async function getJSON(url: string) {
+  const fetchResponse = await fetch(url);
+
+  if (fetchResponse.status === 200) {
+    return await fetchResponse.json();
+  }
+
+  return undefined;
+}

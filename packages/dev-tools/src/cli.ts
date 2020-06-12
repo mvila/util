@@ -2,7 +2,13 @@
 
 import sade from 'sade';
 
-import {linkLocalPackages, buildTSLibrary, testTSLibrary, updateDependencies} from './commands';
+import {
+  linkLocalPackages,
+  buildTSLibrary,
+  testTSLibrary,
+  publishPackage,
+  updateDependencies
+} from './commands';
 import {programName, programVersion, logMessage, logError} from './util';
 
 async function main() {
@@ -31,6 +37,15 @@ async function main() {
     .option('--verbose', 'Display individual test results with the test suite hierarchy')
     .option('--watch', 'Watch files for changes and rerun tests related to changed files')
     .action(testTSLibrary);
+
+  program
+    .command('publish:package')
+    .describe('Publish a package to NPM if the current version differs from the published one')
+    .option(
+      '--access',
+      'Tells the registry whether the package should be published as public or restricted'
+    )
+    .action(publishPackage);
 
   program
     .command('update:dependencies')
