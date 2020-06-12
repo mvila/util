@@ -8,7 +8,11 @@ const NPM_REGISTRY = 'https://registry.npmjs.org';
 export async function publishPackage({access}: {access?: string}) {
   const directory = process.cwd();
 
-  const {name, version} = loadPackage(directory);
+  const {name, version, private: isPrivate} = loadPackage(directory);
+
+  if (isPrivate) {
+    return;
+  }
 
   if (await packageIsPublished(name, version)) {
     return;

@@ -16,7 +16,7 @@ export function updateDependencies() {
 
   const updatedPackage = loadPackage(directory);
 
-  if (!isEqual(currentPackage, updatedPackage)) {
+  if (!isEqual(currentPackage.dependencies, updatedPackage.dependencies)) {
     updatedPackage.version = semver.inc(currentPackage.version, 'patch');
     savePackage(directory, updatedPackage);
     logMessage(`Version of '${currentPackage.name}' bumped to '${updatedPackage.version}'`);
