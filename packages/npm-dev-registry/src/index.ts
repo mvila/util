@@ -9,6 +9,7 @@ import hasha from 'hasha';
 
 const CONFIG_FILE_NAME = '.npm-linker.json';
 const PORT = 3333;
+const NPM_REGISTRY = 'https://registry.npmjs.org';
 
 (async () => {
   const config = loadRootConfig(process.cwd());
@@ -59,7 +60,9 @@ const PORT = 3333;
       }
     }
 
-    ctx.redirect(`https://registry.npmjs.org/${ctx.request.url}`);
+    // TODO: Forward the request instead of doing a redirect
+    // Currently, publishing a package doesn't work
+    ctx.redirect(`${NPM_REGISTRY}/${ctx.request.url}`);
   });
 
   koa.listen(PORT, () => {
