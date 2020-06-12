@@ -9,3 +9,9 @@ export function logMessage(message: string) {
 export function logError(message: string) {
   console.error(`${programName}: ${message}`);
 }
+
+export function throwError(message: string): never {
+  throw Object.assign(new Error('Error'), {
+    displayMessage: message
+  });
+}

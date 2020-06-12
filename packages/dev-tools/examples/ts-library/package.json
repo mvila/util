@@ -1,14 +1,14 @@
 {
   "name": "ts-library-example",
+  "version": "1.0.7",
   "private": true,
-  "version": "1.0.0",
   "dependencies": {
     "lodash": "^4.17.15",
-    "tslib": "^1.11.1"
+    "tslib": "^1.13.0"
   },
   "devDependencies": {
-    "@mvila/tsconfig": "^1.0.1",
-    "@types/jest": "^25.2.1",
-    "@types/lodash": "^4.14.150"
+    "@mvila/tsconfig": "^1.0.4",
+    "@types/jest": "^25.2.3",
+    "@types/lodash": "^4.14.155"
   }
 }

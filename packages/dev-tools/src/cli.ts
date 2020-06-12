@@ -2,7 +2,7 @@
 
 import sade from 'sade';
 
-import {linkLocalPackages, buildTSLibrary, testTSLibrary} from './commands';
+import {linkLocalPackages, buildTSLibrary, testTSLibrary, updateDependencies} from './commands';
 import {programName, programVersion, logMessage, logError} from './util';
 
 async function main() {
@@ -31,6 +31,11 @@ async function main() {
     .option('--verbose', 'Display individual test results with the test suite hierarchy')
     .option('--watch', 'Watch files for changes and rerun tests related to changed files')
     .action(testTSLibrary);
+
+  program
+    .command('update:dependencies')
+    .describe('Update the dependencies of an NPM package')
+    .action(updateDependencies);
 
   const command: any = program.parse(process.argv, {lazy: true});
 

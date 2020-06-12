@@ -6,4 +6,7 @@ Run from the root of 'examples/ts-library':
 
 # test
 (cd ../.. && npm run build) && node ../../dist/node-cjs/cli.js test:ts-library && echo 'All tests passed!'
+
+# update
+(cd ../.. && npm run build) && node ../../dist/node-cjs/cli.js update:dependencies
 ```

@@ -1,5 +1,5 @@
 import upperFirst from 'lodash/upperFirst';
 
-export function hello(who: string = 'World') {
-  return `Hello, ${upperFirst(who)}!`;
+export function hello(who: string = 'world') {
+  return `Hello, ${upperFirst(who)}! :)`;
 }

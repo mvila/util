@@ -2,6 +2,8 @@ import ts from 'typescript';
 import fs from 'fs';
 import path from 'path';
 
+import {throwError} from './util';
+
 export async function compileTS({
   defaultInclude,
   defaultExclude,
@@ -20,9 +22,7 @@ export async function compileTS({
   const configFile = path.resolve('tsconfig.json');
 
   if (!fs.existsSync(configFile)) {
-    throw Object.assign(new Error("'tsconfig.json' not found"), {
-      displayMessage: `Couldn't find the 'tsconfig.json' file (path: '${configFile}')`
-    });
+    throwError(`Couldn't find the 'tsconfig.json' file (path: '${configFile}')`);
   }
 
   const configText = fs.readFileSync(configFile, 'utf8');
@@ -30,9 +30,9 @@ export async function compileTS({
   const {config: configJSON, error} = ts.parseConfigFileTextToJson(configFile, configText);
 
   if (error !== undefined) {
-    throw Object.assign(new Error("'tsconfig.json' is invalid"), {
-      displayMessage: `An error occurred while parsing the JSON of the 'tsconfig.json' file (path: '${configFile}')`
-    });
+    throwError(
+      `An error occurred while parsing the JSON of the 'tsconfig.json' file (path: '${configFile}')`
+    );
   }
 
   if (configJSON.include === undefined) {
@@ -56,9 +56,9 @@ export async function compileTS({
   );
 
   if (errors.length > 0) {
-    throw Object.assign(new Error("'tsconfig.json' is invalid"), {
-      displayMessage: `An error occurred while parsing the 'tsconfig.json' file (path: '${configFile}'): ${errors[0].messageText}`
-    });
+    throwError(
+      `An error occurred while parsing the 'tsconfig.json' file (path: '${configFile}'): ${errors[0].messageText}`
+    );
   }
 
   const program = ts.createProgram(fileNames, options);
@@ -76,8 +76,6 @@ export async function compileTS({
       }
     });
 
-    throw Object.assign(new Error('TypeScript compilation failed'), {
-      displayMessage: `Failed to compile TypeScript\n\n${messages.join('\n')}`
-    });
+    throwError(`Failed to compile TypeScript\n\n${messages.join('\n')}`);
   }
 }
