@@ -1,5 +1,5 @@
 import {promises as fsAsync} from 'fs';
-import {copy, remove, pathExists} from 'fs-extra';
+import {copy, remove, pathExists, readJSONSync, writeJSONSync} from 'fs-extra';
 import {execFileSync} from 'child_process';
 import {join, resolve, sep} from 'path';
 // @ts-ignore
@@ -8,6 +8,7 @@ import temporaryDirectoryRoot from 'temp-dir';
 import hasha from 'hasha';
 import isEqual from 'lodash/isEqual';
 import sleep from 'sleep-promise';
+import bytes from 'bytes';
 
 import {MANAGER_IDENTIFIER} from '../resource';
 import {AWSResource, AWSResourceConfig} from './aws-resource';
@@ -197,7 +198,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
     const role = (await this.getIAMLambdaRole())!;
     const zipArchive = await this.getZipArchive();
 
-    logMessage('Creating the Lambda function...');
+    logMessage(`Creating the Lambda function (${bytes(zipArchive.length)})...`);
 
     let errors = 0;
 
@@ -336,7 +337,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
     const lambda = this.getLambdaClient();
     const zipArchive = await this.getZipArchive();
 
-    logMessage('Updating the Lambda function code...');
+    logMessage(`Updating the Lambda function code (${bytes(zipArchive.length)})...`);
 
     await lambda
       .updateFunctionCode({
@@ -394,16 +395,23 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
       throwError(`Couldn't find a 'package.json' file (directory: '${config.directory}')`);
     }
 
-    const copiedPackageFile = join(codeDirectory, 'package.json');
-    await copy(packageFile, copiedPackageFile);
+    const {dependencies} = readJSONSync(packageFile);
+    const generatedPackageFile = join(codeDirectory, 'package.json');
+    writeJSONSync(generatedPackageFile, {
+      // Include valid 'description', 'license', and 'repository' to suppress NPM warnings
+      description: '...',
+      license: 'MIT', // No worries, the license is not persisted in the deployed Lambda
+      repository: '...',
+      dependencies
+    });
 
     try {
-      execFileSync('npm', ['install', '--production'], {cwd: codeDirectory});
+      execFileSync('npm', ['install'], {cwd: codeDirectory});
     } catch {
       throwError('An error occurred while running `npm`');
     }
 
-    await remove(copiedPackageFile);
+    await remove(generatedPackageFile);
   }
 
   async resetFileTimes(directory: string) {
