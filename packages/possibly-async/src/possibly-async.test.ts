@@ -254,6 +254,33 @@ describe('possibly-async', () => {
     ta.assert<ta.Equal<typeof r7, PromiseLike<{[key: string]: number | string}>>>();
     await expect(r7).resolves.toEqual({x: 2, y: 'BREAK'});
   });
+
+  test('possiblyAsync.some()', async () => {
+    const r1 = possiblyAsync.some([1, 2, 3], (v) => v === 1);
+    ta.assert<ta.Equal<typeof r1, boolean>>();
+    expect(r1).toBe(true);
+
+    const r2 = possiblyAsync.some([1, 2, 3], (v) => v === 2);
+    ta.assert<ta.Equal<typeof r2, boolean>>();
+    expect(r2).toBe(true);
+
+    const r3 = possiblyAsync.some([1, 2, 3], (v) => v === 4);
+    ta.assert<ta.Equal<typeof r3, boolean>>();
+    expect(r3).toBe(false);
+
+    let iterateeCalls = 0;
+    const r4 = possiblyAsync.some([1, 2, 3], (v) => {
+      iterateeCalls += 1;
+      return v === 2;
+    });
+    ta.assert<ta.Equal<typeof r4, boolean>>();
+    expect(r4).toBe(true);
+    expect(iterateeCalls).toBe(2);
+
+    const r5 = possiblyAsync.some([1, 2, 3], (v) => makePromise(v === 3));
+    ta.assert<ta.Equal<typeof r5, PromiseLike<boolean>>>();
+    await expect(r5).resolves.toBe(true);
+  });
 });
 
 function makePromise<V>(value?: 'ERROR'): PromiseLike<never>;

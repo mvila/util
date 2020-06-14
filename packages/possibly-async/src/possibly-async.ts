@@ -164,6 +164,33 @@ export namespace possiblyAsync {
     );
   }
 
+  export function some<
+    Value,
+    IterateeResultValueOrPromise,
+    IterateeResultValue = PromiseLikeValue<IterateeResultValueOrPromise>,
+    Result = IterateeResultValueOrPromise extends PromiseLike<IterateeResultValue>
+      ? PromiseLike<boolean>
+      : boolean
+  >(
+    iterable: Iterable<Value>,
+    iteratee: (value: Value, index: number) => IterateeResultValueOrPromise
+  ): Result;
+  export function some(iterable: any, iteratee: (value: any, index: number) => any) {
+    let result = false;
+
+    return possiblyAsync(
+      possiblyAsync.forEach(iterable, (value, index) =>
+        possiblyAsync(iteratee(value, index), (iterateeResult): void | typeof breakSymbol => {
+          if (iterateeResult) {
+            result = true;
+            return breakSymbol;
+          }
+        })
+      ),
+      () => result
+    );
+  }
+
   export const breakSymbol = Symbol('BREAK');
 
   function isBreaking(value: any) {
