@@ -23,9 +23,9 @@ const DEFAULT_LAMBDA_TIMEOUT = 10;
 const DEFAULT_API_GATEWAY_CORS_CONFIGURATION = {
   AllowOrigins: ['*'],
   AllowHeaders: ['*'],
-  AllowMethods: ['*'],
+  AllowMethods: ['GET', 'POST', 'OPTIONS'],
   ExposeHeaders: ['*'],
-  MaxAge: 300
+  MaxAge: 900 // 15 minutes
 };
 
 const DEFAULT_IAM_LAMBDA_ROLE_NAME = `${MANAGER_IDENTIFIER}-function-lambda-role-v1`;
@@ -162,7 +162,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
       try {
         const result = await lambda
           .getFunction({
-            FunctionName: this.buildLambdaFunctionName()
+            FunctionName: this.getLambdaName()
           })
           .promise();
 
@@ -206,7 +206,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
       try {
         const lambdaFunction = await lambda
           .createFunction({
-            FunctionName: this.buildLambdaFunctionName(),
+            FunctionName: this.getLambdaName(),
             Handler: 'handler.handler',
             Runtime: config.aws.lambda.runtime,
             Role: role.arn,
@@ -239,7 +239,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
 
     if (lambdaFunction.tags?.['managed-by'] !== MANAGER_IDENTIFIER) {
       throwError(
-        `Cannot update a Lambda function that was not originally created by this tool (function: '${this.buildLambdaFunctionName()}')`
+        `Cannot update a Lambda function that was not originally created by this tool (function: '${this.getLambdaName()}')`
       );
     }
   }
@@ -287,7 +287,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
 
     await lambda
       .updateFunctionConfiguration({
-        FunctionName: this.buildLambdaFunctionName(),
+        FunctionName: this.getLambdaName(),
         Runtime: config.aws.lambda.runtime,
         MemorySize: config.aws.lambda.memorySize,
         Timeout: config.aws.lambda.timeout,
@@ -312,13 +312,11 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
     logMessage('Updating the Lambda function concurrency...');
 
     if (config.aws.lambda.reservedConcurrentExecutions === undefined) {
-      await lambda
-        .deleteFunctionConcurrency({FunctionName: this.buildLambdaFunctionName()})
-        .promise();
+      await lambda.deleteFunctionConcurrency({FunctionName: this.getLambdaName()}).promise();
     } else {
       await lambda
         .putFunctionConcurrency({
-          FunctionName: this.buildLambdaFunctionName(),
+          FunctionName: this.getLambdaName(),
           ReservedConcurrentExecutions: config.aws.lambda.reservedConcurrentExecutions
         })
         .promise();
@@ -341,7 +339,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
 
     await lambda
       .updateFunctionCode({
-        FunctionName: this.buildLambdaFunctionName(),
+        FunctionName: this.getLambdaName(),
         ZipFile: zipArchive
       })
       .promise();
@@ -358,7 +356,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
       const temporaryDirectory = join(
         temporaryDirectoryRoot,
         MANAGER_IDENTIFIER,
-        this.buildLambdaFunctionName()
+        this.getLambdaName()
       );
 
       try {
@@ -385,6 +383,8 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
   }
 
   async includeNPMDependencies(codeDirectory: string) {
+    // TODO: Cache the installed dependencies
+
     const config = this.getConfig();
 
     logMessage(`Including the dependencies...`);
@@ -455,7 +455,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
       .promise();
   }
 
-  buildLambdaFunctionName() {
+  getLambdaName() {
     return this.getConfig().domainName.replace(/\./g, '-');
   }
 
@@ -548,11 +548,10 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
 
   async getAPIGateway({throwIfMissing = true} = {}) {
     if (this._apiGateway === undefined) {
-      const config = this.getConfig();
       const apiGateway = this.getAPIGatewayV2Client();
 
       const result = await apiGateway.getApis().promise();
-      const item = result.Items?.find((item) => item.Name === config.domainName);
+      const item = result.Items?.find((item) => item.Name === this.getAPIGatewayName());
 
       if (item !== undefined) {
         this._apiGateway = {id: item.ApiId!, endpoint: item.ApiEndpoint!, tags: item.Tags!};
@@ -571,7 +570,6 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
   }
 
   async createAPIGateway() {
-    const config = this.getConfig();
     const apiGateway = this.getAPIGatewayV2Client();
 
     logMessage(`Creating the API Gateway...`);
@@ -580,7 +578,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
 
     const result = await apiGateway
       .createApi({
-        Name: config.domainName,
+        Name: this.getAPIGatewayName(),
         ProtocolType: 'HTTP',
         Target: (await this.getLambdaFunction())!.arn,
         CorsConfiguration: DEFAULT_API_GATEWAY_CORS_CONFIGURATION,
@@ -592,12 +590,11 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
   }
 
   async checkAPIGatewayTags() {
-    const config = this.getConfig();
     const api = (await this.getAPIGateway())!;
 
     if (api.tags['managed-by'] !== MANAGER_IDENTIFIER) {
       throwError(
-        `Cannot use an API Gateway that was not originally created by this tool (name: '${config.domainName}')`
+        `Cannot use an API Gateway that was not originally created by this tool (name: '${this.getAPIGatewayName()}')`
       );
     }
   }
@@ -693,5 +690,9 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
     };
 
     return this._apiGatewayCustomDomainName;
+  }
+
+  getAPIGatewayName() {
+    return this.getConfig().domainName;
   }
 }

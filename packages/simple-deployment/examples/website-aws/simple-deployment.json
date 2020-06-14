@@ -1,0 +1,13 @@
+{
+  "type": "website",
+  "provider": "aws",
+  "domainName": "simple-deployment-website-aws.mvila.me",
+  "files": ["./src"],
+  "customErrors": [{"errorCode": 404, "responseCode": 200, "responsePage": "index.html"}],
+  "aws": {
+    "region": "ap-northeast-1",
+    "cloudFront": {
+      "priceClass": "PriceClass_100"
+    }
+  }
+}

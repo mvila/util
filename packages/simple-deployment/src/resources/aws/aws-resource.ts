@@ -66,6 +66,18 @@ export class AWSResource extends Resource {
     return this._lambdaClient;
   }
 
+  // === S3 ===
+
+  _s3Client!: AWS.S3;
+
+  getS3Client() {
+    if (this._s3Client === undefined) {
+      this._s3Client = new AWS.S3({...this.buildAWSConfig(), apiVersion: '2006-03-01'});
+    }
+
+    return this._s3Client;
+  }
+
   // === API Gateway v2 ===
 
   _apiGatewayV2Client!: AWS.ApiGatewayV2;
@@ -79,6 +91,21 @@ export class AWSResource extends Resource {
     }
 
     return this._apiGatewayV2Client;
+  }
+
+  // === CloudFront ===
+
+  _cloudFrontClient!: AWS.CloudFront;
+
+  getCloudFrontClient() {
+    if (this._cloudFrontClient === undefined) {
+      this._cloudFrontClient = new AWS.CloudFront({
+        ...this.buildAWSConfig(),
+        apiVersion: '2019-03-26'
+      });
+    }
+
+    return this._cloudFrontClient;
   }
 
   // === Route 53 ===
@@ -334,13 +361,13 @@ export class AWSResource extends Resource {
 
   // === ACM ===
 
-  async ensureACMCertificate() {
+  async ensureACMCertificate({region}: {region?: string} = {}) {
     logMessage(`Checking the ACM Certificate...`);
 
-    let certificate = await this.getACMCertificate({throwIfMissing: false});
+    let certificate = await this.getACMCertificate({region, throwIfMissing: false});
 
     if (certificate === undefined) {
-      certificate = await this.createACMCertificate();
+      certificate = await this.createACMCertificate({region});
     }
 
     return certificate;
@@ -348,17 +375,20 @@ export class AWSResource extends Resource {
 
   _acmCertificate?: {arn: string};
 
-  async getACMCertificate({throwIfMissing = true} = {}) {
+  async getACMCertificate({
+    region,
+    throwIfMissing = true
+  }: {region?: string; throwIfMissing?: boolean} = {}) {
     const config = this.getConfig();
 
     if (this._acmCertificate === undefined) {
-      const certificate = await this.findACMCertificate(config.domainName);
+      const certificate = await this.findACMCertificate(config.domainName, {region});
 
       if (certificate !== undefined) {
         const arn = certificate.CertificateArn!;
 
         if (certificate.Status === 'PENDING_VALIDATION') {
-          await this.waitForACMCertificateValidation(arn);
+          await this.waitForACMCertificateValidation(arn, {region});
         }
 
         this._acmCertificate = {arn};
@@ -372,9 +402,9 @@ export class AWSResource extends Resource {
     return this._acmCertificate;
   }
 
-  async createACMCertificate() {
+  async createACMCertificate({region}: {region?: string} = {}) {
     const config = this.getConfig();
-    const acm = this.getACMClient();
+    const acm = this.getACMClient({region});
 
     logMessage(`Creating the ACM Certificate...`);
 
@@ -387,19 +417,19 @@ export class AWSResource extends Resource {
       .promise();
     const arn = result.CertificateArn!;
 
-    const validationCNAME = await this.getACMCertificateValidationCNAME(arn);
+    const validationCNAME = await this.getACMCertificateValidationCNAME(arn, {region});
 
     await this.ensureRoute53CNAME(validationCNAME);
 
-    await this.waitForACMCertificateValidation(arn);
+    await this.waitForACMCertificateValidation(arn, {region});
 
     this._acmCertificate = {arn};
 
     return this._acmCertificate;
   }
 
-  async findACMCertificate(domainName: string) {
-    const acm = this.getACMClient();
+  async findACMCertificate(domainName: string, {region}: {region?: string}) {
+    const acm = this.getACMClient({region});
 
     let rootDomainName: string | undefined;
 
@@ -504,8 +534,8 @@ export class AWSResource extends Resource {
     return undefined;
   }
 
-  async getACMCertificateValidationCNAME(arn: string) {
-    const acm = this.getACMClient();
+  async getACMCertificateValidationCNAME(arn: string, {region}: {region?: string}) {
+    const acm = this.getACMClient({region});
 
     logMessage(`Getting the ACM Certificate DNS Validation record...`);
 
@@ -536,8 +566,8 @@ export class AWSResource extends Resource {
     );
   }
 
-  async waitForACMCertificateValidation(arn: string) {
-    const acm = this.getACMClient();
+  async waitForACMCertificateValidation(arn: string, {region}: {region?: string}) {
+    const acm = this.getACMClient({region});
 
     logMessage(`Waiting for the ACM Certificate validation...`);
 
@@ -565,22 +595,28 @@ export class AWSResource extends Resource {
     );
   }
 
-  _acmClient!: AWS.ACM;
+  _acmClients!: {[regionKey: string]: AWS.ACM};
 
-  getACMClient() {
-    if (this._acmClient === undefined) {
-      this._acmClient = new AWS.ACM({
-        ...this.buildAWSConfig(),
+  getACMClient({region}: {region?: string} = {}) {
+    if (this._acmClients === undefined) {
+      this._acmClients = {};
+    }
+
+    const regionKey = region !== undefined ? region : '$config';
+
+    if (this._acmClients[regionKey] === undefined) {
+      this._acmClients[regionKey] = new AWS.ACM({
+        ...this.buildAWSConfig({region}),
         apiVersion: '2015-12-08'
       });
     }
 
-    return this._acmClient;
+    return this._acmClients[regionKey];
   }
 
   // === AWS Config ===
 
-  buildAWSConfig() {
+  buildAWSConfig({region}: {region?: string} = {}) {
     const {aws: awsConfig} = this.getConfig();
 
     let credentials: {accessKeyId?: string; secretAccessKey?: string} = {};
@@ -593,7 +629,63 @@ export class AWSResource extends Resource {
     return {
       ...credentials,
       ...pick(awsConfig, ['accessKeyId', 'secretAccessKey', 'region']),
+      ...(region !== undefined && {region}),
       signatureVersion: 'v4'
     };
   }
+}
+
+const S3_REGIONS: {[name: string]: {websiteEndpoint: string}} = {
+  'us-east-1': {websiteEndpoint: 's3-website-us-east-1.amazonaws.com'},
+  'us-east-2': {websiteEndpoint: 's3-website.us-east-2.amazonaws.com'},
+  'us-west-1': {websiteEndpoint: 's3-website-us-west-1.amazonaws.com'},
+  'us-west-2': {websiteEndpoint: 's3-website-us-west-2.amazonaws.com'},
+  'ca-central-1': {websiteEndpoint: 's3-website.ca-central-1.amazonaws.com'},
+  'sa-east-1': {websiteEndpoint: 's3-website-sa-east-1.amazonaws.com'},
+  'ap-east-1': {websiteEndpoint: 's3-website.ap-east-1.amazonaws.com'},
+  'ap-south-1': {websiteEndpoint: 's3-website.ap-south-1.amazonaws.com'},
+  'ap-northeast-1': {websiteEndpoint: 's3-website-ap-northeast-1.amazonaws.com'},
+  'ap-northeast-2': {websiteEndpoint: 's3-website.ap-northeast-2.amazonaws.com'},
+  'ap-northeast-3': {websiteEndpoint: 's3-website.ap-northeast-3.amazonaws.com'},
+  'ap-southeast-1': {websiteEndpoint: 's3-website-ap-southeast-1.amazonaws.com'},
+  'ap-southeast-2': {websiteEndpoint: 's3-website-ap-southeast-2.amazonaws.com'},
+  'cn-northwest-1': {websiteEndpoint: 's3-website.cn-northwest-1.amazonaws.com.cn'},
+  'eu-central-1': {websiteEndpoint: 's3-website.eu-central-1.amazonaws.com'},
+  'eu-west-1': {websiteEndpoint: 's3-website-eu-west-1.amazonaws.com'},
+  'eu-west-2': {websiteEndpoint: 's3-website.eu-west-2.amazonaws.com'},
+  'eu-west-3': {websiteEndpoint: 's3-website.eu-west-3.amazonaws.com'},
+  'eu-north-1': {websiteEndpoint: 's3-website.eu-north-1.amazonaws.com'},
+  'af-south-1': {websiteEndpoint: 's3-website.af-south-1.amazonaws.com'}
+};
+
+export function getS3Endpoint(bucketName: string) {
+  return `${bucketName}.s3.amazonaws.com`;
+}
+
+export function getS3WebsiteEndpoint(regionName = 'us-east-1') {
+  const region = S3_REGIONS[regionName];
+
+  if (region === undefined) {
+    throw new Error(`Sorry, the AWS S3 region '${regionName}' is not supported yet`);
+  }
+
+  return region.websiteEndpoint;
+}
+
+export function getS3WebsiteDomainName(bucketName: string, regionName: string) {
+  return `${bucketName}.${getS3WebsiteEndpoint(regionName)}`;
+}
+
+export function formatS3URL({bucket, key}: {bucket: string; key: string}) {
+  return `https://${getS3Endpoint(bucket)}/${key}`;
+}
+
+export function parseS3URL(url: string) {
+  const matches = url.match(/^https:\/\/(.+)\.s3\.amazonaws\.com\/(.+)$/i);
+
+  if (matches === null) {
+    throw new Error(`The S3 URL '${url}' is invalid`);
+  }
+
+  return {bucket: matches[1], key: matches[2]};
 }
