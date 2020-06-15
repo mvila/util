@@ -8,7 +8,7 @@ type DeployOptions = {
 export async function deploy(options: DeployOptions = {}) {
   const {directory = process.cwd()} = options;
 
-  const config = readConfig(directory);
+  const config = await readConfig(directory);
   const resource = createResource(config);
   await resource.deploy();
 }

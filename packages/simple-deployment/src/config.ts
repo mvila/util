@@ -1,19 +1,23 @@
 import {join, dirname} from 'path';
 import {existsSync} from 'fs';
-import {readJsonSync} from 'fs-extra';
 
 import {throwError} from './util';
 
-const CONFIG_FILE_NAME = 'simple-deployment.json';
+const CONFIG_FILE_NAME_JSON = 'simple-deployment.config.json';
+const CONFIG_FILE_NAME_JS = 'simple-deployment.config.js';
 
-export function readConfig(directory: string) {
+export async function readConfig(directory: string) {
   const configFile = findConfig(directory);
 
   if (configFile === undefined) {
     throwError(`Couldn't find the configuration file (from: '${directory}')`);
   }
 
-  const config = readJsonSync(configFile);
+  let config = require(configFile);
+
+  if (typeof config === 'function') {
+    config = await config();
+  }
 
   config.directory = dirname(configFile);
 
@@ -22,7 +26,13 @@ export function readConfig(directory: string) {
 
 function findConfig(directory: string) {
   while (true) {
-    const configFile = join(directory, CONFIG_FILE_NAME);
+    let configFile = join(directory, CONFIG_FILE_NAME_JSON);
+
+    if (existsSync(configFile)) {
+      return configFile;
+    }
+
+    configFile = join(directory, CONFIG_FILE_NAME_JS);
 
     if (existsSync(configFile)) {
       return configFile;
