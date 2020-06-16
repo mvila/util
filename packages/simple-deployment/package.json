@@ -1,6 +1,6 @@
 {
   "name": "simple-deployment",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "description": "Simple deployment tool",
   "keywords": [
     "frontend",
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "ajv": "^6.12.2",
-    "aws-sdk": "^2.696.0",
+    "aws-sdk": "^2.697.0",
     "bytes": "^3.1.0",
     "core-helpers": "^0.1.26",
     "cross-zip": "^3.1.0",
