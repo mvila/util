@@ -1,1 +1,1 @@
-export {Microbatcher, Microbatcher as default} from './microbatcher';
+export * from './microbatcher';
