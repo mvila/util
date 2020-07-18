@@ -68,7 +68,13 @@ const NPM_REGISTRY = 'https://registry.npmjs.org';
   koa.listen(PORT, () => {
     console.log(`Server started (port: ${PORT})`);
   });
-})();
+})().catch((err) => {
+  if (err.displayMessage !== undefined) {
+    console.error(err.displayMessage);
+  } else {
+    throw err;
+  }
+});
 
 function parseURL(url: string) {
   let str = decodeURIComponent(url);
