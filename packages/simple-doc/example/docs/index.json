@@ -1,0 +1,21 @@
+{
+  "books": [
+    {
+      "title": "Reference",
+      "slug": "reference",
+      "chapters": [
+        {
+          "title": "Component",
+          "slug": "component",
+          "file": "reference/component.md",
+          "source": "../src/component.ts"
+        },
+        {
+          "title": "Property",
+          "slug": "property",
+          "file": "reference/property.md"
+        }
+      ]
+    }
+  ]
+}

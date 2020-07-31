@@ -1,0 +1,46 @@
+{
+  "name": "@mvila/simple-doc",
+  "displayName": "simple-doc",
+  "version": "0.1.66",
+  "description": "Simple documentation tool",
+  "keywords": [
+    "documentation",
+    "tool"
+  ],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/simple-doc",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/node-cjs/index.js",
+  "module": "dist/node-esm/index.js",
+  "bin": {
+    "simple-doc": "dist/node-cjs/cli.js"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "dev-tools build:ts-library",
+    "link": "dev-tools link:local-packages",
+    "prepare": "npm run build",
+    "publish:package": "dev-tools publish:package",
+    "update": "dev-tools update:dependencies"
+  },
+  "dependencies": {
+    "core-helpers": "^0.1.26",
+    "fs-extra": "^9.0.1",
+    "lodash": "^4.17.15",
+    "sade": "^1.7.3",
+    "tslib": "^1.13.0"
+  },
+  "devDependencies": {
+    "@mvila/dev-tools": "^1.0.23",
+    "@mvila/tsconfig": "^1.0.4",
+    "@types/fs-extra": "^9.0.1",
+    "@types/lodash": "^4.14.155",
+    "@types/node": "^13.13.12",
+    "@types/sade": "^1.7.1"
+  }
+}
