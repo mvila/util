@@ -3,6 +3,7 @@ import path from 'path';
 import {readJsonSync, outputJsonSync, outputFileSync, copySync, removeSync} from 'fs-extra';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
+import kebabCase from 'lodash/kebabCase';
 
 import {logMessage, throwError} from './util';
 
@@ -189,6 +190,25 @@ function generateChapter(sourceFile: string, destinationFile: string) {
       name = name.replace(/-/g, ' ');
 
       markdown += ` <badge${type !== undefined ? ` type="${type}"` : ''}>${name}</badge>`;
+    }
+
+    let headerId: string | undefined;
+    const kebabName = kebabCase(entry.name);
+
+    if (entry.types.includes('class')) {
+      headerId = `${kebabName}-class`;
+    } else if (entry.types.includes('constructor')) {
+      headerId = 'constructor';
+    } else if (entry.types.includes('class-method') && entry.types.includes('instance-method')) {
+      headerId = `${kebabName}-dual-method`;
+    } else if (entry.types.includes('class-method')) {
+      headerId = `${kebabName}-class-method`;
+    } else if (entry.types.includes('instance-method')) {
+      headerId = `${kebabName}-instance-method`;
+    }
+
+    if (headerId !== undefined) {
+      markdown += ` {#${headerId}}`;
     }
 
     markdown += `\n`;
