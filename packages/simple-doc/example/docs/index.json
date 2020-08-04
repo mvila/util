@@ -1,6 +1,17 @@
 {
   "books": [
     {
+      "title": "Getting Started",
+      "slug": "getting-started",
+      "chapters": [
+        {
+          "title": "Hello, World!",
+          "slug": "hello-world",
+          "file": "getting-started/hello-world.md"
+        }
+      ]
+    },
+    {
       "title": "Reference",
       "slug": "reference",
       "chapters": [
@@ -8,12 +19,16 @@
           "title": "Component",
           "slug": "component",
           "file": "reference/component.md",
-          "source": "../src/component.ts"
+          "source": [
+            "../packages/component/src/component.ts",
+            "../packages/component/src/decorators.ts"
+          ]
         },
         {
-          "title": "Property",
-          "slug": "property",
-          "file": "reference/property.md"
+          "title": "EmbeddedComponent",
+          "slug": "embedded-component",
+          "file": "reference/embedded-component.md",
+          "source": "../packages/component/src/embedded-component.ts"
         }
       ]
     }

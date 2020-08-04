@@ -117,7 +117,51 @@ export type IntrospectedComponent = {
 type IntrospectedComponentMap = Map<typeof Component, IntrospectedComponent | undefined>;
 
 /**
- * The base class of all your components.
+ * A component is an elementary building block allowing you to define your data models and implement the business logic of your application. Typically, an application is composed of several components that are connected to each other using the `@provide()` and `@consume()` decorators.
+ *
+ * #### Usage
+ *
+ * Just extend the `Component` class to define a component with some attributes and methods that are specific to your application.
+ *
+ * For example, a `Movie` component with a `title` attribute and a `play()` method could be defined as follows:
+ *
+ * ```
+ * // JS
+ *
+ * import {Component} from '@liaison/component';
+ *
+ * class Movie extends Component {
+ *   ﹫attribute('string') title;
+ *
+ *   ﹫method() play() {
+ *     console.log(`Playing '${this.title}...'`);
+ *   }
+ * }
+ * ```
+ *
+ * ```
+ * // TS
+ *
+ * import {Component} from '@liaison/component';
+ *
+ * class Movie extends Component {
+ *   ﹫attribute('string') title!: string;
+ *
+ *   ﹫method() play() {
+ *     console.log(`Playing '${this.title}...'`);
+ *   }
+ * }
+ * ```
+ *
+ * The `@attribute()` and `@method()` decorators allows you to get the full power of Liaison, such as attribute type checking at runtime and remote method invocation.
+ *
+ * Once you have defined a component, you can use it as any JS/TS class :
+ *
+ * ```
+ * const movie = new Movie({title: 'Inception'});
+ *
+ * movie.play(); // => 'Playing Inception...'
+ * ```
  */
 export class Component extends Observable(Object) {
   ['constructor']: typeof Component;
@@ -170,6 +214,7 @@ export class Component extends Observable(Object) {
    * @returns An instance of the component class (possibly a promise if `options.attributeFilter` is an async function or `options.initialize` is `true` and the class has an async `initialize` instance method).
    *
    * @category Creation
+   * @possiblyasync
    */
   static create<T extends typeof Component>(
     this: T,
@@ -272,6 +317,7 @@ export class Component extends Observable(Object) {
    * A (possibly async) method that is called automatically when a component class is deserialized. You can override this method in your component subclasses to implement your initialization logic.
    *
    * @category Initialization
+   * @possiblyasync
    */
   static initialize() {}
 
@@ -279,6 +325,7 @@ export class Component extends Observable(Object) {
    * A (possibly async) method that is called automatically when a component instance is created or deserialized. You can override this method in your component subclasses to implement your initialization logic.
    *
    * @category Initialization
+   * @possiblyasync
    */
   initialize() {}
 
@@ -289,7 +336,7 @@ export class Component extends Observable(Object) {
   }
 
   /**
-   * Returns the name of a component.
+   * Returns the name of a component, which is usually the name of the corresponding class.
    *
    * @returns The name of a component.
    *
@@ -452,6 +499,13 @@ export class Component extends Observable(Object) {
 
   // === Embeddability ===
 
+  /**
+   * Returns whether a component is an [`EmbeddedComponent`](https://liaison.dev/docs/v1/reference/embedded-component).
+   *
+   * @returns A boolean.
+   *
+   * @category Embeddability
+   */
   static isEmbedded() {
     return false;
   }
@@ -2196,7 +2250,7 @@ export class Component extends Observable(Object) {
    * @param component The component class to provide.
    *
    * @example
-   * ```js
+   * ```
    * class Backend extends Component {}
    * class Movie extends Component {}
    * Backend.provideComponent(Movie);
@@ -2310,7 +2364,7 @@ export class Component extends Observable(Object) {
    * @returns A component provider.
    *
    * @example
-   * ```js
+   * ```
    * class Backend extends Component {}
    * class Movie extends Component {}
    * Backend.provideComponent(Movie);
@@ -2406,7 +2460,7 @@ export class Component extends Observable(Object) {
    * @param name The name of the component to consume.
    *
    * @example
-   * ```js
+   * ```
    * class Backend extends Component {}
    * class Movie extends Component {}
    * Backend.provideComponent(Movie);
@@ -2503,6 +2557,7 @@ export class Component extends Observable(Object) {
    * @returns A clone of the component.
    *
    * @category Cloning
+   * @possiblyasync
    */
   clone<
     T extends Component,
@@ -2542,13 +2597,13 @@ export class Component extends Observable(Object) {
    * @returns The component class fork.
    *
    * @example
-   * ```js
+   * ```
    * class Movie extends Component {}
    *
    * Movie.fork() // => A fork of the `Movie` class
+   * ```
    *
    * @category Forking
-   * ```
    */
   static fork<T extends typeof Component>(this: T, options: ForkOptions = {}): T {
     const {componentProvider = this.__getComponentProvider()} = options;
@@ -2573,7 +2628,7 @@ export class Component extends Observable(Object) {
    * @returns The component instance fork.
    *
    * @example
-   * ```js
+   * ```
    * class Movie extends Component {}
    * const movie = new Movie();
    *
@@ -2652,7 +2707,7 @@ export class Component extends Observable(Object) {
    * @returns The ghost of the current component class.
    *
    * @example
-   * ```js
+   * ```
    * class Movie extends Component {}
    *
    * Movie.getGhost() // => A fork of the `Movie` class
@@ -2684,8 +2739,10 @@ export class Component extends Observable(Object) {
    *
    * @returns The ghost of the current component instance.
    *
-   * @example <caption>JavaScript:</caption>
-   * ```js
+   * @example
+   * ```
+   * // JS
+   *
    * class Movie extends Component {
    *   ﹫primaryIdentifier() id;
    * }
@@ -2696,8 +2753,10 @@ export class Component extends Observable(Object) {
    * movie.getGhost() // => The same fork of `movie`
    * ```
    *
-   * @example <caption>TypeScript:</caption>
-   * ```ts
+   * @example
+   * ```
+   * // TS
+   *
    * class Movie extends Component {
    *   ﹫primaryIdentifier() id!: string;
    * }
@@ -2811,6 +2870,7 @@ export class Component extends Observable(Object) {
    * @returns A plain object representing the serialized component class.
    *
    * @category Serialization
+   * @possiblyasync
    */
   static serialize(options: SerializeOptions = {}) {
     const {
@@ -2896,6 +2956,7 @@ export class Component extends Observable(Object) {
    * @returns A plain object representing the serialized component instance.
    *
    * @category Serialization
+   * @possiblyasync
    */
   serialize(options: SerializeOptions = {}) {
     const {
@@ -3040,6 +3101,7 @@ export class Component extends Observable(Object) {
    * @returns The current component class.
    *
    * @category Serialization
+   * @possiblyasync
    */
   static deserialize<T extends typeof Component>(
     this: T,
@@ -3078,6 +3140,7 @@ export class Component extends Observable(Object) {
    * @returns The deserialized component instance.
    *
    * @category Serialization
+   * @possiblyasync
    */
   static deserializeInstance<T extends typeof Component>(
     this: T,

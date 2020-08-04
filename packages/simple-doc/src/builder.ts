@@ -43,8 +43,9 @@ export function buildDocumentation(indexFile: string, destinationDirectory: stri
       const destinationFile = path.resolve(destinationDirectory, chapter.file);
 
       if (chapter.source !== undefined) {
-        const sourceFile = path.resolve(sourceDirectory, chapter.source);
-        generateChapter(sourceFile, destinationFile);
+        const sources: string[] = Array.isArray(chapter.source) ? chapter.source : [chapter.source];
+        const sourceFiles = sources.map((source) => path.resolve(sourceDirectory, source));
+        generateChapter(sourceFiles, destinationFile);
       } else {
         const sourceFile = path.resolve(sourceDirectory, chapter.file);
         copyChapter(sourceFile, destinationFile);
@@ -73,7 +74,6 @@ type Context = {
 };
 
 type Entry = {
-  level: number;
   name: string;
   types: string[];
   description: string;
@@ -90,164 +90,186 @@ type Parameter = {
   isOptional: boolean;
 };
 
-function generateChapter(sourceFile: string, destinationFile: string) {
-  if (!fs.existsSync(sourceFile)) {
-    throwError(`A documentation source file is missing (file: '${sourceFile}')`);
-  }
-
-  logMessage(`Generating chapter from '${path.relative(process.cwd(), sourceFile)}'...`);
-
-  const source = fs.readFileSync(sourceFile, {encoding: 'utf8'});
-  let sourceIndex = 0;
-  const entries = new Array<Entry>();
-  let previousEntry: Entry | undefined;
-  const context: Context = {sourceFile, className: undefined};
-
-  while (true) {
-    const startIndex = source.indexOf('/**\n', sourceIndex);
-
-    if (startIndex === -1) {
-      break;
-    }
-
-    const endIndex = source.indexOf('*/\n', startIndex + '/**\n'.length);
-
-    if (endIndex === -1) {
-      throwError(
-        `Couldn't handle a JSDoc comment (issue: 'Comment terminator is missing', file: '${sourceFile}')`
-      );
-    }
-
-    let jsDocComment = source.slice(startIndex + '/**\n'.length, endIndex);
-
-    jsDocComment = jsDocComment
-      .split('\n')
-      .map((jsDocLine) => {
-        jsDocLine = jsDocLine.trimLeft();
-
-        if (jsDocLine === '*') {
-          jsDocLine = '';
-        } else if (jsDocLine.startsWith('* ')) {
-          jsDocLine = jsDocLine.slice('* '.length);
-        }
-
-        return jsDocLine;
-      })
-      .join('\n');
-
-    sourceIndex = endIndex + '*/\n'.length;
-
-    const entry = handleJSDocComment({jsDocComment, source, sourceIndex, context});
-
-    const entryIsSimilar = isEqual(omit(entry, 'types'), omit(previousEntry, 'types'));
-
-    if (entryIsSimilar) {
-      previousEntry!.types.push(...entry.types);
-    } else {
-      entries.push(entry);
-      previousEntry = entry;
-    }
-  }
-
+function generateChapter(sourceFiles: string[], destinationFile: string) {
   let chapterMarkdown = '';
   let previousCategory: string | undefined;
 
-  for (const entry of entries) {
-    let markdown = '';
-
-    if (chapterMarkdown !== '') {
-      markdown += `\n`;
+  for (const sourceFile of sourceFiles) {
+    if (!fs.existsSync(sourceFile)) {
+      throwError(`A documentation source file is missing (file: '${sourceFile}')`);
     }
 
-    if (entry.category !== undefined && entry.category !== previousCategory) {
-      markdown += `#### ${entry.category}\n\n`;
-      previousCategory = entry.category;
-    }
+    logMessage(`Generating chapter from '${path.relative(process.cwd(), sourceFile)}'...`);
 
-    markdown += entry.level === 1 ? '### ' : '##### ';
+    const source = fs.readFileSync(sourceFile, {encoding: 'utf8'});
+    let sourceIndex = 0;
+    const entries = new Array<Entry>();
+    let previousEntry: Entry | undefined;
+    const context: Context = {sourceFile, className: undefined};
 
-    if (
-      entry.types.includes('constructor') ||
-      entry.types.includes('class-method') ||
-      entry.types.includes('instance-method')
-    ) {
-      markdown += `\`${entry.name}(${formatFunctionParams(entry.params)})\``;
-    } else {
-      markdown += entry.name;
-    }
+    while (true) {
+      const startIndex = source.indexOf('/**\n', sourceIndex);
 
-    for (let name of entry.types) {
-      let type: string | undefined;
-
-      if (name === 'class') {
-        type = 'primary';
-      } else if (name === 'constructor' || name === 'class-method') {
-        type = 'secondary';
-      } else if (name === 'instance-method') {
-        type = 'tertiary';
+      if (startIndex === -1) {
+        break;
       }
 
-      name = name.replace(/-/g, ' ');
+      const endIndex = source.indexOf('*/\n', startIndex + '/**\n'.length);
 
-      markdown += ` <badge${type !== undefined ? ` type="${type}"` : ''}>${name}</badge>`;
-    }
+      if (endIndex === -1) {
+        throwError(
+          `Couldn't handle a JSDoc comment (issue: 'Comment terminator is missing', file: '${sourceFile}')`
+        );
+      }
 
-    let headerId: string | undefined;
-    const kebabName = kebabCase(entry.name);
+      let jsDocComment = source.slice(startIndex + '/**\n'.length, endIndex);
 
-    if (entry.types.includes('class')) {
-      headerId = `${kebabName}-class`;
-    } else if (entry.types.includes('constructor')) {
-      headerId = 'constructor';
-    } else if (entry.types.includes('class-method') && entry.types.includes('instance-method')) {
-      headerId = `${kebabName}-dual-method`;
-    } else if (entry.types.includes('class-method')) {
-      headerId = `${kebabName}-class-method`;
-    } else if (entry.types.includes('instance-method')) {
-      headerId = `${kebabName}-instance-method`;
-    }
+      jsDocComment = jsDocComment
+        .split('\n')
+        .map((jsDocLine) => {
+          jsDocLine = jsDocLine.trimLeft();
 
-    if (headerId !== undefined) {
-      markdown += ` {#${headerId}}`;
-    }
+          if (jsDocLine === '*') {
+            jsDocLine = '';
+          } else if (jsDocLine.startsWith('* ')) {
+            jsDocLine = jsDocLine.slice('* '.length);
+          }
 
-    markdown += `\n`;
-    markdown += `\n`;
+          return jsDocLine;
+        })
+        .join('\n');
 
-    markdown += `${entry.description}\n`;
+      sourceIndex = endIndex + '*/\n'.length;
 
-    if (entry.alias !== undefined) {
-      markdown += `\n`;
-      markdown += `**Alias:**\n`;
-      markdown += `\n`;
-      markdown += `\`${entry.alias}()\`\n`;
-    }
+      const entry = handleJSDocComment({jsDocComment, source, sourceIndex, context});
 
-    if (entry.params.length > 0) {
-      markdown += `\n`;
-      markdown += `**Parameters:**\n`;
-      markdown += `\n`;
+      const entryIsSimilar = isEqual(omit(entry, 'types'), omit(previousEntry, 'types'));
 
-      for (const param of entry.params) {
-        markdown += `* \`${param.name}\`: ${param.description}\n`;
+      if (entryIsSimilar) {
+        previousEntry!.types.push(...entry.types);
+      } else {
+        entries.push(entry);
+        previousEntry = entry;
       }
     }
 
-    if (entry.return !== undefined) {
-      markdown += `\n`;
-      markdown += `**Returns:**\n`;
-      markdown += `\n`;
-      markdown += `${entry.return}\n`;
-    }
+    for (const entry of entries) {
+      let markdown = '';
 
-    if (entry.example !== undefined) {
-      markdown += `\n`;
-      markdown += `**Example:**\n`;
-      markdown += `\n`;
-      markdown += `${entry.example}`;
-    }
+      if (chapterMarkdown !== '') {
+        markdown += `\n`;
+      }
 
-    chapterMarkdown += markdown;
+      if (entry.category !== undefined && entry.category !== previousCategory) {
+        markdown += `#### ${entry.category}\n\n`;
+        previousCategory = entry.category;
+      }
+
+      markdown += entry.types.includes('class') ? '### ' : '##### ';
+
+      if (
+        entry.types.includes('constructor') ||
+        entry.types.includes('class-method') ||
+        entry.types.includes('instance-method') ||
+        entry.types.includes('function') ||
+        entry.types.includes('decorator')
+      ) {
+        let name = entry.name;
+
+        if (entry.types.includes('decorator')) {
+          name = `@${name}`;
+        }
+
+        markdown += `\`${name}(${formatFunctionParams(entry.params)})\``;
+      } else {
+        markdown += entry.name;
+      }
+
+      for (let name of entry.types) {
+        let type: string | undefined;
+
+        if (name === 'class') {
+          type = 'primary';
+        } else if (name === 'constructor' || name === 'class-method') {
+          type = 'secondary';
+        } else if (name === 'instance-method') {
+          type = 'secondary-outline';
+        } else if (name === 'function') {
+          type = 'tertiary-outline';
+        } else if (name === 'decorator') {
+          type = 'tertiary';
+        } else if (name === 'async' || name === 'possibly-async') {
+          type = 'outline';
+        }
+
+        name = name.replace(/-/g, ' ');
+
+        markdown += ` <badge${type !== undefined ? ` type="${type}"` : ''}>${name}</badge>`;
+      }
+
+      let headerId: string | undefined;
+      const kebabName = kebabCase(entry.name);
+
+      if (entry.types.includes('class')) {
+        headerId = `${kebabName}-class`;
+      } else if (entry.types.includes('constructor')) {
+        headerId = 'constructor';
+      } else if (entry.types.includes('class-method') && entry.types.includes('instance-method')) {
+        headerId = `${kebabName}-dual-method`;
+      } else if (entry.types.includes('class-method')) {
+        headerId = `${kebabName}-class-method`;
+      } else if (entry.types.includes('instance-method')) {
+        headerId = `${kebabName}-instance-method`;
+      } else if (entry.types.includes('function')) {
+        headerId = `${kebabName}-function`;
+      } else if (entry.types.includes('decorator')) {
+        headerId = `${kebabName}-decorator`;
+      }
+
+      if (headerId !== undefined) {
+        markdown += ` {#${headerId}}`;
+      }
+
+      markdown += `\n`;
+      markdown += `\n`;
+
+      markdown += `${entry.description}\n`;
+
+      if (entry.alias !== undefined) {
+        markdown += `\n`;
+        markdown += `**Alias:**\n`;
+        markdown += `\n`;
+        markdown += `\`${entry.alias}()\`\n`;
+      }
+
+      if (entry.params.length > 0) {
+        markdown += `\n`;
+        markdown += `**Parameters:**\n`;
+        markdown += `\n`;
+
+        for (const param of entry.params) {
+          markdown += `* \`${param.name}\`: ${param.description}\n`;
+        }
+      }
+
+      if (entry.return !== undefined) {
+        markdown += `\n`;
+        markdown += `**Returns:**\n`;
+        markdown += `\n`;
+        markdown += `${entry.return}\n`;
+      }
+
+      if (entry.example !== undefined) {
+        markdown += `\n`;
+        markdown += `**Example:**\n`;
+        markdown += `\n`;
+        markdown += `${entry.example}`;
+      }
+
+      markdown = markdown.replace(/﹫/g, '@');
+
+      chapterMarkdown += markdown;
+    }
   }
 
   outputFileSync(destinationFile, chapterMarkdown);
@@ -267,7 +289,6 @@ function handleJSDocComment({
   context: Context;
 }) {
   const entry: Entry = {
-    level: -1,
     name: '???',
     types: [],
     description: '',
@@ -298,6 +319,8 @@ function handleJSDocComment({
 
   entry.description = entry.description.trim();
 
+  entry.types = Array.from(new Set(entry.types)); // Deduplicate types
+
   return entry;
 }
 
@@ -317,43 +340,52 @@ function handleSourceLine({
   let matches = sourceLine.match(/^export class (\w+)/);
 
   if (matches !== null) {
-    entry.level = 1;
     entry.name = matches[1];
     entry.types.push('class');
     context.className = entry.name;
     return;
   }
 
-  matches = sourceLine.match(/^constructor\(/);
+  if (context.className !== undefined) {
+    matches = sourceLine.match(/^constructor\(/);
 
-  if (matches !== null) {
-    if (context.className === undefined) {
-      `Couldn't handle a constructor in source code line (issue: 'There is no current class', file: '${
-        context.sourceFile
-      }', line: ${JSON.stringify(sourceLine)}, jsDocComment: ${JSON.stringify(jsDocComment)})`;
+    if (matches !== null) {
+      entry.name = `new ${context.className}`;
+      entry.types.push('constructor');
+      return;
     }
 
-    entry.level = 3;
-    entry.name = `new ${context.className}`;
-    entry.types.push('constructor');
-    return;
+    matches = sourceLine.match(/^static (?:get )?(async )?(\w+)/);
+
+    if (matches !== null) {
+      entry.name = matches[2];
+      entry.types.push('class-method');
+      if (matches[1]) {
+        entry.types.push('async');
+      }
+      return;
+    }
+
+    matches = sourceLine.match(/^(async )?(\w+)/);
+
+    if (matches !== null) {
+      entry.name = matches[2];
+      entry.types.push('instance-method');
+      if (matches[1]) {
+        entry.types.push('async');
+      }
+      return;
+    }
   }
 
-  matches = sourceLine.match(/^static (?:get )?(\w+)/);
+  matches = sourceLine.match(/^export (async )?function (\w+)/);
 
   if (matches !== null) {
-    entry.level = 3;
-    entry.name = matches[1];
-    entry.types.push('class-method');
-    return;
-  }
-
-  matches = sourceLine.match(/^(\w+)/);
-
-  if (matches !== null) {
-    entry.level = 3;
-    entry.name = matches[1];
-    entry.types.push('instance-method');
+    entry.name = matches[2];
+    entry.types.push('function');
+    if (matches[1]) {
+      entry.types.push('async');
+    }
     return;
   }
 
@@ -393,31 +425,41 @@ function handleJSDocSection({
 
     if (tag === '@alias') {
       handleAliasTag({entry, content});
-
       return newJSDocIndex;
     }
 
     if (tag === '@param') {
       handleParamTag({entry, content, context});
-
       return newJSDocIndex;
     }
 
     if (tag === '@returns') {
       handleReturnsTag({entry, content});
-
       return newJSDocIndex;
     }
 
     if (tag === '@example') {
       newJSDocIndex = handleExampleTag({entry, jsDocComment, jsDocIndex: newJSDocIndex, context});
+      return newJSDocIndex;
+    }
 
+    if (tag === '@decorator') {
+      handleDecoratorTag({entry});
+      return newJSDocIndex;
+    }
+
+    if (tag === '@async') {
+      handleAsyncTag({entry});
+      return newJSDocIndex;
+    }
+
+    if (tag === '@possiblyasync') {
+      handlePossiblyAsyncTag({entry});
       return newJSDocIndex;
     }
 
     if (tag === '@category') {
       handleCategoryTag({entry, content});
-
       return newJSDocIndex;
     }
 
@@ -509,8 +551,6 @@ function handleExampleTag({
 
   let example = jsDocComment.slice(jsDocIndex, newJSDocIndex);
 
-  example = example.replace(/﹫/g, '@');
-
   if (entry.example === undefined) {
     entry.example = example;
   } else {
@@ -518,6 +558,19 @@ function handleExampleTag({
   }
 
   return newJSDocIndex;
+}
+
+function handleDecoratorTag({entry}: {entry: Entry}) {
+  entry.types = entry.types.filter((type) => type !== 'function');
+  entry.types.unshift('decorator');
+}
+
+function handleAsyncTag({entry}: {entry: Entry}) {
+  entry.types.push('async');
+}
+
+function handlePossiblyAsyncTag({entry}: {entry: Entry}) {
+  entry.types.push('possibly-async');
 }
 
 function handleCategoryTag({entry, content}: {entry: Entry; content: string}) {
