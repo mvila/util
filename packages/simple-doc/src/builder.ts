@@ -91,8 +91,7 @@ type Parameter = {
 };
 
 function generateChapter(sourceFiles: string[], destinationFile: string) {
-  let chapterMarkdown = '';
-  let previousCategory: string | undefined;
+  let markdownByCategories: {[category: string]: string} = {};
 
   for (const sourceFile of sourceFiles) {
     if (!fs.existsSync(sourceFile)) {
@@ -155,15 +154,6 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
 
     for (const entry of entries) {
       let markdown = '';
-
-      if (chapterMarkdown !== '') {
-        markdown += `\n`;
-      }
-
-      if (entry.category !== undefined && entry.category !== previousCategory) {
-        markdown += `#### ${entry.category}\n\n`;
-        previousCategory = entry.category;
-      }
 
       markdown += entry.types.includes('class') ? '### ' : '##### ';
 
@@ -268,8 +258,30 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
 
       markdown = markdown.replace(/﹫/g, '@');
 
-      chapterMarkdown += markdown;
+      const category = entry.category || '';
+
+      if (markdownByCategories[category] === undefined) {
+        markdownByCategories[category] = '';
+      } else {
+        markdownByCategories[category] += '\n';
+      }
+
+      markdownByCategories[category] += markdown;
     }
+  }
+
+  let chapterMarkdown = '';
+
+  for (const [category, markdown] of Object.entries(markdownByCategories)) {
+    if (category !== '') {
+      if (chapterMarkdown !== '') {
+        chapterMarkdown += '\n';
+      }
+
+      chapterMarkdown += `#### ${category}\n\n`;
+    }
+
+    chapterMarkdown += markdown;
   }
 
   outputFileSync(destinationFile, chapterMarkdown);

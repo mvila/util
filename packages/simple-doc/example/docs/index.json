@@ -21,6 +21,7 @@
           "file": "reference/component.md",
           "source": [
             "../packages/component/src/component.ts",
+            "../packages/component/src/cloning.ts",
             "../packages/component/src/decorators.ts"
           ]
         },
