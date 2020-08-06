@@ -171,6 +171,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         }
 
         markdown += `\`${name}(${formatFunctionParams(entry.params)})\``;
+      } else if (entry.types.includes('type')) {
+        markdown += `\`${entry.name}\``;
       } else {
         markdown += entry.name;
       }
@@ -188,6 +190,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
           type = 'tertiary-outline';
         } else if (name === 'decorator') {
           type = 'tertiary';
+        } else if (name === 'type') {
+          type = 'primary-outline';
         } else if (name === 'async' || name === 'possibly-async') {
           type = 'outline';
         }
@@ -214,6 +218,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         headerId = `${kebabName}-function`;
       } else if (entry.types.includes('decorator')) {
         headerId = `${kebabName}-decorator`;
+      } else if (entry.types.includes('type')) {
+        headerId = `${kebabName}-type`;
       }
 
       if (headerId !== undefined) {
@@ -301,7 +307,7 @@ function handleJSDocComment({
   context: Context;
 }) {
   const entry: Entry = {
-    name: '???',
+    name: '',
     types: [],
     description: '',
     alias: undefined,
@@ -321,13 +327,21 @@ function handleJSDocComment({
 
   const sourceLine = source.slice(sourceIndex, lineTerminatorIndex);
 
-  handleSourceLine({entry, sourceLine, jsDocComment, context});
+  handleSourceLine({entry, sourceLine, context});
 
   let jsDocIndex = 0;
 
   do {
     jsDocIndex = handleJSDocSection({entry, jsDocComment, jsDocIndex, context});
   } while (jsDocIndex !== -1);
+
+  if (entry.name === '') {
+    throwError(
+      `Couldn't handle a JSDoc comment (issue: 'Unable to detect the name of an entry', file: '${
+        context.sourceFile
+      }', jsDocComment: ${JSON.stringify(jsDocComment)})`
+    );
+  }
 
   entry.description = entry.description.trim();
 
@@ -339,12 +353,10 @@ function handleJSDocComment({
 function handleSourceLine({
   entry,
   sourceLine,
-  jsDocComment,
   context
 }: {
   entry: Entry;
   sourceLine: string;
-  jsDocComment: string;
   context: Context;
 }) {
   sourceLine = sourceLine.trimLeft();
@@ -400,12 +412,6 @@ function handleSourceLine({
     }
     return;
   }
-
-  throwError(
-    `Couldn't handle a source code line (issue: 'Unable to detect a definition', file: '${
-      context.sourceFile
-    }', line: ${JSON.stringify(sourceLine)}, jsDocComment: ${JSON.stringify(jsDocComment)})`
-  );
 }
 
 function handleJSDocSection({
@@ -457,6 +463,11 @@ function handleJSDocSection({
 
     if (tag === '@decorator') {
       handleDecoratorTag({entry});
+      return newJSDocIndex;
+    }
+
+    if (tag === '@typedef') {
+      handleTypeDefTag({entry, content});
       return newJSDocIndex;
     }
 
@@ -575,6 +586,11 @@ function handleExampleTag({
 function handleDecoratorTag({entry}: {entry: Entry}) {
   entry.types = entry.types.filter((type) => type !== 'function');
   entry.types.unshift('decorator');
+}
+
+function handleTypeDefTag({entry, content}: {entry: Entry; content: string}) {
+  entry.name = content;
+  entry.types.push('type');
 }
 
 function handleAsyncTag({entry}: {entry: Entry}) {
