@@ -3,6 +3,7 @@ import path from 'path';
 import {readJsonSync, outputJsonSync, outputFileSync, copySync, removeSync} from 'fs-extra';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
+import set from 'lodash/set';
 import kebabCase from 'lodash/kebabCase';
 
 import {logMessage, throwError} from './util';
@@ -242,10 +243,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         markdown += `\n`;
         markdown += `**Parameters:**\n`;
         markdown += `\n`;
-
-        for (const param of entry.params) {
-          markdown += `* \`${param.name}\`: ${param.description}\n`;
-        }
+        markdown += formatParams(entry.params);
       }
 
       if (entry.return !== undefined) {
@@ -633,4 +631,33 @@ function formatFunctionParams(params: Parameter[]) {
     .join(', ');
 
   return formattedParams;
+}
+
+type ParametersObject = {[name: string]: string | ParametersObject};
+
+function formatParams(params: Parameter[]) {
+  const paramsObject: ParametersObject = {};
+
+  for (const {name, description} of params) {
+    set(paramsObject, name, description);
+  }
+
+  return _formatParams(paramsObject, 0);
+}
+
+function _formatParams(paramsObject: ParametersObject, level: number) {
+  let markdown = '';
+
+  for (const [name, value] of Object.entries(paramsObject)) {
+    const indent = '  '.repeat(level);
+
+    if (typeof value === 'object') {
+      markdown += `${indent}* \`${name}\`:\n`;
+      markdown += _formatParams(value, level + 1);
+    } else {
+      markdown += `${indent}* \`${name}\`: ${value}\n`;
+    }
+  }
+
+  return markdown;
 }
