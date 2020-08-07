@@ -368,6 +368,17 @@ function handleSourceLine({
     return;
   }
 
+  matches = sourceLine.match(/^export (async )?function (\w+)/);
+
+  if (matches !== null) {
+    entry.name = matches[2];
+    entry.types.push('function');
+    if (matches[1]) {
+      entry.types.push('async');
+    }
+    return;
+  }
+
   if (context.className !== undefined) {
     matches = sourceLine.match(/^constructor\(/);
 
@@ -398,17 +409,6 @@ function handleSourceLine({
       }
       return;
     }
-  }
-
-  matches = sourceLine.match(/^export (async )?function (\w+)/);
-
-  if (matches !== null) {
-    entry.name = matches[2];
-    entry.types.push('function');
-    if (matches[1]) {
-      entry.types.push('async');
-    }
-    return;
   }
 }
 
