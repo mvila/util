@@ -464,6 +464,11 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
+    if (tag === '@instancemethod') {
+      handleInstanceMethodTag({entry, content});
+      return newJSDocIndex;
+    }
+
     if (tag === '@typedef') {
       handleTypeDefTag({entry, content});
       return newJSDocIndex;
@@ -584,6 +589,11 @@ function handleExampleTag({
 function handleDecoratorTag({entry}: {entry: Entry}) {
   entry.types = entry.types.filter((type) => type !== 'function');
   entry.types.unshift('decorator');
+}
+
+function handleInstanceMethodTag({entry, content}: {entry: Entry; content: string}) {
+  entry.name = content;
+  entry.types.push('instance-method');
 }
 
 function handleTypeDefTag({entry, content}: {entry: Entry; content: string}) {
