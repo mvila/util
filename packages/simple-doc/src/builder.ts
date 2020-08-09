@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import {readJsonSync, outputJsonSync, outputFileSync, copySync, removeSync} from 'fs-extra';
 import isEqual from 'lodash/isEqual';
+import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import set from 'lodash/set';
 import kebabCase from 'lodash/kebabCase';
@@ -156,7 +157,9 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
     for (const entry of entries) {
       let markdown = '';
 
-      markdown += entry.types.includes('class') ? '### ' : '##### ';
+      const isFirstEntry = isEmpty(markdownByCategories);
+
+      markdown += isFirstEntry ? '### ' : '##### ';
 
       if (
         entry.types.includes('constructor') ||
@@ -172,7 +175,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         }
 
         markdown += `\`${name}(${formatFunctionParams(entry.params)})\``;
-      } else if (entry.types.includes('type')) {
+      } else if (entry.types.includes('type') && !isFirstEntry) {
         markdown += `\`${entry.name}\``;
       } else {
         markdown += entry.name;
