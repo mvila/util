@@ -462,6 +462,11 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
+    if (tag === '@examplelink') {
+      handleExampleLinkTag({entry, content});
+      return newJSDocIndex;
+    }
+
     if (tag === '@decorator') {
       handleDecoratorTag({entry});
       return newJSDocIndex;
@@ -587,6 +592,10 @@ function handleExampleTag({
   }
 
   return newJSDocIndex;
+}
+
+function handleExampleLinkTag({entry, content}: {entry: Entry; content: string}) {
+  entry.example = content;
 }
 
 function handleDecoratorTag({entry}: {entry: Entry}) {
