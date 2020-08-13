@@ -184,7 +184,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
       for (let name of entry.types) {
         let type: string | undefined;
 
-        if (name === 'class') {
+        if (name === 'module' || name === 'class') {
           type = 'primary';
         } else if (name === 'constructor' || name === 'class-method') {
           type = 'secondary';
@@ -208,7 +208,9 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
       let headerId: string | undefined;
       const kebabName = kebabCase(entry.name);
 
-      if (entry.types.includes('class')) {
+      if (entry.types.includes('module')) {
+        headerId = `${kebabName}-module`;
+      } else if (entry.types.includes('class')) {
         headerId = `${kebabName}-class`;
       } else if (entry.types.includes('constructor')) {
         headerId = 'constructor';
@@ -442,6 +444,11 @@ function handleJSDocSection({
     const tag = matches[1];
     const content = jsDocLine.slice(tag.length).trimLeft();
 
+    if (tag === '@module') {
+      handleModuleTag({entry, content});
+      return newJSDocIndex;
+    }
+
     if (tag === '@alias') {
       handleAliasTag({entry, content});
       return newJSDocIndex;
@@ -507,6 +514,11 @@ function handleJSDocSection({
   entry.description += jsDocLine + '\n';
 
   return newJSDocIndex;
+}
+
+function handleModuleTag({entry, content}: {entry: Entry; content: string}) {
+  entry.name = content;
+  entry.types.push('module');
 }
 
 function handleAliasTag({entry, content}: {entry: Entry; content: string}) {
