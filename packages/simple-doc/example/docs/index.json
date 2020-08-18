@@ -42,6 +42,12 @@
           "slug": "attribute",
           "file": "reference/attribute.md",
           "source": "../packages/component/src/attribute.ts"
+        },
+        {
+          "title": "Storable()",
+          "slug": "storable",
+          "file": "reference/storable.md",
+          "source": "../packages/storable/src/storable.ts"
         }
       ]
     }

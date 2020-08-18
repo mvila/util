@@ -175,6 +175,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         }
 
         markdown += `\`${name}(${formatFunctionParams(entry.params)})\``;
+      } else if (entry.types.includes('mixin')) {
+        markdown += `${entry.name}()`;
       } else if (entry.types.includes('type') && !isFirstEntry) {
         markdown += `\`${entry.name}\``;
       } else {
@@ -184,7 +186,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
       for (let name of entry.types) {
         let type: string | undefined;
 
-        if (name === 'module' || name === 'class') {
+        if (name === 'module' || name === 'class' || name === 'mixin') {
           type = 'primary';
         } else if (name === 'constructor' || name === 'class-method') {
           type = 'secondary';
@@ -212,6 +214,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         headerId = `${kebabName}-module`;
       } else if (entry.types.includes('class')) {
         headerId = `${kebabName}-class`;
+      } else if (entry.types.includes('mixin')) {
+        headerId = `${kebabName}-mixin`;
       } else if (entry.types.includes('constructor')) {
         headerId = 'constructor';
       } else if (entry.types.includes('class-method') && entry.types.includes('instance-method')) {
@@ -484,6 +488,11 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
+    if (tag === '@mixin') {
+      handleMixinTag({entry});
+      return newJSDocIndex;
+    }
+
     if (tag === '@typedef') {
       handleTypeDefTag({entry, content});
       return newJSDocIndex;
@@ -618,6 +627,11 @@ function handleDecoratorTag({entry}: {entry: Entry}) {
 function handleInstanceMethodTag({entry, content}: {entry: Entry; content: string}) {
   entry.name = content;
   entry.types.push('instance-method');
+}
+
+function handleMixinTag({entry}: {entry: Entry}) {
+  entry.types = entry.types.filter((type) => type !== 'function');
+  entry.types.unshift('mixin');
 }
 
 function handleTypeDefTag({entry, content}: {entry: Entry; content: string}) {
