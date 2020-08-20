@@ -397,7 +397,7 @@ function handleSourceLine({
       return;
     }
 
-    matches = sourceLine.match(/^static (?:get )?(async )?(\w+)/);
+    matches = sourceLine.match(/^(?:@\w+\(\) )?static (?:get )?(async )?(\w+)/);
 
     if (matches !== null) {
       entry.name = matches[2];
@@ -408,7 +408,7 @@ function handleSourceLine({
       return;
     }
 
-    matches = sourceLine.match(/^(async )?(\w+)/);
+    matches = sourceLine.match(/^(?:@\w+\(\) )?(async )?(\w+)/);
 
     if (matches !== null) {
       entry.name = matches[2];
@@ -489,7 +489,7 @@ function handleJSDocSection({
     }
 
     if (tag === '@mixin') {
-      handleMixinTag({entry});
+      handleMixinTag({entry, context});
       return newJSDocIndex;
     }
 
@@ -629,9 +629,10 @@ function handleInstanceMethodTag({entry, content}: {entry: Entry; content: strin
   entry.types.push('instance-method');
 }
 
-function handleMixinTag({entry}: {entry: Entry}) {
+function handleMixinTag({entry, context}: {entry: Entry; context: Context}) {
   entry.types = entry.types.filter((type) => type !== 'function');
   entry.types.unshift('mixin');
+  context.className = entry.name;
 }
 
 function handleTypeDefTag({entry, content}: {entry: Entry; content: string}) {

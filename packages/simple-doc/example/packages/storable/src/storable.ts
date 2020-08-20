@@ -66,6 +66,18 @@ export function Storable<T extends Constructor<typeof Component>>(Base: T) {
 
     static __store: AbstractStore | undefined;
 
+    /**
+     * Returns the store in which the component is registered. If the component is not registered in a store, an error is thrown.
+     *
+     * @returns A [`Store`](https://liaison.dev/docs/v1/reference/store) instance.
+     *
+     * @example
+     * ```
+     * Movie.getStore(); // => store
+     * ```
+     *
+     * @category Store Registration
+     */
     static getStore() {
       const store = this.__store;
 
@@ -822,6 +834,47 @@ export function Storable<T extends Constructor<typeof Component>>(Base: T) {
       return this;
     }
 
+    /**
+     * Finds some storable component instances matching the specified query in the store, and load all or some of their attributes (and possibly, load some of their related components as well).
+     *
+     * > This method uses the [`load()`](https://liaison.dev/docs/v1/reference/storable#load-instance-method) method under the hood to load the components' attributes. So if you want to expose the [`find()`](https://liaison.dev/docs/v1/reference/storable#find-class-method) method to the frontend, you will typically have to expose the [`load()`](https://liaison.dev/docs/v1/reference/storable#load-instance-method) method as well.
+     *
+     * @param [query] A [`Query`](https://liaison.dev/docs/v1/reference/storable#query-type) object specifying the criteria to be used when selecting the components from the store (default: `{}`, which means that any component can be selected).
+     * @param [attributeSelector] An [`AttributeSelector`](https://liaison.dev/docs/v1/reference/attribute-selector) specifying the attributes to be loaded (default: `true`, which means that all the attributes will be loaded).
+     * @param [options.sort] A plain object specifying how the found components should be sorted (default: `undefined`). The shape of the object should be `{[name]: direction}` where `name` is the name of an attribute, and `direction` is the string `'asc'` or `'desc'` representing the sort direction (ascending or descending).
+     * @param [options.skip] A number specifying how many components should be skipped from the found components (default: `0`).
+     * @param [options.limit] A number specifying the maximum number of components that should be returned (default: `undefined`).
+     * @param [options.reload] A boolean specifying whether a component that has already been loaded should be loaded again from the store (default: `false`). Most of the time you will leave this option off to take advantage of the cache.
+     *
+     * @returns An array of [`StorableComponent`](https://liaison.dev/docs/v1/reference/storable#storable-component-class) instances.
+     *
+     * @example
+     * ```
+     * // Find all the movies
+     * await Movie.find();
+     *
+     * // Find the Japanese movies
+     * await Movie.find({country: 'Japan'});
+     *
+     * // Find the Japanese drama movies
+     * await Movie.find({country: 'Japan', genre: 'drama'});
+     *
+     * // Find the Tarantino's movies
+     * const tarantino = await Director.get({slug: 'quentin-tarantino'})
+     * await Movie.find({director: tarantino});
+     *
+     * // Find the movies released after 2010
+     * await Movie.find({year: {$greaterThan: 2010}});
+     *
+     * // Find the top 30 movies
+     * await Movie.find({}, true, {sort: {rating: 'desc'}, limit: 30});
+     *
+     * // Find the next top 30 movies
+     * await Movie.find({}, true, {sort: {rating: 'desc'}, skip: 30, limit: 30});
+     * ```
+     *
+     * @category Storage Operations
+     */
     @method() static async find<T extends typeof StorableComponent>(
       this: T,
       query: Query = {},
