@@ -368,7 +368,7 @@ function handleSourceLine({
 }) {
   sourceLine = sourceLine.trimLeft();
 
-  let matches = sourceLine.match(/^export class (\w+)/);
+  let matches = sourceLine.match(/^(?:export )?class (\w+)/);
 
   if (matches !== null) {
     entry.name = matches[1];
@@ -448,6 +448,11 @@ function handleJSDocSection({
     const tag = matches[1];
     const content = jsDocLine.slice(tag.length).trimLeft();
 
+    if (tag === '@name') {
+      handleNameTag({entry, content, context});
+      return newJSDocIndex;
+    }
+
     if (tag === '@module') {
       handleModuleTag({entry, content});
       return newJSDocIndex;
@@ -480,6 +485,11 @@ function handleJSDocSection({
 
     if (tag === '@decorator') {
       handleDecoratorTag({entry});
+      return newJSDocIndex;
+    }
+
+    if (tag === '@constructor') {
+      handleConstructorTag({entry, context});
       return newJSDocIndex;
     }
 
@@ -523,6 +533,22 @@ function handleJSDocSection({
   entry.description += jsDocLine + '\n';
 
   return newJSDocIndex;
+}
+
+function handleNameTag({
+  entry,
+  content,
+  context
+}: {
+  entry: Entry;
+  content: string;
+  context: Context;
+}) {
+  entry.name = content;
+
+  if (entry.types.includes('class')) {
+    context.className = content;
+  }
 }
 
 function handleModuleTag({entry, content}: {entry: Entry; content: string}) {
@@ -622,6 +648,14 @@ function handleExampleLinkTag({entry, content}: {entry: Entry; content: string})
 function handleDecoratorTag({entry}: {entry: Entry}) {
   entry.types = entry.types.filter((type) => type !== 'function');
   entry.types.unshift('decorator');
+}
+
+function handleConstructorTag({entry, context}: {entry: Entry; context: Context}) {
+  if (context.className !== undefined) {
+    entry.name = `new ${context.className}`;
+  }
+
+  entry.types.push('constructor');
 }
 
 function handleMethodTag({entry, content}: {entry: Entry; content: string}) {
