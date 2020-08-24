@@ -483,8 +483,8 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
-    if (tag === '@instancemethod') {
-      handleInstanceMethodTag({entry, content});
+    if (tag === '@method') {
+      handleMethodTag({entry, content});
       return newJSDocIndex;
     }
 
@@ -624,7 +624,7 @@ function handleDecoratorTag({entry}: {entry: Entry}) {
   entry.types.unshift('decorator');
 }
 
-function handleInstanceMethodTag({entry, content}: {entry: Entry; content: string}) {
+function handleMethodTag({entry, content}: {entry: Entry; content: string}) {
   entry.name = content;
   entry.types.push('instance-method');
 }
