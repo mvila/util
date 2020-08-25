@@ -368,7 +368,7 @@ function handleSourceLine({
 }) {
   sourceLine = sourceLine.trimLeft();
 
-  let matches = sourceLine.match(/^(?:export )?class (\w+)/);
+  let matches = sourceLine.match(/^(?:export )?(?:abstract )?class (\w+)/);
 
   if (matches !== null) {
     entry.name = matches[1];
