@@ -157,87 +157,92 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
     for (const entry of entries) {
       let markdown = '';
 
-      const isFirstEntry = isEmpty(markdownByCategories);
+      if (entry.name !== '') {
+        const isFirstEntry = isEmpty(markdownByCategories);
 
-      markdown += isFirstEntry ? '### ' : '##### ';
+        markdown += isFirstEntry ? '### ' : '##### ';
 
-      if (
-        entry.types.includes('constructor') ||
-        entry.types.includes('class-method') ||
-        entry.types.includes('instance-method') ||
-        entry.types.includes('function') ||
-        entry.types.includes('decorator')
-      ) {
-        let name = entry.name;
+        if (
+          entry.types.includes('constructor') ||
+          entry.types.includes('class-method') ||
+          entry.types.includes('instance-method') ||
+          entry.types.includes('function') ||
+          entry.types.includes('decorator')
+        ) {
+          let name = entry.name;
 
-        if (entry.types.includes('decorator')) {
-          name = `@${name}`;
+          if (entry.types.includes('decorator')) {
+            name = `@${name}`;
+          }
+
+          markdown += `\`${name}(${formatFunctionParams(entry.params)})\``;
+        } else if (entry.types.includes('mixin')) {
+          markdown += `${entry.name}()`;
+        } else if (entry.types.includes('type') && !isFirstEntry) {
+          markdown += `\`${entry.name}\``;
+        } else {
+          markdown += entry.name;
         }
 
-        markdown += `\`${name}(${formatFunctionParams(entry.params)})\``;
-      } else if (entry.types.includes('mixin')) {
-        markdown += `${entry.name}()`;
-      } else if (entry.types.includes('type') && !isFirstEntry) {
-        markdown += `\`${entry.name}\``;
-      } else {
-        markdown += entry.name;
-      }
+        for (let name of entry.types) {
+          let type: string | undefined;
 
-      for (let name of entry.types) {
-        let type: string | undefined;
+          if (name === 'module' || name === 'class' || name === 'mixin') {
+            type = 'primary';
+          } else if (name === 'constructor' || name === 'class-method') {
+            type = 'secondary';
+          } else if (name === 'instance-method') {
+            type = 'secondary-outline';
+          } else if (name === 'function') {
+            type = 'tertiary-outline';
+          } else if (name === 'decorator') {
+            type = 'tertiary';
+          } else if (name === 'type') {
+            type = 'primary-outline';
+          } else if (name === 'async' || name === 'possibly-async') {
+            type = 'outline';
+          }
 
-        if (name === 'module' || name === 'class' || name === 'mixin') {
-          type = 'primary';
-        } else if (name === 'constructor' || name === 'class-method') {
-          type = 'secondary';
-        } else if (name === 'instance-method') {
-          type = 'secondary-outline';
-        } else if (name === 'function') {
-          type = 'tertiary-outline';
-        } else if (name === 'decorator') {
-          type = 'tertiary';
-        } else if (name === 'type') {
-          type = 'primary-outline';
-        } else if (name === 'async' || name === 'possibly-async') {
-          type = 'outline';
+          name = name.replace(/-/g, ' ');
+
+          markdown += ` <badge${type !== undefined ? ` type="${type}"` : ''}>${name}</badge>`;
         }
 
-        name = name.replace(/-/g, ' ');
+        let headerId: string | undefined;
+        const kebabName = kebabCase(entry.name);
 
-        markdown += ` <badge${type !== undefined ? ` type="${type}"` : ''}>${name}</badge>`;
+        if (entry.types.includes('module')) {
+          headerId = `${kebabName}-module`;
+        } else if (entry.types.includes('class')) {
+          headerId = `${kebabName}-class`;
+        } else if (entry.types.includes('mixin')) {
+          headerId = `${kebabName}-mixin`;
+        } else if (entry.types.includes('constructor')) {
+          headerId = 'constructor';
+        } else if (
+          entry.types.includes('class-method') &&
+          entry.types.includes('instance-method')
+        ) {
+          headerId = `${kebabName}-dual-method`;
+        } else if (entry.types.includes('class-method')) {
+          headerId = `${kebabName}-class-method`;
+        } else if (entry.types.includes('instance-method')) {
+          headerId = `${kebabName}-instance-method`;
+        } else if (entry.types.includes('function')) {
+          headerId = `${kebabName}-function`;
+        } else if (entry.types.includes('decorator')) {
+          headerId = `${kebabName}-decorator`;
+        } else if (entry.types.includes('type')) {
+          headerId = `${kebabName}-type`;
+        }
+
+        if (headerId !== undefined) {
+          markdown += ` {#${headerId}}`;
+        }
+
+        markdown += `\n`;
+        markdown += `\n`;
       }
-
-      let headerId: string | undefined;
-      const kebabName = kebabCase(entry.name);
-
-      if (entry.types.includes('module')) {
-        headerId = `${kebabName}-module`;
-      } else if (entry.types.includes('class')) {
-        headerId = `${kebabName}-class`;
-      } else if (entry.types.includes('mixin')) {
-        headerId = `${kebabName}-mixin`;
-      } else if (entry.types.includes('constructor')) {
-        headerId = 'constructor';
-      } else if (entry.types.includes('class-method') && entry.types.includes('instance-method')) {
-        headerId = `${kebabName}-dual-method`;
-      } else if (entry.types.includes('class-method')) {
-        headerId = `${kebabName}-class-method`;
-      } else if (entry.types.includes('instance-method')) {
-        headerId = `${kebabName}-instance-method`;
-      } else if (entry.types.includes('function')) {
-        headerId = `${kebabName}-function`;
-      } else if (entry.types.includes('decorator')) {
-        headerId = `${kebabName}-decorator`;
-      } else if (entry.types.includes('type')) {
-        headerId = `${kebabName}-type`;
-      }
-
-      if (headerId !== undefined) {
-        markdown += ` {#${headerId}}`;
-      }
-
-      markdown += `\n`;
-      markdown += `\n`;
 
       markdown += `${entry.description}\n`;
 
@@ -342,17 +347,9 @@ function handleJSDocComment({
     jsDocIndex = handleJSDocSection({entry, jsDocComment, jsDocIndex, context});
   } while (jsDocIndex !== -1);
 
-  if (entry.name === '') {
-    throwError(
-      `Couldn't handle a JSDoc comment (issue: 'Unable to detect the name of an entry', file: '${
-        context.sourceFile
-      }', jsDocComment: ${JSON.stringify(jsDocComment)})`
-    );
-  }
-
   entry.description = entry.description.trim();
 
-  entry.types = Array.from(new Set(entry.types)); // Deduplicate types
+  entry.types = Array.from(new Set(entry.types)); // Dedupe types
 
   return entry;
 }
