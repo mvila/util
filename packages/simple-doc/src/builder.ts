@@ -167,7 +167,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
           entry.types.includes('class-method') ||
           entry.types.includes('instance-method') ||
           entry.types.includes('function') ||
-          entry.types.includes('decorator')
+          entry.types.includes('decorator') ||
+          entry.types.includes('react-hook')
         ) {
           let name = entry.name;
 
@@ -193,7 +194,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
             type = 'secondary';
           } else if (name === 'instance-method') {
             type = 'secondary-outline';
-          } else if (name === 'function') {
+          } else if (name === 'function' || name === 'react-hook') {
             type = 'tertiary-outline';
           } else if (name === 'decorator') {
             type = 'tertiary';
@@ -232,6 +233,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
           headerId = `${kebabName}-function`;
         } else if (entry.types.includes('decorator')) {
           headerId = `${kebabName}-decorator`;
+        } else if (entry.types.includes('react-hook')) {
+          headerId = `${kebabName}-react-hook`;
         } else if (entry.types.includes('type')) {
           headerId = `${kebabName}-type`;
         }
@@ -485,6 +488,11 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
+    if (tag === '@reacthook') {
+      handleReactHookTag({entry});
+      return newJSDocIndex;
+    }
+
     if (tag === '@constructor') {
       handleConstructorTag({entry, context});
       return newJSDocIndex;
@@ -645,6 +653,11 @@ function handleExampleLinkTag({entry, content}: {entry: Entry; content: string})
 function handleDecoratorTag({entry}: {entry: Entry}) {
   entry.types = entry.types.filter((type) => type !== 'function');
   entry.types.unshift('decorator');
+}
+
+function handleReactHookTag({entry}: {entry: Entry}) {
+  entry.types = entry.types.filter((type) => type !== 'function');
+  entry.types.unshift('react-hook');
 }
 
 function handleConstructorTag({entry, context}: {entry: Entry; context: Context}) {
