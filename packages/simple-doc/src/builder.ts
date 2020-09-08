@@ -79,11 +79,13 @@ type Entry = {
   name: string;
   types: string[];
   description: string;
+  details: string;
   alias: string | undefined;
   params: Parameter[];
   return: string | undefined;
   example: string | undefined;
   category: string | undefined;
+  currentTag: string | undefined;
 };
 
 type Parameter = {
@@ -247,7 +249,9 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         markdown += `\n`;
       }
 
-      markdown += `${entry.description}\n`;
+      if (entry.description !== '') {
+        markdown += `${entry.description}\n`;
+      }
 
       if (entry.alias !== undefined) {
         markdown += `\n`;
@@ -268,6 +272,10 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
         markdown += `**Returns:**\n`;
         markdown += `\n`;
         markdown += `${entry.return}\n`;
+      }
+
+      if (entry.details !== '') {
+        markdown += `\n${entry.details}\n`;
       }
 
       if (entry.example !== undefined) {
@@ -325,11 +333,13 @@ function handleJSDocComment({
     name: '',
     types: [],
     description: '',
+    details: '',
     alias: undefined,
     params: [],
     return: undefined,
     example: undefined,
-    category: undefined
+    category: undefined,
+    currentTag: undefined
   };
 
   const lineTerminatorIndex = source.indexOf('\n', sourceIndex);
@@ -351,6 +361,7 @@ function handleJSDocComment({
   } while (jsDocIndex !== -1);
 
   entry.description = entry.description.trim();
+  entry.details = entry.details.trim();
 
   entry.types = Array.from(new Set(entry.types)); // Dedupe types
 
@@ -448,6 +459,8 @@ function handleJSDocSection({
     const tag = matches[1];
     const content = jsDocLine.slice(tag.length).trimLeft();
 
+    entry.currentTag = tag;
+
     if (tag === '@name') {
       handleNameTag({entry, content, context});
       return newJSDocIndex;
@@ -528,6 +541,10 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
+    if (tag === '@details') {
+      return newJSDocIndex;
+    }
+
     throwError(
       `Couldn't handle a JSDoc section (issue: "The tag '${tag}' is not supported", file: '${
         context.sourceFile
@@ -535,7 +552,11 @@ function handleJSDocSection({
     );
   }
 
-  entry.description += jsDocLine + '\n';
+  if (entry.currentTag === '@details') {
+    entry.details += jsDocLine + '\n';
+  } else {
+    entry.description += jsDocLine + '\n';
+  }
 
   return newJSDocIndex;
 }
