@@ -149,7 +149,31 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
       const entryIsSimilar = isEqual(omit(entry, 'types'), omit(previousEntry, 'types'));
 
       if (entryIsSimilar) {
-        previousEntry!.types.push(...entry.types);
+        const mergedTypes = new Set<string>();
+
+        while (true) {
+          let typeHasBeenAdded = false;
+
+          let type = previousEntry!.types.shift();
+
+          if (type !== undefined) {
+            mergedTypes.add(type);
+            typeHasBeenAdded = true;
+          }
+
+          type = entry.types.shift();
+
+          if (type !== undefined) {
+            mergedTypes.add(type);
+            typeHasBeenAdded = true;
+          }
+
+          if (!typeHasBeenAdded) {
+            break;
+          }
+        }
+
+        previousEntry!.types = Array.from(mergedTypes);
       } else {
         entries.push(entry);
         previousEntry = entry;
