@@ -2,6 +2,6 @@
   "name": "example",
   "version": "0.1.0",
   "dependencies": {
-    "core-helpers": "^0.1.22"
+    "core-helpers": "^1.0.0"
   }
 }
