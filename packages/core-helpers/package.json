@@ -1,6 +1,6 @@
 {
   "name": "core-helpers",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A small collection of utility functions",
   "keywords": [
     "util",
@@ -30,13 +30,13 @@
   },
   "dependencies": {
     "lodash": "^4.17.20",
-    "tslib": "^1.13.0",
+    "tslib": "^2.0.3",
     "type-fest": "^0.13.1"
   },
   "devDependencies": {
-    "@mvila/dev-tools": "^1.0.24",
+    "@mvila/dev-tools": "^1.0.26",
     "@mvila/tsconfig": "^1.0.4",
     "@types/jest": "^25.2.3",
-    "@types/lodash": "^4.14.161"
+    "@types/lodash": "^4.14.162"
   }
 }

@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "lodash": "^4.17.15",
-    "tslib": "^1.13.0"
+    "tslib": "^2.0.3"
   },
   "devDependencies": {
     "@mvila/tsconfig": "^1.0.4",

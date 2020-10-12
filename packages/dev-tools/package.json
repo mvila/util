@@ -1,7 +1,7 @@
 {
   "name": "@mvila/dev-tools",
   "displayName": "dev-tools",
-  "version": "1.0.24",
+  "version": "1.0.26",
   "description": "Simple development tools used by mvila's projects",
   "keywords": [
     "npm",
@@ -27,30 +27,30 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.10.1",
-    "@babel/plugin-proposal-decorators": "^7.10.1",
-    "@babel/preset-env": "^7.10.2",
-    "cross-fetch": "^3.0.4",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-decorators": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "cross-fetch": "^3.0.6",
     "fs-extra": "^9.0.1",
-    "hasha": "^5.2.0",
-    "jest": "^25.5.4",
+    "hasha": "^5.2.2",
+    "jest": "^26.5.3",
     "jest-watch-typeahead": "^0.5.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "npm-linker": "^1.0.13",
     "rimraf": "^3.0.2",
-    "sade": "^1.7.3",
+    "sade": "^1.7.4",
     "semver": "^7.3.2",
-    "ts-jest": "^25.5.1",
-    "tslib": "^1.13.0",
-    "typescript": "^3.9.5"
+    "ts-jest": "^26.4.1",
+    "tslib": "^2.0.3",
+    "typescript": "^4.0.3"
   },
   "devDependencies": {
     "@mvila/tsconfig": "^1.0.4",
-    "@types/fs-extra": "^9.0.1",
-    "@types/lodash": "^4.14.155",
-    "@types/node": "^13.13.12",
+    "@types/fs-extra": "^9.0.2",
+    "@types/lodash": "^4.14.162",
+    "@types/node": "^14.11.8",
     "@types/rimraf": "^3.0.0",
-    "@types/sade": "^1.7.1",
-    "@types/semver": "^7.2.0"
+    "@types/sade": "^1.7.2",
+    "@types/semver": "^7.3.4"
   }
 }
