@@ -59,7 +59,7 @@ describe('Class', () => {
       "Expected a class or an instance, but received a value of type 'undefined'"
     );
     expect(() => ensureClass(null)).toThrow(
-      "Expected a class or an instance, but received a value of type 'null'"
+      "Expected a class or an instance, but received a value of type 'object'"
     );
     expect(() => ensureClass('abc')).toThrow(
       "Expected a class or an instance, but received a value of type 'string'"
@@ -83,7 +83,7 @@ describe('Class', () => {
       "Expected a class or an instance, but received a value of type 'undefined'"
     );
     expect(() => ensureInstance(null)).toThrow(
-      "Expected a class or an instance, but received a value of type 'null'"
+      "Expected a class or an instance, but received a value of type 'object'"
     );
     expect(() => ensureInstance('abc')).toThrow(
       "Expected a class or an instance, but received a value of type 'string'"

@@ -1,7 +1,6 @@
 import {Class} from 'type-fest';
 
 import {hasOwnProperty, isObjectLike} from './object';
-import {getTypeOf} from './utilities';
 
 // Helps to implement the "modern" mixin pattern
 // https://mariusschulz.com/blog/mixin-classes-in-typescript
@@ -51,7 +50,7 @@ export function ensureClass(value: any): ClassLike {
   }
 
   throw new Error(
-    `Expected a class or an instance, but received a value of type '${getTypeOf(value)}'`
+    `Expected a class or an instance, but received a value of type '${typeof value}'`
   );
 }
 
@@ -65,32 +64,32 @@ export function ensureInstance(value: any): InstanceLike {
   }
 
   throw new Error(
-    `Expected a class or an instance, but received a value of type '${getTypeOf(value)}'`
+    `Expected a class or an instance, but received a value of type '${typeof value}'`
   );
 }
 
 export function assertIsClass(value: any): asserts value is ClassLike {
   if (!isClass(value)) {
-    throw new Error(`Expected a class, but received a value of type '${getTypeOf(value)}'`);
+    throw new Error(`Expected a class, but received a value of type '${typeof value}'`);
   }
 }
 
 export function assertIsES2015Class(value: any): asserts value is Class {
   if (!isES2015Class(value)) {
-    throw new Error(`Expected an ES2015 class, but received a value of type '${getTypeOf(value)}'`);
+    throw new Error(`Expected an ES2015 class, but received a value of type '${typeof value}'`);
   }
 }
 
 export function assertIsInstance(value: any): asserts value is InstanceLike {
   if (!isInstance(value)) {
-    throw new Error(`Expected an instance, but received a value of type '${getTypeOf(value)}'`);
+    throw new Error(`Expected an instance, but received a value of type '${typeof value}'`);
   }
 }
 
 export function assertIsES2015Instance(value: any): asserts value is Instance {
   if (!isES2015Instance(value)) {
     throw new Error(
-      `Expected an instance of an ES2015 class, but received a value of type '${getTypeOf(value)}'`
+      `Expected an instance of an ES2015 class, but received a value of type '${typeof value}'`
     );
   }
 }

@@ -1,5 +1,3 @@
-import {getTypeOf} from './utilities';
-
 export type SyncFunction<Args extends any[] = any[], Result = any> = (...args: Args) => Result;
 export type AsyncFunction<Args extends any[] = any[], Result = any> = (
   ...args: Args
@@ -36,6 +34,6 @@ export function getFunctionName(
 
 export function assertIsFunction(value: Function): asserts value is Function {
   if (typeof value !== 'function') {
-    throw new Error(`Expected a function, but received a value of type '${getTypeOf(value)}'`);
+    throw new Error(`Expected a function, but received a value of type '${typeof value}'`);
   }
 }

@@ -1,8 +1,6 @@
 import lodashIsPlainObject from 'lodash/isPlainObject';
 import lodashIsObjectLike from 'lodash/isObjectLike';
 
-import {getTypeOf} from './utilities';
-
 export type PropertyKey = string | number | symbol;
 
 export function hasOwnProperty(object: Object, key: PropertyKey) {
@@ -62,13 +60,13 @@ export function isPlainObject(value: any): value is PlainObject {
 
 export function assertIsObjectLike(value: any): asserts value is ObjectLike {
   if (!isObjectLike(value)) {
-    throw new Error(`Expected an object-like, but received a value of type '${getTypeOf(value)}'`);
+    throw new Error(`Expected an object-like, but received a value of type '${typeof value}'`);
   }
 }
 
 export function assertIsPlainObject(value: any): asserts value is PlainObject {
   if (!isPlainObject(value)) {
-    throw new Error(`Expected a plain object, but received a value of type '${getTypeOf(value)}'`);
+    throw new Error(`Expected a plain object, but received a value of type '${typeof value}'`);
   }
 }
 
