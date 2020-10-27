@@ -577,7 +577,8 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
             OriginKeepaliveTimeout: 30
           },
           ConnectionAttempts: 3,
-          ConnectionTimeout: 10
+          ConnectionTimeout: 10,
+          OriginShield: {Enabled: false}
         }
       ]
     };
@@ -595,6 +596,7 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
         QueryStringCacheKeys: {Quantity: 0, Items: []}
       },
       TrustedSigners: {Enabled: false, Quantity: 0, Items: []},
+      TrustedKeyGroups: {Enabled: false, Quantity: 0, Items: []},
       ViewerProtocolPolicy: 'redirect-to-https',
       AllowedMethods: {
         Quantity: 2,
