@@ -22,10 +22,10 @@ const DEFAULT_LAMBDA_TIMEOUT = 10;
 
 const DEFAULT_API_GATEWAY_CORS_CONFIGURATION = {
   AllowOrigins: ['*'],
-  AllowHeaders: ['*'],
+  AllowHeaders: ['content-type'],
   AllowMethods: ['GET', 'POST', 'OPTIONS'],
   ExposeHeaders: ['*'],
-  MaxAge: 900 // 15 minutes
+  MaxAge: 3600 // 1 hour
 };
 
 const DEFAULT_IAM_LAMBDA_ROLE_NAME = `${MANAGER_IDENTIFIER}-function-lambda-role-v1`;
