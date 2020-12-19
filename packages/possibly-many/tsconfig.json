@@ -1,5 +1,6 @@
 {
   "extends": "@mvila/tsconfig",
+  "include": ["src/**/*"],
   "compilerOptions": {
     "strict": false
   }

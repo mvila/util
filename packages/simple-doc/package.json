@@ -1,7 +1,7 @@
 {
   "name": "@mvila/simple-doc",
   "displayName": "simple-doc",
-  "version": "0.1.117",
+  "version": "0.1.118",
   "description": "Simple documentation tool",
   "keywords": [
     "documentation",
@@ -29,7 +29,7 @@
     "update": "dev-tools update:dependencies"
   },
   "dependencies": {
-    "core-helpers": "^1.0.2",
+    "core-helpers": "^1.0.3",
     "fs-extra": "^9.0.1",
     "lodash": "^4.17.20",
     "sade": "^1.7.4",
@@ -37,10 +37,10 @@
   },
   "devDependencies": {
     "@mvila/dev-tools": "^1.0.26",
-    "@mvila/tsconfig": "^1.0.4",
-    "@types/fs-extra": "^9.0.2",
-    "@types/lodash": "^4.14.162",
-    "@types/node": "^14.11.8",
+    "@mvila/tsconfig": "^1.0.5",
+    "@types/fs-extra": "^9.0.5",
+    "@types/lodash": "^4.14.165",
+    "@types/node": "^14.14.14",
     "@types/sade": "^1.7.2"
   }
 }
