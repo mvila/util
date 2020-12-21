@@ -1,6 +1,6 @@
 {
   "name": "possibly-async",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Helps implementing functions that are synchronous or asynchronous depending of their parameters",
   "keywords": [
     "sync",

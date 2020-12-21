@@ -281,11 +281,19 @@ describe('possibly-async', () => {
     ta.assert<ta.Equal<typeof r5, PromiseLike<boolean>>>();
     await expect(r5).resolves.toBe(true);
   });
+
+  test('possiblyAsync.all()', async () => {
+    const r1 = possiblyAsync.all([1, 2, 3]);
+    expect(r1).toEqual([1, 2, 3]);
+
+    const r2 = possiblyAsync.all([1, makePromise(2), 3]);
+    await expect(r2).resolves.toEqual([1, 2, 3]);
+  });
 });
 
-function makePromise<V>(value?: 'ERROR'): PromiseLike<never>;
-function makePromise<V>(value?: V): PromiseLike<V>;
-function makePromise<V>(value?: V): PromiseLike<V> {
+function makePromise<V>(value: 'ERROR'): PromiseLike<never>;
+function makePromise<V>(value: V): PromiseLike<V>;
+function makePromise(value: any): any {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (typeof value === 'string' && value === 'ERROR') {

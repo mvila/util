@@ -191,6 +191,12 @@ export namespace possiblyAsync {
     );
   }
 
+  export function all(valuesOrPromises: unknown[]) {
+    return valuesOrPromises.some((valueOrPromise) => isPromise(valueOrPromise))
+      ? Promise.all(valuesOrPromises)
+      : valuesOrPromises;
+  }
+
   export const breakSymbol = Symbol('BREAK');
 
   function isBreaking(value: any) {
