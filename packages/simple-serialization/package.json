@@ -1,6 +1,6 @@
 {
   "name": "simple-serialization",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Simple serialization library that can serialize/deserialize anything including dates, undefined values, and function's attributes",
   "keywords": [
     "serialize",
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "core-helpers": "^1.0.3",
-    "possibly-async": "^1.0.3",
+    "possibly-async": "^1.0.4",
     "tslib": "^2.0.3"
   },
   "devDependencies": {
