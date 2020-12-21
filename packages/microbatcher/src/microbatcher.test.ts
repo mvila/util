@@ -1,25 +1,24 @@
-import {Microbatcher, Invocation} from './microbatcher';
+import {Microbatcher, Operation} from './microbatcher';
 
-interface TestInvocation extends Invocation {
-  operation: 'increment';
+interface TestOperation extends Operation {
   params: [number];
   resolve: (value: number) => void;
 }
 
 describe('Microbatcher', () => {
   test('Batching', async () => {
-    const run = jest.fn(async (invocations: TestInvocation[]) => {
+    const run = jest.fn(async (operations: TestOperation[]) => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      for (const invocation of invocations) {
-        invocation.resolve(invocation.params[0] + 1);
+      for (const operation of operations) {
+        operation.resolve(operation.params[0] + 1);
       }
     });
 
-    const batcher = new Microbatcher<TestInvocation>(run);
+    const batcher = new Microbatcher<TestOperation>(run);
 
     const increment = jest.fn(async (number) => {
-      return await batcher.batch('increment', number);
+      return await batcher.batch(number);
     });
 
     const promise1 = increment(1);
