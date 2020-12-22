@@ -2,22 +2,11 @@
 
 import sade from 'sade';
 
-import {
-  linkLocalPackages,
-  buildTSLibrary,
-  testTSLibrary,
-  publishPackage,
-  updateDependencies
-} from './commands';
+import {buildTSLibrary, testTSLibrary, publishPackage, updateDependencies} from './commands';
 import {programName, programVersion, logMessage, logError} from './util';
 
 async function main() {
   const program = sade(programName).version(programVersion);
-
-  program
-    .command('link:local-packages')
-    .describe('Link dependencies to local development packages')
-    .action(linkLocalPackages);
 
   program
     .command('build:ts-library')
