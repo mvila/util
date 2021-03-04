@@ -7,7 +7,7 @@ import {readJsonSync} from 'fs-extra';
 import getStream from 'get-stream';
 import hasha from 'hasha';
 
-const CONFIG_FILE_NAME = '.npm-linker.json';
+const CONFIG_FILE_NAME = '.npm-dev-registry.json';
 const PORT = 3333;
 const NPM_REGISTRY = 'https://registry.npmjs.org';
 
