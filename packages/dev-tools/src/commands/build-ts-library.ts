@@ -14,6 +14,8 @@ export async function buildTSLibrary() {
   const directory = process.cwd();
   const distDirectory = join(directory, 'dist');
 
+  const pkg = loadPackage(directory);
+
   const previousDistChecksum = getDirectoryChecksum(distDirectory);
 
   rimraf.sync('dist');
@@ -23,13 +25,16 @@ export async function buildTSLibrary() {
     defaultExclude: ['src/**/*.test.ts', 'src/**/*.fixture.ts']
   };
 
-  await compileTS({...options, module: 'CommonJS', outDir: 'dist/node-cjs'});
-  await compileTS({...options, module: 'ES2015', outDir: 'dist/node-esm'});
+  if (pkg.type === 'module') {
+    await compileTS({...options, module: 'ES2020', outDir: 'dist'});
+  } else {
+    await compileTS({...options, module: 'CommonJS', outDir: 'dist/node-cjs'});
+    await compileTS({...options, module: 'ES2015', outDir: 'dist/node-esm'});
+  }
 
   const newDistChecksum = getDirectoryChecksum(distDirectory);
 
   if (newDistChecksum !== previousDistChecksum) {
-    const pkg = loadPackage(directory);
     pkg.version = semver.inc(pkg.version, 'patch');
     savePackage(directory, pkg);
     logMessage(`Version of '${pkg.name}' bumped to '${pkg.version}'`);
