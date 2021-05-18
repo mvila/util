@@ -9,7 +9,9 @@ import kebabCase from 'lodash/kebabCase';
 
 import {logMessage, throwError} from './util';
 
-export function buildDocumentation(indexFile: string, destinationDirectory: string) {
+export function buildDocumentation(sourceDirectory: string, destinationDirectory: string) {
+  const indexFile = path.join(sourceDirectory, 'index.json');
+
   if (!fs.existsSync(indexFile)) {
     throwError(`The documentation index file is missing (file: '${indexFile}')`);
   }
@@ -21,9 +23,7 @@ export function buildDocumentation(indexFile: string, destinationDirectory: stri
     )}'...`
   );
 
-  const sourceDirectory = path.dirname(indexFile);
-
-  const contents = readJsonSync(indexFile);
+  const inputContents = readJsonSync(indexFile);
 
   if (fs.existsSync(destinationDirectory)) {
     if (!fs.existsSync(path.join(destinationDirectory, 'index.json'))) {
@@ -38,22 +38,39 @@ export function buildDocumentation(indexFile: string, destinationDirectory: stri
     removeSync(destinationDirectory);
   }
 
-  outputJsonSync(path.join(destinationDirectory, 'index.json'), contents, {spaces: 2});
+  const outputContents: any = {books: []};
 
-  for (const book of contents.books) {
-    for (const chapter of book.chapters) {
-      const destinationFile = path.resolve(destinationDirectory, chapter.file);
+  for (const inputBook of inputContents.books) {
+    const outputBook: any = {title: inputBook.title, slug: inputBook.slug, chapters: []};
 
-      if (chapter.source !== undefined) {
-        const sources: string[] = Array.isArray(chapter.source) ? chapter.source : [chapter.source];
+    for (const inputChapter of inputBook.chapters) {
+      const outputChapter: any = {
+        title: inputChapter.title,
+        slug: inputChapter.slug,
+        file: inputChapter.file,
+        category: inputChapter.category
+      };
+
+      const destinationFile = path.resolve(destinationDirectory, inputChapter.file);
+
+      if (inputChapter.source !== undefined) {
+        const sources: string[] = Array.isArray(inputChapter.source)
+          ? inputChapter.source
+          : [inputChapter.source];
         const sourceFiles = sources.map((source) => path.resolve(sourceDirectory, source));
         generateChapter(sourceFiles, destinationFile);
       } else {
-        const sourceFile = path.resolve(sourceDirectory, chapter.file);
+        const sourceFile = path.resolve(sourceDirectory, inputChapter.file);
         copyChapter(sourceFile, destinationFile);
       }
+
+      outputBook.chapters.push(outputChapter);
     }
+
+    outputContents.books.push(outputBook);
   }
+
+  outputJsonSync(path.join(destinationDirectory, 'index.json'), outputContents, {spaces: 2});
 
   logMessage(
     `Documentation successfully built in '${path.relative(process.cwd(), destinationDirectory)}'`

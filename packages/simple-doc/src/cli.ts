@@ -8,7 +8,10 @@ import {programName, programVersion, logError} from './util';
 async function main() {
   const program = sade(programName).version(programVersion);
 
-  program.command('build <src> <dest>', '', {default: true}).action(build);
+  program
+    .command('build <src> <dest>', '', {default: true})
+    .option('--freeze', 'Generate files marked as immutable')
+    .action(build);
 
   await program.parse(process.argv);
 }

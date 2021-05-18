@@ -1,7 +1,7 @@
 {
   "name": "@mvila/simple-doc",
   "displayName": "simple-doc",
-  "version": "0.1.118",
+  "version": "0.1.130",
   "description": "Simple documentation tool",
   "keywords": [
     "documentation",
@@ -28,8 +28,10 @@
     "update": "dev-tools update:dependencies"
   },
   "dependencies": {
+    "base-x": "^3.0.8",
     "core-helpers": "^1.0.3",
     "fs-extra": "^9.0.1",
+    "hasha": "^5.2.2",
     "lodash": "^4.17.20",
     "sade": "^1.7.4",
     "tslib": "^2.0.3"
