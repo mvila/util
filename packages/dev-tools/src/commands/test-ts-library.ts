@@ -15,7 +15,7 @@ export async function testTSLibrary({
   const rootDir = 'src';
 
   const babelConfig = {
-    presets: [[require.resolve('@babel/preset-env'), {targets: {node: '10'}, loose: true}]],
+    presets: [[require.resolve('@babel/preset-env'), {targets: {node: '12'}, loose: true}]],
     plugins: [
       [require.resolve('@babel/plugin-proposal-decorators'), {legacy: true}],
       [require.resolve('@babel/plugin-proposal-class-properties'), {loose: true}]
@@ -26,7 +26,7 @@ export async function testTSLibrary({
     rootDir,
     testMatch: ['<rootDir>/**/*.(spec|test).{ts,tsx,js,jsx}'],
     transform: {
-      '.(ts|tsx)$': require.resolve('ts-jest/dist'),
+      '.(ts|tsx)$': require.resolve('ts-jest'),
       '.(js|jsx)$': [require.resolve('babel-jest'), babelConfig]
     },
     transformIgnorePatterns: ['[/\\\\](node_modules|dist)[/\\\\].+\\.js$'],
