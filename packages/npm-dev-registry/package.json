@@ -18,7 +18,8 @@
     "build": "dev-tools build:ts-library",
     "prepare": "npm run build",
     "publish:package": "dev-tools publish:package",
-    "update": "dev-tools update:dependencies"
+    "update": "dev-tools update:dependencies",
+    "start": "node ./dist/node-cjs"
   },
   "dependencies": {
     "core-helpers": "^1.0.3",
