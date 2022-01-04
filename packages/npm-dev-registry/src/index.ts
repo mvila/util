@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import logger from 'koa-logger';
+import proxy from 'koa-proxies';
 import tar from 'tar';
 import {resolve, join, dirname} from 'path';
 import {existsSync, readdirSync, lstatSync} from 'fs';
@@ -28,7 +29,7 @@ const NPM_REGISTRY = 'https://registry.npmjs.org';
     })
   );
 
-  koa.use(async function (ctx) {
+  koa.use(async function (ctx, next) {
     if (ctx.method === 'GET') {
       const {name, tarballURL} = parseURL(ctx.url);
 
@@ -60,10 +61,10 @@ const NPM_REGISTRY = 'https://registry.npmjs.org';
       }
     }
 
-    // TODO: Forward the request instead of doing a redirect
-    // Currently, publishing a package doesn't work
-    ctx.redirect(`${NPM_REGISTRY}/${ctx.request.url}`);
+    await next();
   });
+
+  koa.use(proxy('/', {target: NPM_REGISTRY, changeOrigin: true, logs: true}));
 
   koa.listen(PORT, () => {
     console.log(`Server started (port: ${PORT})`);

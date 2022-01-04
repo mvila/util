@@ -1,6 +1,6 @@
 {
   "name": "npm-dev-registry",
-  "version": "0.1.14",
+  "version": "0.1.18",
   "description": "Serves your local packages for development",
   "keywords": [],
   "author": "Manuel Vila <hi@mvila.me>",
@@ -28,6 +28,7 @@
     "hasha": "^5.2.2",
     "koa": "^2.13.0",
     "koa-logger": "^3.2.1",
+    "koa-proxies": "^0.12.1",
     "lodash": "^4.17.20",
     "tar": "^6.0.5",
     "tslib": "^2.0.3"
