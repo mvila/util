@@ -40,6 +40,7 @@ const NPM_REGISTRY = 'https://registry.npmjs.org';
 
         if (tarballURL !== undefined) {
           ctx.body = localPackage.tarball;
+
           return;
         }
 
@@ -57,8 +58,14 @@ const NPM_REGISTRY = 'https://registry.npmjs.org';
             }
           }
         };
+
         return;
       }
+
+      // OPTIMIZATION: Redirecting is faster than proxying
+      ctx.redirect(`${NPM_REGISTRY}/${ctx.request.url}`);
+
+      return;
     }
 
     await next();

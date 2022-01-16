@@ -1,6 +1,6 @@
 {
   "name": "npm-dev-registry",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Serves your local packages for development",
   "keywords": [],
   "author": "Manuel Vila <hi@mvila.me>",
