@@ -1,0 +1,49 @@
+{
+  "name": "transformable",
+  "version": "1.0.0",
+  "description": "Transforms plain objects to class instances and vice versa",
+  "keywords": [
+    "class",
+    "instance",
+    "plain",
+    "object",
+    "transformer",
+    "transformation",
+    "transformable",
+    "serializer",
+    "serialization",
+    "serializable",
+    "deserializer",
+    "deserialization",
+    "deserializable",
+    "toPlain",
+    "fromPlain",
+    "json",
+    "stringify",
+    "toJSON",
+    "fromJSON"
+  ],
+  "author": "Manuel Vila <hi@mvila.me>",
+  "license": "MIT",
+  "repository": "https://github.com/mvila/util/tree/master/packages/transformable",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/node-cjs/index.js",
+  "module": "dist/node-esm/index.js",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "dev-tools build:ts-library",
+    "publish:package": "dev-tools publish:package",
+    "update": "dev-tools update:dependencies"
+  },
+  "dependencies": {
+    "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@mvila/dev-tools": "^1.0.30",
+    "@mvila/tsconfig": "^1.0.5"
+  }
+}
