@@ -27,3 +27,9 @@ export function TransformInstance(classProvider: () => Constructor) {
     output: (sourceInstance: Object) => instanceToPlain(sourceInstance)
   });
 }
+
+export function ExcludeOutput() {
+  return Transform({
+    output: (_sourceValue: unknown) => undefined
+  });
+}

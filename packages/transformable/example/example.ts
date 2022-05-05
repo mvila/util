@@ -1,4 +1,4 @@
-import {Transformable, TransformDate, TransformSet, TransformInstance} from '../src';
+import {Transformable, TransformDate, TransformSet, TransformInstance, ExcludeOutput} from '../src';
 
 /**
  * npx ts-node example/example.ts
@@ -6,6 +6,9 @@ import {Transformable, TransformDate, TransformSet, TransformInstance} from '../
 
 class User extends Transformable {
   email!: string;
+
+  @ExcludeOutput()
+  password!: string;
 
   @TransformInstance(() => Organization)
   organization!: Organization;
@@ -24,25 +27,32 @@ class Organization extends Transformable {
   createdOn!: Date;
 }
 
-const payloadPlain = {
+console.log('--- plainPayload ---\n');
+
+const plainPayload = {
   email: 'mvila@1place.io',
+  password: 'sEcReT',
   organization: {name: '1Place Inc', createdOn: '2022-05-02T17:15:12.087Z'},
   roles: ['viewer', 'editor'],
   createdOn: '2022-05-03T22:33:09.015Z'
 };
 
-console.log('=== console.log(payloadPlain) ===\n');
-console.log(payloadPlain);
+console.log(plainPayload);
 
-const userInstance = User.fromPlain(payloadPlain);
+console.log('\n--- plainPayload => userInstance ---\n');
 
-console.log('\n=== console.log(userInstance) ===\n');
+const userInstance = User.fromPlain(plainPayload);
+
 console.log(userInstance);
 
-const userPlain = userInstance.toPlain();
+console.log('\n--- userInstance => plainUser ---\n');
 
-console.log('\n=== console.log(userPlain) ===\n');
-console.log(userPlain);
+const plainUser = userInstance.toPlain();
 
-console.log('\n=== JSON.stringify(userPlain, undefined, 2) ===\n');
-console.log(JSON.stringify(userPlain, undefined, 2));
+console.log(plainUser);
+
+console.log('\n--- plainUser => stringifiedUser ---\n');
+
+const stringifiedUser = JSON.stringify(plainUser, undefined, 2);
+
+console.log(stringifiedUser);

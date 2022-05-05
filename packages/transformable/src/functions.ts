@@ -42,6 +42,10 @@ export function instanceToPlain(sourceInstance: Object) {
       if (transformer) {
         attributeValue = transformer(attributeValue);
       }
+
+      if (attributeValue === undefined) {
+        continue;
+      }
     }
 
     targetPlain[attributeName] = attributeValue;
