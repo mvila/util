@@ -4,7 +4,12 @@ import {Transformable, TransformDate, TransformSet, TransformInstance, ExcludeOu
  * npx ts-node example/example.ts
  */
 
-class User extends Transformable {
+class Base extends Transformable {
+  @TransformDate()
+  createdOn!: Date;
+}
+
+class User extends Base {
   email!: string;
 
   @ExcludeOutput()
@@ -15,16 +20,10 @@ class User extends Transformable {
 
   @TransformSet()
   roles!: Set<string>;
-
-  @TransformDate()
-  createdOn!: Date;
 }
 
-class Organization extends Transformable {
+class Organization extends Base {
   name!: string;
-
-  @TransformDate()
-  createdOn!: Date;
 }
 
 console.log('--- plainPayload ---\n');

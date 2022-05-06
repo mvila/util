@@ -1,6 +1,6 @@
 {
   "name": "transformable",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Transforms plain objects to class instances and vice versa",
   "keywords": [
     "class",

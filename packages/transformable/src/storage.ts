@@ -3,7 +3,21 @@ import type {AttributeTransformationMap, Transformation} from './types';
 const prototypeMap = new WeakMap<Object, AttributeTransformationMap>();
 
 export function getTransformation(prototype: Object, attributeName: string) {
-  return prototypeMap.get(prototype)?.get(attributeName);
+  while (true) {
+    const transformation = prototypeMap.get(prototype)?.get(attributeName);
+
+    if (transformation) {
+      return transformation;
+    }
+
+    const parentPrototype = Object.getPrototypeOf(prototype);
+
+    if (!parentPrototype) {
+      return undefined;
+    }
+
+    prototype = parentPrototype;
+  }
 }
 
 export function setTransformation(
