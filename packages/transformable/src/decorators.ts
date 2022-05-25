@@ -1,6 +1,8 @@
+import {Class} from 'type-fest';
+
 import {plainToInstance, instanceToPlain} from './functions';
 import {setTransformation} from './storage';
-import type {Transformation, Constructor} from './types';
+import type {Transformation} from './types';
 
 export function Transform(transformation: Transformation) {
   return function (targetPrototype: Object, attributeName: string) {
@@ -21,7 +23,7 @@ export function TransformSet() {
   });
 }
 
-export function TransformInstance(classProvider: () => Constructor) {
+export function TransformInstance(classProvider: () => Class<Object>) {
   return Transform({
     input: (sourcePlain: Object) => plainToInstance(sourcePlain, classProvider()),
     output: (sourceInstance: Object) => instanceToPlain(sourceInstance)

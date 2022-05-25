@@ -1,7 +1,8 @@
-import {getTransformation} from './storage';
-import type {Constructor} from './types';
+import {Class} from 'type-fest';
 
-export function plainToInstance<TargetClass extends Constructor>(
+import {getTransformation} from './storage';
+
+export function plainToInstance<TargetClass extends Class<Object>>(
   sourcePlain: Object,
   targetClass: TargetClass
 ) {
