@@ -30,6 +30,15 @@ export function TransformInstance(classProvider: () => Class<Object>) {
   });
 }
 
+export function TransformInstances(classProvider: () => Class<Object>) {
+  return Transform({
+    input: (sourcePlains: Object[]) =>
+      sourcePlains.map((sourcePlain) => plainToInstance(sourcePlain, classProvider())),
+    output: (sourceInstances: Object[]) =>
+      sourceInstances.map((sourceInstance) => instanceToPlain(sourceInstance))
+  });
+}
+
 export function ExcludeOutput() {
   return Transform({
     output: (_sourceValue: unknown) => undefined
