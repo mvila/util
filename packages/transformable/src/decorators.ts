@@ -23,19 +23,28 @@ export function TransformSet() {
   });
 }
 
-export function TransformInstance(classProvider: () => Class<Object>) {
+export function TransformInstance(
+  classProvider: () => Class<Object>,
+  {excludeOutput = false}: {excludeOutput?: boolean} = {}
+) {
   return Transform({
-    input: (sourcePlain: Object) => plainToInstance(sourcePlain, classProvider()),
-    output: (sourceInstance: Object) => instanceToPlain(sourceInstance)
+    input: (sourcePlain: Object, {source}) => plainToInstance(sourcePlain, classProvider(), source),
+    output: (sourceInstance: Object, {target}) =>
+      !excludeOutput ? instanceToPlain(sourceInstance, target) : undefined
   });
 }
 
-export function TransformInstances(classProvider: () => Class<Object>) {
+export function TransformInstances(
+  classProvider: () => Class<Object>,
+  {excludeOutput = false}: {excludeOutput?: boolean} = {}
+) {
   return Transform({
-    input: (sourcePlains: Object[]) =>
-      sourcePlains.map((sourcePlain) => plainToInstance(sourcePlain, classProvider())),
-    output: (sourceInstances: Object[]) =>
-      sourceInstances.map((sourceInstance) => instanceToPlain(sourceInstance))
+    input: (sourcePlains: Object[], {source}) =>
+      sourcePlains.map((sourcePlain) => plainToInstance(sourcePlain, classProvider(), source)),
+    output: (sourceInstances: Object[], {target}) =>
+      !excludeOutput
+        ? sourceInstances.map((sourceInstance) => instanceToPlain(sourceInstance, target))
+        : undefined
   });
 }
 

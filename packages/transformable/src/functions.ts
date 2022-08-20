@@ -4,7 +4,8 @@ import {getTransformation} from './storage';
 
 export function plainToInstance<TargetClass extends Class<Object>>(
   sourcePlain: Object,
-  targetClass: TargetClass
+  targetClass: TargetClass,
+  sourceContext?: string
 ) {
   const targetInstance: Record<string, any> = new targetClass();
   const targetPrototype = targetClass.prototype;
@@ -18,7 +19,7 @@ export function plainToInstance<TargetClass extends Class<Object>>(
       const transformer = getTransformation(targetPrototype, attributeName)?.input;
 
       if (transformer) {
-        attributeValue = transformer(attributeValue);
+        attributeValue = transformer(attributeValue, {source: sourceContext});
       }
     }
 
@@ -28,7 +29,7 @@ export function plainToInstance<TargetClass extends Class<Object>>(
   return targetInstance as InstanceType<TargetClass>;
 }
 
-export function instanceToPlain(sourceInstance: Object) {
+export function instanceToPlain(sourceInstance: Object, targetContext?: string) {
   const targetPlain: Record<string, any> = {};
   const sourcePrototype = Object.getPrototypeOf(sourceInstance);
 
@@ -41,7 +42,7 @@ export function instanceToPlain(sourceInstance: Object) {
       const transformer = getTransformation(sourcePrototype, attributeName)?.output;
 
       if (transformer) {
-        attributeValue = transformer(attributeValue);
+        attributeValue = transformer(attributeValue, {target: targetContext});
       }
 
       if (attributeValue === undefined) {
