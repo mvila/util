@@ -1,8 +1,9 @@
 import {existsSync} from 'fs';
 import {join} from 'path';
 import {readJsonSync, writeJsonSync} from 'fs-extra';
+import {execFileSync} from 'child_process';
 
-import {throwError} from './util';
+import {logMessage, throwError} from './util';
 
 export function loadPackage(directory: string) {
   const packageFile = join(directory, 'package.json');
@@ -25,6 +26,17 @@ export function loadPackage(directory: string) {
 export function savePackage(directory: string, packageJSON: object) {
   const packageFile = join(directory, 'package.json');
   writeJsonSync(packageFile, packageJSON, {spaces: 2});
+}
+
+export function bumpPackageVersion(directory: string) {
+  execFileSync('npm', ['version', '--no-git-tag-version patch'], {
+    cwd: directory,
+    stdio: 'inherit'
+  });
+
+  const bumpedPackage = loadPackage(directory);
+
+  logMessage(`Version of '${bumpedPackage.name}' bumped to '${bumpedPackage.version}'`);
 }
 
 export function parseVersionSpecifier(version: string) {

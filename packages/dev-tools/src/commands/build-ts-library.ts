@@ -4,11 +4,9 @@ import {readdirSync} from 'fs';
 import {existsSync} from 'fs-extra';
 import hasha from 'hasha';
 import sortBy from 'lodash/sortBy';
-import semver from 'semver';
 
 import {compileTS} from '../ts-compiler';
-import {loadPackage, savePackage} from '../npm-helpers';
-import {logMessage} from '../util';
+import {loadPackage, bumpPackageVersion} from '../npm-helpers';
 
 export async function buildTSLibrary() {
   const directory = process.cwd();
@@ -35,9 +33,7 @@ export async function buildTSLibrary() {
   const newDistChecksum = getDirectoryChecksum(distDirectory);
 
   if (newDistChecksum !== previousDistChecksum) {
-    pkg.version = semver.inc(pkg.version, 'patch');
-    savePackage(directory, pkg);
-    logMessage(`Version of '${pkg.name}' bumped to '${pkg.version}'`);
+    bumpPackageVersion(directory);
   }
 }
 

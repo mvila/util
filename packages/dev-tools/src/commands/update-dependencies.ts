@@ -1,25 +1,22 @@
 import {join} from 'path';
 import {execFileSync} from 'child_process';
-import semver from 'semver';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import {loadPackage, savePackage, parseVersionSpecifier} from '../npm-helpers';
+import {loadPackage, savePackage, bumpPackageVersion, parseVersionSpecifier} from '../npm-helpers';
 import {logMessage} from '../util';
 
 export function updateDependencies() {
   const directory = process.cwd();
   const currentPackage = loadPackage(directory);
 
-  execFileSync('npm', ['update', '--dev'], {stdio: 'inherit'});
+  execFileSync('npm', ['update', '--include=dev'], {stdio: 'inherit'});
   updatePackageWithActualDependencyVersions(directory);
 
   const updatedPackage = loadPackage(directory);
 
   if (!isEqual(currentPackage.dependencies, updatedPackage.dependencies)) {
-    updatedPackage.version = semver.inc(currentPackage.version, 'patch');
-    savePackage(directory, updatedPackage);
-    logMessage(`Version of '${currentPackage.name}' bumped to '${updatedPackage.version}'`);
+    bumpPackageVersion(directory);
   }
 }
 
