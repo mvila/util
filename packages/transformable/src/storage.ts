@@ -1,8 +1,8 @@
 import type {AttributeTransformationMap, Transformation} from './types';
 
-const prototypeMap = new WeakMap<Object, AttributeTransformationMap>();
-
 export function getTransformation(prototype: Object, attributeName: string) {
+  const prototypeMap = getPrototypeMap();
+
   while (true) {
     const transformation = prototypeMap.get(prototype)?.get(attributeName);
 
@@ -25,6 +25,8 @@ export function setTransformation(
   attributeName: string,
   transformation: Transformation
 ) {
+  const prototypeMap = getPrototypeMap();
+
   let attributeTransformationMap = prototypeMap.get(prototype);
 
   if (!attributeTransformationMap) {
@@ -33,4 +35,19 @@ export function setTransformation(
   }
 
   attributeTransformationMap.set(attributeName, transformation);
+}
+
+declare global {
+  var __transformablePrototypeMap: WeakMap<Object, AttributeTransformationMap>;
+}
+
+function getPrototypeMap() {
+  let prototypeMap = globalThis.__transformablePrototypeMap;
+
+  if (prototypeMap === undefined) {
+    prototypeMap = new WeakMap<Object, AttributeTransformationMap>();
+    globalThis.__transformablePrototypeMap = prototypeMap;
+  }
+
+  return prototypeMap;
 }
