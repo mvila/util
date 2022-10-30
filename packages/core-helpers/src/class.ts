@@ -20,7 +20,7 @@ export function isClass(value: any): value is ClassLike {
   return typeof value === 'function' && hasOwnProperty(value, 'prototype');
 }
 
-export function isES2015Class(value: any): value is Class {
+export function isES2015Class(value: any): value is Class<any> {
   return (
     typeof value === 'function' &&
     hasOwnProperty(value, 'prototype') &&
@@ -34,7 +34,7 @@ export function isInstance(value: any): value is InstanceLike {
   return isObjectLike(value) && isClass(value.constructor);
 }
 
-export type Instance = {constructor: Class};
+export type Instance = {constructor: Class<any>};
 
 export function isES2015Instance(value: any): value is Instance {
   return isObjectLike(value) && isES2015Class(value.constructor);
@@ -74,7 +74,7 @@ export function assertIsClass(value: any): asserts value is ClassLike {
   }
 }
 
-export function assertIsES2015Class(value: any): asserts value is Class {
+export function assertIsES2015Class(value: any): asserts value is Class<any> {
   if (!isES2015Class(value)) {
     throw new Error(`Expected an ES2015 class, but received a value of type '${typeof value}'`);
   }

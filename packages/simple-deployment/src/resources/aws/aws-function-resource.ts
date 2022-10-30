@@ -178,7 +178,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
           codeSHA256: config.CodeSha256!,
           tags: result.Tags!
         };
-      } catch (err) {
+      } catch (err: any) {
         if (err.code !== 'ResourceNotFoundException') {
           throw err;
         }
@@ -218,7 +218,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
           .promise();
 
         this._lambdaFunction = {arn: lambdaFunction.FunctionArn!};
-      } catch (err) {
+      } catch (err: any) {
         const roleMayNotBeReady = err.code === 'InvalidParameterValueException' && ++errors <= 10;
 
         if (!roleMayNotBeReady) {
@@ -482,7 +482,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
           .getRole({RoleName: this.getConfig().aws.lambda.executionRole})
           .promise();
         this._iamLambdaRole = {arn: result.Role.Arn};
-      } catch (err) {
+      } catch (err: any) {
         if (err.code !== 'NoSuchEntity') {
           throw err;
         }
@@ -634,7 +634,7 @@ export class AWSFunctionResource extends FunctionResource(AWSResource) {
             DomainName: config.domainName
           })
           .promise();
-      } catch (err) {
+      } catch (err: any) {
         if (err.code !== 'NotFoundException') {
           throw err;
         }

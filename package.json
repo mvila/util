@@ -1,6 +1,6 @@
 {
   "name": "@mvila/util",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "A collection of packages used by mvila's projects",
   "keywords": [],
@@ -9,8 +9,8 @@
   "repository": "https://github.com/mvila/util",
   "prettier": "@mvila/prettierrc",
   "devDependencies": {
-    "@mvila/prettierrc": "^1.1.0",
-    "lerna": "^3.22.1",
-    "prettier": "^2.1.2"
+    "@mvila/prettierrc": "^1.1.1",
+    "lerna": "^6.0.1",
+    "prettier": "^2.7.1"
   }
 }

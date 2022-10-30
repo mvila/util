@@ -161,7 +161,7 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
 
     try {
       return (await s3.getBucketTagging({Bucket: this.getS3BucketName()}).promise()).TagSet;
-    } catch (err) {
+    } catch (err: any) {
       if (err.code === 'NoSuchTagSet') {
         return [];
       }
@@ -331,7 +331,7 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
         .promise();
 
       return JSON.parse(result.Body as string);
-    } catch (err) {
+    } catch (err: any) {
       if (err.code === 'NoSuchKey') {
         return {};
       }
