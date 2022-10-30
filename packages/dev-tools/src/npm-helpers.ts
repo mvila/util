@@ -29,7 +29,7 @@ export function savePackage(directory: string, packageJSON: object) {
 }
 
 export function bumpPackageVersion(directory: string) {
-  execFileSync('npm', ['version', '--no-git-tag-version patch'], {
+  execFileSync('npm', ['version', '--no-git-tag-version', 'patch'], {
     cwd: directory,
     stdio: 'inherit'
   });

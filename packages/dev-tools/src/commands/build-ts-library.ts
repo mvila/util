@@ -1,7 +1,6 @@
 import {join} from 'path';
-import rimraf from 'rimraf';
 import {readdirSync} from 'fs';
-import {existsSync} from 'fs-extra';
+import {existsSync, removeSync} from 'fs-extra';
 import hasha from 'hasha';
 import sortBy from 'lodash/sortBy';
 
@@ -16,7 +15,7 @@ export async function buildTSLibrary() {
 
   const previousDistChecksum = getDirectoryChecksum(distDirectory);
 
-  rimraf.sync('dist');
+  removeSync(distDirectory);
 
   const options = {
     defaultInclude: ['src/**/*'],
