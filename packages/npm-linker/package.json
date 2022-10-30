@@ -24,7 +24,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "build": "dev-tools build:ts-library",
+    "build:deprecated": "dev-tools build:ts-library",
     "prepare": "npm run build"
   },
   "dependencies": {

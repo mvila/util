@@ -2,6 +2,8 @@
 
 `npm link`, easier.
 
+> This tool is deprecated.
+
 ## Installation
 
 ```
