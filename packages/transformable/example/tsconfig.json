@@ -1,8 +1,0 @@
-{
-  "extends": "@mvila/tsconfig",
-  "compilerOptions": {
-    "isolatedModules": true,
-    "useDefineForClassFields": true,
-  },
-  "include": ["*.ts"]
-}

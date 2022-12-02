@@ -1,4 +1,0 @@
-{
-  "extends": "@mvila/tsconfig",
-  "include": ["src/**/*"]
-}
