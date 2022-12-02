@@ -34,12 +34,7 @@ console.log(plainPayload);
 
 // =========================================
 
-class Base extends Transformable {
-  @TransformDate()
-  createdOn!: Date;
-}
-
-class User extends Base {
+class User extends Transformable {
   email!: string;
 
   @ExcludeOutput()
@@ -53,14 +48,23 @@ class User extends Base {
 
   @TransformInstances(() => AccessToken)
   accessTokens!: AccessToken[];
+
+  @TransformDate()
+  createdOn!: Date;
 }
 
-class Organization extends Base {
+class Organization extends Transformable {
   name!: string;
+
+  @TransformDate()
+  createdOn!: Date;
 }
 
-class AccessToken extends Base {
+class AccessToken extends Transformable {
   value!: string;
+
+  @TransformDate()
+  createdOn!: Date;
 }
 
 console.log('\n--- plainPayload => userInstance ---\n');

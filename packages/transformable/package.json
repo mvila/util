@@ -1,8 +1,9 @@
 {
   "name": "transformable",
-  "version": "1.0.12",
-  "description": "Transforms plain objects to class instances and vice versa",
+  "version": "1.0.13",
+  "description": "Transforms plain objects to class instances and vice versa (a lightweight alternative to 'class-transformer')",
   "keywords": [
+    "class-transformer",
     "class",
     "instance",
     "plain",
@@ -25,7 +26,11 @@
   ],
   "author": "Manuel Vila <hi@mvila.me>",
   "license": "MIT",
-  "repository": "https://github.com/mvila/util/tree/master/packages/transformable",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mvila/util.git",
+    "directory": "packages/transformable"
+  },
   "files": [
     "dist"
   ],
