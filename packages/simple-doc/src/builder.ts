@@ -211,6 +211,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
           entry.types.includes('instance-method') ||
           entry.types.includes('function') ||
           entry.types.includes('decorator') ||
+          entry.types.includes('react-component') ||
           entry.types.includes('react-hook')
         ) {
           let name = entry.name;
@@ -237,7 +238,7 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
             type = 'secondary';
           } else if (name === 'instance-method') {
             type = 'secondary-outline';
-          } else if (name === 'function' || name === 'react-hook') {
+          } else if (name === 'function' || name === 'react-component' || name === 'react-hook') {
             type = 'tertiary-outline';
           } else if (name === 'decorator') {
             type = 'tertiary';
@@ -276,6 +277,8 @@ function generateChapter(sourceFiles: string[], destinationFile: string) {
           headerId = `${kebabName}-function`;
         } else if (entry.types.includes('decorator')) {
           headerId = `${kebabName}-decorator`;
+        } else if (entry.types.includes('react-component')) {
+          headerId = `${kebabName}-react-component`;
         } else if (entry.types.includes('react-hook')) {
           headerId = `${kebabName}-react-hook`;
         } else if (entry.types.includes('type')) {
@@ -542,6 +545,11 @@ function handleJSDocSection({
       return newJSDocIndex;
     }
 
+    if (tag === '@reactcomponent') {
+      handleReactComponentTag({entry});
+      return newJSDocIndex;
+    }
+
     if (tag === '@reacthook') {
       handleReactHookTag({entry});
       return newJSDocIndex;
@@ -715,6 +723,11 @@ function handleExampleLinkTag({entry, content}: {entry: Entry; content: string})
 function handleDecoratorTag({entry}: {entry: Entry}) {
   entry.types = entry.types.filter((type) => type !== 'function');
   entry.types.unshift('decorator');
+}
+
+function handleReactComponentTag({entry}: {entry: Entry}) {
+  entry.types = entry.types.filter((type) => type !== 'function');
+  entry.types.unshift('react-component');
 }
 
 function handleReactHookTag({entry}: {entry: Entry}) {
