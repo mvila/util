@@ -1,6 +1,6 @@
 {
   "name": "possibly-async",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Helps implementing functions that are synchronous or asynchronous depending of their parameters",
   "keywords": [
     "sync",
@@ -30,14 +30,14 @@
     "update": "dev-tools update:dependencies"
   },
   "dependencies": {
-    "core-helpers": "^1.0.5",
+    "core-helpers": "^1.0.8",
     "is-promise": "^4.0.0",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@mvila/dev-tools": "^1.2.1",
+    "@mvila/dev-tools": "^1.3.1",
     "@mvila/tsconfig": "^1.0.6",
-    "@types/jest": "^29.2.0",
+    "@types/jest": "^29.2.5",
     "type-assertions": "^1.1.0"
   }
 }
