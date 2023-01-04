@@ -52,6 +52,7 @@ export function buildDocumentation(sourceDirectory: string, destinationDirectory
       };
 
       const destinationFile = path.resolve(destinationDirectory, inputChapter.file);
+      const assetsDestinationDirectory = path.join(path.dirname(destinationFile), 'assets');
 
       if (inputChapter.source !== undefined) {
         const sources: string[] = Array.isArray(inputChapter.source)
@@ -62,6 +63,11 @@ export function buildDocumentation(sourceDirectory: string, destinationDirectory
       } else {
         const sourceFile = path.resolve(sourceDirectory, inputChapter.file);
         copyChapter(sourceFile, destinationFile);
+      }
+
+      if (inputChapter.assets !== undefined) {
+        const assetsSourceDirectory = path.resolve(sourceDirectory, inputChapter.assets);
+        copyChapterAssets(assetsSourceDirectory, assetsDestinationDirectory);
       }
 
       outputBook.chapters.push(outputChapter);
@@ -85,6 +91,18 @@ function copyChapter(sourceFile: string, destinationFile: string) {
   logMessage(`Copying chapter from '${path.relative(process.cwd(), sourceFile)}'...`);
 
   copySync(sourceFile, destinationFile);
+}
+
+function copyChapterAssets(assetsSourceDirectory: string, assetsDestinationDirectory: string) {
+  if (!fs.existsSync(assetsSourceDirectory)) {
+    throwError(`A chapter assets directory is missing (directory: '${assetsSourceDirectory}')`);
+  }
+
+  logMessage(
+    `Copying chapter assets from '${path.relative(process.cwd(), assetsSourceDirectory)}'...`
+  );
+
+  copySync(assetsSourceDirectory, assetsDestinationDirectory);
 }
 
 type Context = {
