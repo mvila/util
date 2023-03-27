@@ -487,7 +487,7 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
       .createDistributionWithTags(params)
       .promise();
 
-    this._cloudFrontDistribution = (distribution as unknown) as AWS.CloudFront.DistributionSummary;
+    this._cloudFrontDistribution = distribution as unknown as AWS.CloudFront.DistributionSummary;
 
     return this._cloudFrontDistribution;
   }
@@ -497,27 +497,27 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
 
     const distribution = (await this.getCloudFrontDistribution())!;
 
-    if (!isEqual(distribution.Origins, this.generateCloudFrontDistributionOrigins())) {
-      return true;
-    }
+    // if (!isEqual(distribution.Origins, this.generateCloudFrontDistributionOrigins())) {
+    //   return true;
+    // }
 
-    if (
-      !isEqual(
-        distribution.DefaultCacheBehavior,
-        this.generateCloudFrontDistributionDefaultCacheBehavior()
-      )
-    ) {
-      return true;
-    }
+    // if (
+    //   !isEqual(
+    //     distribution.DefaultCacheBehavior,
+    //     this.generateCloudFrontDistributionDefaultCacheBehavior()
+    //   )
+    // ) {
+    //   return true;
+    // }
 
-    if (
-      !isEqual(
-        distribution.CustomErrorResponses,
-        this.generateCloudFrontDistributionCustomErrorResponses()
-      )
-    ) {
-      return true;
-    }
+    // if (
+    //   !isEqual(
+    //     distribution.CustomErrorResponses,
+    //     this.generateCloudFrontDistributionCustomErrorResponses()
+    //   )
+    // ) {
+    //   return true;
+    // }
 
     if (distribution.PriceClass !== config.aws.cloudFront.priceClass) {
       return true;
