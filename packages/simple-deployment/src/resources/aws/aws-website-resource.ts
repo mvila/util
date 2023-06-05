@@ -94,8 +94,7 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
       logMessage(`Creating the S3 bucket...`);
 
       const params: AWS.S3.CreateBucketRequest = {
-        Bucket: this.getS3BucketName(),
-        ACL: 'public-read'
+        Bucket: this.getS3BucketName()
       };
 
       if (config.aws.region !== 'us-east-1') {
@@ -103,6 +102,31 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
       }
 
       await s3.createBucket(params).promise();
+
+      await s3
+        .putPublicAccessBlock({
+          Bucket: this.getS3BucketName(),
+          PublicAccessBlockConfiguration: {BlockPublicPolicy: false}
+        })
+        .promise();
+
+      await s3
+        .putBucketPolicy({
+          Bucket: this.getS3BucketName(),
+          Policy: JSON.stringify({
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Sid: 'PublicReadGetObject',
+                Effect: 'Allow',
+                Principal: '*',
+                Action: ['s3:GetObject'],
+                Resource: [`arn:aws:s3:::${this.getS3BucketName()}/*`]
+              }
+            ]
+          })
+        })
+        .promise();
 
       await s3
         .putBucketTagging({
@@ -221,7 +245,6 @@ export class AWSWebsiteResource extends WebsiteResource(AWSResource) {
       const params: AWS.S3.PutObjectRequest = {
         Bucket: this.getS3BucketName(),
         Key: file,
-        ACL: 'public-read',
         Body: createReadStream(absoluteFile),
         ContentType: mime.getType(file) ?? 'application/octet-stream',
         ContentMD5: Buffer.from(md5, 'hex').toString('base64')
