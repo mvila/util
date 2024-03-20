@@ -34,6 +34,7 @@ async function main() {
       '--access',
       'Tells the registry whether the package should be published as public or restricted'
     )
+    .option('--tag', 'Specifies the distribution tag to use when publishing')
     .action(publishPackage);
 
   program

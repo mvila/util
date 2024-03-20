@@ -5,7 +5,7 @@ import {loadPackage} from '../npm-helpers';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';
 
-export async function publishPackage({access}: {access?: string}) {
+export async function publishPackage({access, tag}: {access?: string; tag?: string}) {
   const directory = process.cwd();
 
   const {name, version, private: isPrivate} = loadPackage(directory);
@@ -22,6 +22,10 @@ export async function publishPackage({access}: {access?: string}) {
 
   if (access !== undefined) {
     args.push(`--access=${access}`);
+  }
+
+  if (tag !== undefined) {
+    args.push(`--tag=${tag}`);
   }
 
   execFileSync('npm', args, {stdio: 'inherit'});
